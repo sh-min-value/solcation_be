@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: solcation_be
+  jpa:
+    show-sql: true
+  jackson:
+    time-zone: Asia/Seoul
+  main:
+    banner-mode: "off"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+server:
+  forward-headers-strategy: framework
+  shutdown: graceful
+
+springdoc:
+  swagger-ui:
+    persist-authorization: true
