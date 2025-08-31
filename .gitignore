@@ -201,7 +201,7 @@ application-*.yml
 .env.*
 !application.yml
 !application.properties
-!application-example.properties
+!application-example.yml.sample
 
 
 # End of https://www.toptal.com/developers/gitignore/api/java,gradle,intellij+all,visualstudiocode,macos
