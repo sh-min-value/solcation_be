@@ -194,12 +194,13 @@ gradle-app.setting
 # Java heap dump
 *.hprof
 
-### Properties ###
+### yml/yaml ###
 application-*.properties
 application-*.yml
 .env
 .env.*
-
+!application.yml
+!application.properties
 !application-example.properties
 
 
