@@ -29,3 +29,11 @@ security:
     secret: ${SECURITY_JWT_SECRET:local_jwt_secret}
     access-token-validity-ms: ${SECURITY_JWT_AT_EXPIRE:3600000}   #1hour
     refresh-token-validity-ms: ${SECURITY_JWT_RT_EXPIRE:1209600000} #14days
+
+cloud:
+  aws:
+    credentials:
+      access-key:
+      secret-key:
+    region:
+      static: ap-northeast-2
