@@ -57,6 +57,11 @@ jobs:
             ghcr.io/${{ secrets.IMAGE_NAME }}:dev-latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          provenance: false
+          sbom: false
+        retry:
+          max-attempts: 3
+          delay-seconds: 20
 
       - name: Deploy with Docker Compose (on self-hosted runner)
         run: |
