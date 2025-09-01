@@ -8,8 +8,11 @@ on:
 jobs:
   gradle-build-test:
     runs-on: ubuntu-latest
-    permissions: { contents: read }
-    concurrency: { group: ci-${{ github.ref }}, cancel-in-progress: true }
+    permissions:
+      contents: read
+      concurrency:
+        group: "ci-${{ github.ref }}"
+        cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
       - uses: gradle/wrapper-validation-action@v2
