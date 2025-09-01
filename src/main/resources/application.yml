@@ -7,6 +7,8 @@ spring:
     time-zone: Asia/Seoul
   main:
     banner-mode: "off"
+  profiles:
+    active: local
 
 management:
   endpoints:
@@ -25,3 +27,4 @@ server:
 springdoc:
   swagger-ui:
     persist-authorization: true
+
