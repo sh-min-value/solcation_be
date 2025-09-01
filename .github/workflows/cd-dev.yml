@@ -1,0 +1,91 @@
+name: CD (dev - docker compose, self-hosted)
+
+on:
+  push:
+    branches: ["dev"]
+  workflow_dispatch: {}
+
+env:
+  IMAGE_TAG: dev-${{ github.sha }}
+  APP_DIR: $HOME/apps/solcation
+
+jobs:
+  build_push_deploy:
+    runs-on: self-hosted
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Gradle cache
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Build JAR
+        run: ./gradlew clean bootJar --stacktrace
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver: docker-container
+          install: true
+
+      - name: Build image (load into local Docker)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          load: true
+          tags: |
+            ghcr.io/${{ secrets.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+            ghcr.io/${{ secrets.IMAGE_NAME }}:dev-latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: false
+          sbom: false
+
+      - name: Docker login (GITHUB_TOKEN)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push images (classic docker)
+        run: |
+          set -e
+          docker push ghcr.io/${{ secrets.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          docker push ghcr.io/${{ secrets.IMAGE_NAME }}:dev-latest
+
+      - name: Verify pushed image on GHCR
+        run: |
+          set -e
+          docker manifest inspect ghcr.io/${{ secrets.IMAGE_NAME }}:${{ env.IMAGE_TAG }} >/dev/null
+          docker manifest inspect ghcr.io/${{ secrets.IMAGE_NAME }}:dev-latest >/dev/null
+
+      - name: Deploy with Docker Compose (on self-hosted runner)
+        env:
+          IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
+          IMAGE_TAG: ${{ env.IMAGE_TAG }}
+        run: |
+          set -e
+          mkdir -p "$APP_DIR"
+          cp docker-compose.yml "$APP_DIR/"
+          cd "$APP_DIR"
+
+          echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
+
+          export IMAGE_NAME IMAGE_TAG
+
+          docker compose pull
+          docker compose up -d
+          docker compose ps
