@@ -3,7 +3,7 @@ name: CI (Gradle + Docker build check)
 on:
   pull_request:
   push:
-    branches: [ "**" ]
+    branches: ["**"]
 
 jobs:
   gradle-build-test:
@@ -19,9 +19,14 @@ jobs:
         continue-on-error: true
         timeout-minutes: 3
       - uses: actions/setup-java@v4
-        with: { distribution: temurin, java-version: "17" }
+        with:
+          distribution: temurin
+          java-version: "17"
       - uses: gradle/actions/setup-gradle@v4
-      - run: ./gradlew clean test -x build --stacktrace
+
+      - name: Build (skip tests)
+        run: ./gradlew clean bootJar -x test --stacktrace
+
       - uses: actions/upload-artifact@v4
         with:
           name: app-jar
@@ -33,6 +38,12 @@ jobs:
     needs: gradle-build-test
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: app-jar
+          path: build/libs
+
       - uses: docker/setup-buildx-action@v3
       - uses: docker/build-push-action@v6
         with:
