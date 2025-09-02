@@ -37,9 +37,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     @SuppressWarnings("unchecked")
                     var roles = (Collection<String>) claims.getOrDefault("roles", java.util.List.of("ROLE_USER"));
-                    var authorities = roles.stream().filter(Objects::nonNull)
-                            .map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-                    Authentication auth = new JwtUserAuthentication(userId, authorities);
+                    var authorities = roles.stream()
+                            .filter(Objects::nonNull)
+                            .map(SimpleGrantedAuthority::new)
+                            .collect(Collectors.toList());
+
+                    JwtPrincipal principal = new JwtPrincipal(
+                            userId,
+                            (String) claims.get("userName"),
+                            (String) claims.get("email"),
+                            (String) claims.get("tel"),
+                            roles
+                    );
+
+                    Authentication auth = new JwtUserAuthentication(principal, authorities);
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 }
             } catch (Exception ignore) {
@@ -60,9 +71,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     // 인증 객체
     static class JwtUserAuthentication extends AbstractAuthenticationToken {
-        private final String principal; // userId
+        private final JwtPrincipal principal; // userId
 
-        JwtUserAuthentication(String principal, Collection<SimpleGrantedAuthority> authorities) {
+        JwtUserAuthentication(JwtPrincipal principal, Collection<SimpleGrantedAuthority> authorities) {
             super(authorities);
             this.principal = principal;
             setAuthenticated(true);
