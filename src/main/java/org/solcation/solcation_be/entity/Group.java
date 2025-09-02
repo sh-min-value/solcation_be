@@ -31,9 +31,9 @@ public class Group {
     @Column(name = "signature_url")
     private String signatureUrl;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "gc_pk", referencedColumnName = "gc_pk")
-//    private GroupCategory gcPk;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "gc_pk", referencedColumnName = "gc_pk")
+    private GroupCategory gcPk;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_leader", referencedColumnName = "user_pk")
