@@ -18,11 +18,13 @@ public class JsonSecurityHandlers {
 
     private final ObjectMapper om = new ObjectMapper();
 
+    /* Unauthorized exception */
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
         return (request, response, ex) -> writeJson(response, HttpStatus.UNAUTHORIZED, ApiResponse.fail(ErrorCode.UNAUTHORIZED));
     }
 
+    /* Forbidden exception */
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
         return (request, response, ex) -> writeJson(response, HttpStatus.FORBIDDEN, ApiResponse.fail(ErrorCode.FORBIDDEN));
