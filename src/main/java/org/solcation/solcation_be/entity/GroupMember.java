@@ -25,15 +25,15 @@ public class GroupMember {
     private User user;
 
     @Column(name = "role", nullable = false)
-    private Integer role;
+    private Boolean role;
 
-    @Column(name = "is_accepted", nullable = false, columnDefinition = "TINYINT(1)")
+    @Column(name = "is_accepted", nullable = false)
     private Boolean isAccepted;
 
-    @Column(name = "is_out", nullable = false, columnDefinition = "TINYINT(1)")
+    @Column(name = "is_out", nullable = false)
     private Boolean isOut;
 
-    @Column(name = "has_card", nullable = false, columnDefinition = "TINYINT(1)")
+    @Column(name = "has_card", nullable = false)
     private Boolean hasCard;
 
 }
