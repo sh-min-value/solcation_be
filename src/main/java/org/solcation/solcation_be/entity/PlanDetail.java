@@ -1,10 +1,7 @@
 package org.solcation.solcation_be.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.solcation.solcation_be.entity.converter.TravelStateConverter;
 
 import java.time.LocalDate;
@@ -18,41 +15,28 @@ import java.time.LocalDate;
 public class PlanDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "tp_pk")
-    public Long tpPk;
+    @Column(name = "pd_pk")
+    private Long pdPk;
 
-    @Column(
-            name = "tp_title",
-            nullable = false,
-            length = 100
-    )
-    public String tpTitle;
+    @Column(name = "pd_place", nullable = false, length = 100)
+    private String pdPlace;
 
-    @Column(
-            name = "tp_start",
-            nullable = false
-    )
-    public LocalDate tpStart;
+    @Column(name = "pd_address", nullable = false, length = 100)
+    private String pdAddress;
 
-    @Column(
-            name = "tp_end",
-            nullable = false
-    )
-    public LocalDate tpEnd;
+    @Column(name = "pd_cost", nullable = false)
+    private int pdCost;
 
-    @Column(
-            name = "tp_image",
-            nullable = false
-    )
-    public String tpImage;
+    @Column(name = "pd_day", nullable = false)
+    private int pdDay;
 
-    @Convert(converter = TravelStateConverter.class)
-    public TRAVELSTATE tpState;
+    @Column(name = "pd_order", nullable = false)
+    private int pdOrder;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tpc_pk", nullable = false)
-    public TravelCategory tpcPk;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "tp_pk", nullable = false)
+    private Travel travel;
 
-
+    public void setTravel(Travel travel) { this.travel = travel; }
 
 }

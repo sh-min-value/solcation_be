@@ -14,19 +14,11 @@ public class TravelCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="tpc_pk")
-    public Long tpcPk;
+    private Long tpcPk;
 
-    @Column(
-            name="tpc_name",
-            nullable = false,
-            length = 50
-    )
-    public String tpcName;
+    @Column(name="tpc_name")
+    private String tpcName;
 
-    @Column(
-            name="tpc_icon",
-            nullable = false,
-            length = 50
-    )
-    public String tpcIcon; //파일 경로
+    @Column(name="tpc_icon")
+    private String tpcIcon; //파일 경로
 }
