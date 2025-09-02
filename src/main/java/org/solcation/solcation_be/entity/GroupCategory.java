@@ -11,10 +11,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Table(name = "group_catgory_tb")
+@Table(name = "group_category_tb")
 public class GroupCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "gc_pk", nullable = false)
     private Long gcPk;
 
     @Column(name = "gc_name", nullable = false)
