@@ -1,9 +1,12 @@
 package org.solcation.solcation_be.auth;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.solcation.solcation_be.domain.auth.AuthService;
+import org.solcation.solcation_be.domain.auth.dto.LoginReqDTO;
+import org.solcation.solcation_be.domain.auth.dto.LoginResDTO;
 import org.solcation.solcation_be.domain.auth.dto.SignupReqDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,5 +38,17 @@ public class AuthTests {
         authService.signUp(req);
 
         log.info("sing up userId: {}", SignupReqDTO.toEntity(req).getUserId());
+    }
+
+    @Test
+    public void loginSucTest() {
+        LoginReqDTO reqDto = LoginReqDTO.builder()
+                .userId("bread0930")
+                .userPw("1234")
+                .build();
+
+        LoginResDTO resDto = authService.login(reqDto);
+
+        log.info("login successful: {}", resDto.getAccessToken());
     }
 }
