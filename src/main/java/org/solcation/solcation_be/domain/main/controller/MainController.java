@@ -17,14 +17,12 @@ public class MainController {
     private final GroupShortService groupShortService;
 
     @GetMapping("/my-groups")
-    public ResponseEntity<List<GroupShortDTO>> getMyGroups(
+    public List<GroupShortDTO> getMyGroups(
             @AuthenticationPrincipal String userId,
             @RequestParam(defaultValue = "8") int limit
     ) {
         Long userPk = 1L;
-
-        List<GroupShortDTO> groups = groupShortService.getUserGroups(userPk, limit);
-        return ResponseEntity.ok(groups);
+        return groupShortService.getUserGroups(userPk, limit);
     }
 }
 
