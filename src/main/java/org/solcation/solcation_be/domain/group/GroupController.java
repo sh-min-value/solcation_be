@@ -1,0 +1,28 @@
+package org.solcation.solcation_be.domain.group;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.solcation.solcation_be.common.CustomException;
+import org.solcation.solcation_be.common.ErrorCode;
+import org.solcation.solcation_be.domain.group.dto.AddGroupReqDTO;
+import org.solcation.solcation_be.entity.User;
+import org.solcation.solcation_be.repository.UserRepository;
+import org.solcation.solcation_be.security.JwtPrincipal;
+import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+@Slf4j
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/group")
+public class GroupController {
+    private final UserRepository userRepository;
+    private final GroupService groupService;
+
+    @PostMapping(value = "/new", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public boolean addGroup(@ModelAttribute AddGroupReqDTO addGroupReqDTO, @AuthenticationPrincipal JwtPrincipal user){
+        User groupLeader = userRepository.findByUserId(user.userId()).orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
+        return groupService.addGroup(addGroupReqDTO, groupLeader);
+    }
+}

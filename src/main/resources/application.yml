@@ -9,6 +9,10 @@ spring:
     banner-mode: "off"
   profiles:
     active: local
+  servlet:
+    multipart:
+      max-request-size: 10MB
+      max-file-size: 30MB
 
 management:
   endpoints:
@@ -28,3 +32,12 @@ springdoc:
   swagger-ui:
     persist-authorization: true
 
+cloud:
+  s3:
+    bucket:
+      name: solcation
+      upload:
+        profile:
+          group: images/group_profiles/
+          travel: images/travel_profiles/
+        signature: signatures/
