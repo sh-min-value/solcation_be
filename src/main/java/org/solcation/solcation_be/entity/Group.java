@@ -19,7 +19,7 @@ public class Group {
     @Column(name = "group_name", nullable = false, length = 100)
     private String groupName;
 
-    @Column(name = "group_image")
+    @Column(name = "group_image", nullable = false)
     private String groupImage;
 
     @Column(name = "total_members", nullable = false)
@@ -31,9 +31,11 @@ public class Group {
     @Column(name = "signature_url")
     private String signatureUrl;
 
-    @Column(name = "gc_pk", nullable = false)
-    private Long gcPk;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "gc_pk", referencedColumnName = "gc_pk")
+    private GroupCategory gcPk;
 
-    @Column(name = "group_leader", nullable = false)
-    private Long groupLeader;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_leader", referencedColumnName = "user_pk")
+    private User groupLeader;
 }
