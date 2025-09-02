@@ -25,8 +25,6 @@ public class GroupShortService {
                         .groupPk(g.getGroupPk())
                         .groupName(g.getGroupName())
                         .groupImage(g.getGroupImage())
-                        .categoryName("임시카테고리") // gc_pk → category name 변환은 추후
-                        .totalMembers(g.getTotalMembers())
                         .build())
                 .collect(Collectors.toList());
     }

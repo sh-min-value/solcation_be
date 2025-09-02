@@ -9,6 +9,4 @@ public class GroupShortDTO {
     private Long groupPk;
     private String groupName;
     private String groupImage;
-    private String categoryName;
-    private Integer totalMembers;
 }

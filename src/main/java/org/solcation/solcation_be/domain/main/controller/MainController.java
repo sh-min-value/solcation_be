@@ -19,7 +19,7 @@ public class MainController {
     @GetMapping("/my-groups")
     public ResponseEntity<List<GroupShortDTO>> getMyGroups(
             @AuthenticationPrincipal String userId,
-            @RequestParam(defaultValue = "11") int limit
+            @RequestParam(defaultValue = "8") int limit
     ) {
         Long userPk = 1L;
 
