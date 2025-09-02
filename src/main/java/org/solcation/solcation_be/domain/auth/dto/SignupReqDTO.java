@@ -1,5 +1,6 @@
 package org.solcation.solcation_be.domain.auth.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import org.solcation.solcation_be.entity.GENDER;
@@ -8,6 +9,7 @@ import org.solcation.solcation_be.entity.User;
 
 import java.time.LocalDate;
 
+@Schema(name = "회원가입 요청 DTO")
 @Getter
 @Builder
 @NoArgsConstructor
