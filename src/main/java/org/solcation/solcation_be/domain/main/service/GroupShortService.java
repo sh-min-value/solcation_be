@@ -2,30 +2,27 @@ package org.solcation.solcation_be.domain.main.service;
 
 import lombok.RequiredArgsConstructor;
 import org.solcation.solcation_be.domain.main.dto.GroupShortDTO;
-import org.solcation.solcation_be.entity.Group;
-import org.solcation.solcation_be.repository.main.GroupShortRepository;
 import org.springframework.stereotype.Service;
+import org.solcation.solcation_be.repository.GroupMemberRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class GroupShortService {
 
-    private final GroupShortRepository groupShortRepository;
+    private final GroupMemberRepository groupMemberRepository;
 
-    public List<GroupShortDTO> getUserGroups(Long userPk, int limit) {
-        List<Group> groups = groupShortRepository
-                .findTop8ByGroupLeaderOrderByGroupPkDesc(userPk);
+    public List<GroupShortDTO> getUserGroups(Long userPk) {
+        var memberships = groupMemberRepository
+                .findTop8ByUser_UserPkAndIsAcceptedTrueAndIsOutFalseOrderByGroup_GroupPkDesc(userPk);
 
-        return groups.stream()
-                .limit(limit)
-                .map(g -> GroupShortDTO.builder()
-                        .groupPk(g.getGroupPk())
-                        .groupName(g.getGroupName())
-                        .groupImage(g.getGroupImage())
-                        .build())
-                .collect(Collectors.toList());
+        return memberships.stream()
+                .map(m -> new GroupShortDTO(
+                        m.getGroup().getGroupPk(),
+                        m.getGroup().getGroupName(),
+                        m.getGroup().getGroupImage()
+                ))
+                .toList();
     }
 }
