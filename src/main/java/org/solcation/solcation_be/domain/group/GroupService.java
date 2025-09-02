@@ -5,8 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.domain.group.dto.AddGroupReqDTO;
 import org.solcation.solcation_be.entity.Group;
 import org.solcation.solcation_be.entity.GroupCategory;
+import org.solcation.solcation_be.entity.GroupMember;
 import org.solcation.solcation_be.entity.User;
 import org.solcation.solcation_be.repository.GroupCategoryRepository;
+import org.solcation.solcation_be.repository.GroupMemberRepository;
 import org.solcation.solcation_be.repository.GroupRepository;
 import org.solcation.solcation_be.util.s3.S3Utils;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +23,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 public class GroupService {
     private final GroupRepository groupRepository;
     private final GroupCategoryRepository groupCategoryRepository;
+    private final GroupMemberRepository groupMemberRepository;
     private final S3Utils s3Utils;
 
     @Value("${cloud.s3.bucket.upload.profile.group}")
@@ -56,8 +59,16 @@ public class GroupService {
 
         groupRepository.save(group);
 
-
         //그룹 멤버 저장(group leader)
+        GroupMember gm = GroupMember.builder()
+                .group(group)
+                .user(user)
+                .role(true)
+                .isAccepted(true)
+                .isOut(false)
+                .hasCard(false)
+                .build();
+        groupMemberRepository.save(gm);
 
         return true;
     }
