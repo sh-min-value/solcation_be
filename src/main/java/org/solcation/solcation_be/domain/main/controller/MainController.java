@@ -3,7 +3,6 @@ package org.solcation.solcation_be.domain.main.controller;
 import lombok.RequiredArgsConstructor;
 import org.solcation.solcation_be.domain.main.dto.GroupShortDTO;
 import org.solcation.solcation_be.domain.main.service.GroupShortService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,11 +17,9 @@ public class MainController {
 
     @GetMapping("/my-groups")
     public List<GroupShortDTO> getMyGroups(
-            @AuthenticationPrincipal String userId,
-            @RequestParam(defaultValue = "8") int limit
+            @AuthenticationPrincipal(expression = "userPk") Long userPk
     ) {
-        Long userPk = 1L;
-        return groupShortService.getUserGroups(userPk, limit);
+        if (userPk == null) userPk = 1L; // 더미
+        return groupShortService.getUserGroups(userPk);
     }
 }
-
