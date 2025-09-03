@@ -33,10 +33,9 @@ public class PlanDetail {
     @Column(name = "pd_order", nullable = false)
     private int pdOrder;
 
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "tp_pk", nullable = false)
     private Travel travel;
-
-    public void setTravel(Travel travel) { this.travel = travel; }
 
 }

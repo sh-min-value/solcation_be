@@ -2,6 +2,7 @@ package org.solcation.solcation_be.domain.travel;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.solcation.solcation_be.domain.travel.dto.TravelReqDTO;
 import org.solcation.solcation_be.domain.travel.dto.TravelResDTO;
 import org.solcation.solcation_be.entity.TRAVELSTATE;
 import org.solcation.solcation_be.entity.Travel;
@@ -27,8 +28,17 @@ public class TravelService {
         return travels.stream().map(this::toDto).toList();
     }
 
-    private void create(Travel travel) {
-
+    private void create(TravelReqDTO dto) {
+        Travel travel = Travel.builder()
+                .tpTitle(dto.getTitle())
+                .tpLocation(dto.getCountry() +" " + dto.getCity())
+                .tpStart(dto.getStartDate())
+                .tpEnd(dto.getEndDate())
+                .tpImage(dto.getPhoto())
+                .tpState(TRAVELSTATE.BEFORE)
+                .travelCategory(dto.getTheme())
+                .group()
+                .build();
         travelRepository.save(travel);
     }
 

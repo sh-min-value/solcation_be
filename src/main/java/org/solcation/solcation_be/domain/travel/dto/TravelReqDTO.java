@@ -30,7 +30,7 @@ public class TravelReqDTO {
     private String title;
 
     @Schema(description = "시작일", example = "2025-09-20")
-    @NotNull(message = "시작일을 선택해주세요")
+    @NotBlank(message = "시작일을 선택해주세요")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate startDate;
 
@@ -40,12 +40,12 @@ public class TravelReqDTO {
     private LocalDate endDate;
 
     @Schema(description = "테마(카테고리명)", example = "힐링")
-    @NotNull(message = "테마를 선택해주세요")
-    @NotBlank @Size(max = 50)
+    @NotBlank(message = "테마를 선택해주세요")
+    @Size(max = 50)
     private String theme;
 
     @Schema(description = "대표 사진 파일")
-    @NotNull(message = "이미지를 선택해주세요")
+    @NotBlank(message = "이미지를 선택해주세요")
     private MultipartFile photo;
 }
 
