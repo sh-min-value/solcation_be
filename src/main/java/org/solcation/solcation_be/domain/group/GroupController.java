@@ -34,4 +34,9 @@ public class GroupController {
     public List<GroupListDTO> getList(@AuthenticationPrincipal JwtPrincipal user, @RequestParam(required = false) String searchTerm) {
         return groupService.getList(user.userId(), searchTerm);
     }
+
+    @GetMapping("/{groupId:\\d+}")
+    public Long groupMain(@PathVariable("groupId") Long groupId) {
+        return groupId;
+    }
 }

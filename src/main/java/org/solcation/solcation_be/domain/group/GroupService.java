@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.common.CustomException;
 import org.solcation.solcation_be.common.ErrorCode;
 import org.solcation.solcation_be.domain.group.dto.AddGroupReqDTO;
+import org.solcation.solcation_be.domain.group.dto.GroupInfoDTO;
 import org.solcation.solcation_be.domain.group.dto.GroupListDTO;
 import org.solcation.solcation_be.entity.Group;
 import org.solcation.solcation_be.entity.GroupCategory;
@@ -108,5 +109,10 @@ public class GroupService {
         }
 
         return result;
+    }
+
+    /* 그룹 메인 - 그룹 정보 렌더링 */
+    public GroupInfoDTO getGroupInfo() {
+        return null;
     }
 }

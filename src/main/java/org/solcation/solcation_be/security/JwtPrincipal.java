@@ -6,6 +6,7 @@ import java.util.Collection;
 
 
 public record JwtPrincipal (
+        Long userPk,
         String userId,
         String userName,
         String email,

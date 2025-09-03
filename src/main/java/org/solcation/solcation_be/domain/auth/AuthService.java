@@ -51,6 +51,7 @@ public class AuthService {
         String newAccess = jwtTokenProvider.createAccessToken(
                 String.valueOf(user.getUserId()),
                 Map.of(
+                        "userPk", user.getUserPk(),
                         "roles", roles,
                         "userId", user.getUserId(),
                         "userName", user.getUserName(),
