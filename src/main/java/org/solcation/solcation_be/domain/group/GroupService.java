@@ -2,6 +2,8 @@ package org.solcation.solcation_be.domain.group;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.solcation.solcation_be.common.CustomException;
+import org.solcation.solcation_be.common.ErrorCode;
 import org.solcation.solcation_be.domain.group.dto.AddGroupReqDTO;
 import org.solcation.solcation_be.entity.Group;
 import org.solcation.solcation_be.entity.GroupCategory;
@@ -16,6 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -33,8 +38,15 @@ public class GroupService {
     public boolean addGroup(AddGroupReqDTO addGroupReqDTO, User user) {
         GroupCategory gc = groupCategoryRepository.findByGcPk(addGroupReqDTO.getGcPk());
 
+        //확장자 확인(png, jpeg, jpg)
+        String originalFilename = addGroupReqDTO.getProfileImg().getOriginalFilename();
+
+        if(!checkExtension(originalFilename)){
+            throw new CustomException(ErrorCode.UNSUPPORTED_MEDIA_TYPE);
+        }
+
         //이미지 업로드
-        String filename = s3Utils.uploadObject(addGroupReqDTO.getProfileImg(), addGroupReqDTO.getProfileImg().getOriginalFilename(), UPLOAD_PATH);
+        String filename = s3Utils.uploadObject(addGroupReqDTO.getProfileImg(), originalFilename, UPLOAD_PATH);
 
         //DB실패 시 이미지 삭제
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
@@ -71,5 +83,16 @@ public class GroupService {
         groupMemberRepository.save(gm);
 
         return true;
+    }
+
+    /* 확장자 확인 확인 및 제한 */
+    public boolean checkExtension(String filename) {
+        if(filename.isEmpty()) {
+            return false;
+        }
+        List<String> possibleExt = Arrays.asList(".jpg", ".jpeg", ".png");
+        String extension = filename.substring(filename.lastIndexOf("."));
+
+        return possibleExt.contains(extension);
     }
 }
