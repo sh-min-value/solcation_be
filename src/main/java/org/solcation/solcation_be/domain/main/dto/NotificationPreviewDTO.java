@@ -4,8 +4,8 @@ import lombok.*;
 
 @Getter
 @Builder
-public class GroupShortDTO {
-    private Long groupPk;
+public class NotificationPreviewDTO {
+    private String acName;
     private String groupName;
-    private String groupImage;
+    private String groupLeader;
 }

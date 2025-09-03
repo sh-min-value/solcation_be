@@ -18,11 +18,12 @@ public class GroupShortService {
                 .findTop8ByUser_UserPkAndIsAcceptedTrueAndIsOutFalseOrderByGroup_GroupPkDesc(userPk);
 
         return memberships.stream()
-                .map(m -> new GroupShortDTO(
-                        m.getGroup().getGroupPk(),
-                        m.getGroup().getGroupName(),
-                        m.getGroup().getGroupImage()
-                ))
+                .map(m -> GroupShortDTO.builder()
+                        .groupPk(m.getGroup().getGroupPk())
+                        .groupName(m.getGroup().getGroupName())
+                        .groupImage(m.getGroup().getGroupImage())
+                        .build()
+                )
                 .toList();
     }
 }

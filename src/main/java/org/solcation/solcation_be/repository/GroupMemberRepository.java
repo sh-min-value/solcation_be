@@ -1,6 +1,5 @@
 package org.solcation.solcation_be.repository;
 
-import org.solcation.solcation_be.entity.Group;
 import org.solcation.solcation_be.entity.GroupMember;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
