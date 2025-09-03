@@ -25,7 +25,7 @@ public class GroupMember {
     private User user;
 
     @Column(name = "role", nullable = false)
-    private Integer role;
+    private Boolean role;
 
     @Column(name = "is_accepted", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean isAccepted;

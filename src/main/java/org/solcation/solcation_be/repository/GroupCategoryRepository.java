@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface GroupCategoryRepository extends JpaRepository<GroupCategory, Long> {
+    GroupCategory findByGcPk(long id);
 }
