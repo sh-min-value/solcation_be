@@ -3,6 +3,7 @@ package org.solcation.solcation_be.domain.travel.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.*;
+
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,6 +15,9 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TravelReqDTO {
+    @Schema(description = "그룹 pk")
+    private Long groupPk;
+
     @Schema(description = "국가", example = "대한민국")
     @NotBlank(message = "국가를 선택해주세요")
     @Size(max = 60)
@@ -39,10 +43,9 @@ public class TravelReqDTO {
     @NotNull @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate endDate;
 
-    @Schema(description = "테마(카테고리명)", example = "힐링")
+    @Schema(description = "카테고리", example = "힐링")
     @NotBlank(message = "테마를 선택해주세요")
-    @Size(max = 50)
-    private String theme;
+    private int categoryPk;
 
     @Schema(description = "대표 사진 파일")
     @NotBlank(message = "이미지를 선택해주세요")

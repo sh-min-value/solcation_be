@@ -21,4 +21,5 @@ public class TravelCategory {
 
     @Column(name="tpc_icon")
     private String tpcIcon; //파일 경로
+
 }

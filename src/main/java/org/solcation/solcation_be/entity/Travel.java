@@ -54,19 +54,6 @@ public class Travel {
     @JoinColumn(name = "group_pk", nullable = false)
     private Group group;
 
-    @OneToMany(mappedBy = "travel", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("pdDay ASC, pdOrder ASC")
-    private List<PlanDetail> details = new ArrayList<>();
-
-    public void addDetail(PlanDetail d) {
-        details.add(d);
-        d.setTravel(this);
-    }
-    public void removeDetail(PlanDetail d) {
-        details.remove(d);
-        d.setTravel(null);
-    }
-
     // 비즈니스 규칙 체크 예시
     public void validatePeriod() {
         if (tpEnd.isBefore(tpStart)) {
