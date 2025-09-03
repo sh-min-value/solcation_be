@@ -1,5 +1,6 @@
 package org.solcation.solcation_be.domain.group;
 
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.common.CustomException;
@@ -30,7 +31,7 @@ public class GroupController {
     }
 
     @GetMapping("/list")
-    public List<GroupListDTO> getList(@AuthenticationPrincipal JwtPrincipal user) {
-        return groupService.getList(user.userId());
+    public List<GroupListDTO> getList(@AuthenticationPrincipal JwtPrincipal user, @RequestParam(required = false) String searchTerm) {
+        return groupService.getList(user.userId(), searchTerm);
     }
 }

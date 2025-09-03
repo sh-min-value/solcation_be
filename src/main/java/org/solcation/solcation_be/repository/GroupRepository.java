@@ -22,9 +22,14 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
         COALESCE(SUM(CASE WHEN t.tpStart > CURRENT_DATE THEN 1 ELSE 0 END), 0)
     FROM Group g
     LEFT JOIN g.travels t
-    WHERE g.groupLeader.userId = :userId
+    WHERE g.groupLeader.userId = :userId 
+          AND (
+               :searchTerm IS NULL
+               OR :searchTerm = ''
+               OR LOWER(g.groupName) LIKE CONCAT('%', LOWER(:searchTerm), '%')
+          )
     GROUP BY g.groupPk, g.groupLeader, g.totalMembers, g.gcPk, g.groupImage
     """)
-    List<Object[]> getGroupList(@Param("userId") String userId);
+    List<Object[]> getGroupListWithSearch(@Param("userId") String userId, @Param("searchTerm") String searchTerm);
 
 }

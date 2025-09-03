@@ -89,16 +89,16 @@ public class GroupService {
     }
 
     /* 그룹 목록 */
-    public List<GroupListDTO> getList(String userId) {
+    public List<GroupListDTO> getList(String userId, String searchTerm) {
         List<GroupListDTO> result = new ArrayList<>();
 
-        List<Object[]> results = groupRepository.getGroupList(userId);
+        List<Object[]> results = groupRepository.getGroupListWithSearch(userId, searchTerm);
 
         for(Object[] obj: results) {
             GroupListDTO dto = GroupListDTO.builder()
                     .groupPk((Long) obj[0])
                     .groupName((String) obj[1])
-                    .profileImg((String) obj[2])
+                    .profileImg(s3Utils.getPublicUrl((String) obj[2], UPLOAD_PATH))
                     .gcPk((GroupCategory) obj[3])
                     .groupLeader((User) obj[4])
                     .totalMembers((int) obj[5])
