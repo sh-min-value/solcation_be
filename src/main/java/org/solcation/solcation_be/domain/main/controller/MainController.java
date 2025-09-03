@@ -31,10 +31,6 @@ public class MainController {
     public List<GroupShortDTO> getMyGroups(
             @AuthenticationPrincipal JwtPrincipal principal
     ) {
-        if (principal == null) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED);
-        }
-
         Long userPk = userRepository.findByUserId(principal.userId())
                 .map(User::getUserPk)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -46,10 +42,6 @@ public class MainController {
     public MyPageDTO getMyPage(
             @AuthenticationPrincipal JwtPrincipal principal
     ) {
-        if (principal == null) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED);
-        }
-
         Long userPk = userRepository.findByUserId(principal.userId())
                 .map(User::getUserPk)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -61,10 +53,6 @@ public class MainController {
     public List<NotificationPreviewDTO> getNotificationPreview(
             @AuthenticationPrincipal JwtPrincipal principal
     ) {
-        if (principal == null) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED);
-        }
-
         Long userPk = userRepository.findByUserId(principal.userId())
                 .map(User::getUserPk)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
