@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class GroupCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "gc_pk", nullable = false)
+    @Column(name = "gc_pk")
     private Long gcPk;
 
     @Column(name = "gc_name", nullable = false)

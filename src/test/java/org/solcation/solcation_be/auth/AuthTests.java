@@ -23,7 +23,7 @@ public class AuthTests {
     @Test
     public void signupTest() {
         SignupReqDTO req = SignupReqDTO.builder()
-                .userId("bread0930")
+                .userId("admin")
                 .userPw("1234")
                 .streetAddr("경기도 수원시 영통구")
                 .addrDetail("하늘땅")
