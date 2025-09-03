@@ -43,6 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             .collect(Collectors.toList());
 
                     JwtPrincipal principal = new JwtPrincipal(
+                            (Long) claims.get("userPk"),
                             userId,
                             (String) claims.get("userName"),
                             (String) claims.get("email"),

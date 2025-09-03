@@ -3,6 +3,9 @@ package org.solcation.solcation_be.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "group_tb")
 @Getter
@@ -38,4 +41,7 @@ public class Group {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_leader", referencedColumnName = "user_pk")
     private User groupLeader;
+
+    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
+    private List<Travel> travels = new ArrayList<>();
 }

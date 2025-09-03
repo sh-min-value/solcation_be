@@ -1,9 +1,7 @@
 package org.solcation.solcation_be.config;
 
 import lombok.RequiredArgsConstructor;
-import org.solcation.solcation_be.security.JsonSecurityHandlers;
-import org.solcation.solcation_be.security.JwtAuthenticationFilter;
-import org.solcation.solcation_be.security.JwtTokenProvider;
+import org.solcation.solcation_be.security.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,6 +13,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -25,7 +25,9 @@ public class SecurityConfig {
 
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, GroupAuth groupAuth) throws Exception {
+        var pp = PathPatternRequestMatcher.withDefaults();
+        RequestMatcher groupMatcher = pp.matcher("/group/{groupId:\\d+}/**");
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> {})
@@ -38,6 +40,8 @@ public class SecurityConfig {
                         // 인증 발급/회원가입/소셜 콜백 등 공개
                         .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/auth/**").permitAll()
+                        //그룹 멤버 인증
+                        .requestMatchers(groupMatcher).access(new GroupAuthorizationManager(groupAuth))
                         // 그 외는 인증 필요
                         .anyRequest().authenticated()
                 )
