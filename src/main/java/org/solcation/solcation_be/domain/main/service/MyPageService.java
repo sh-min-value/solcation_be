@@ -19,7 +19,7 @@ public class MyPageService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         return MyPageDTO.builder()
-//                .userPk(user.getUserPk())
+                .userPk(user.getUserPk())
                 .userId(user.getUserId())
                 .userName(user.getUserName())
                 .email(user.getEmail())

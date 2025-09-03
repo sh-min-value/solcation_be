@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MyPageDTO {
-//    private Long userPk;
+    private Long userPk;
     private String userId;
     private String userName;
     private String email;
