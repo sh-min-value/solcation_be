@@ -2,6 +2,8 @@ package org.solcation.solcation_be.domain.travel;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.solcation.solcation_be.common.CustomException;
+import org.solcation.solcation_be.common.ErrorCode;
 import org.solcation.solcation_be.domain.travel.dto.TravelReqDTO;
 import org.solcation.solcation_be.domain.travel.dto.TravelResDTO;
 import org.solcation.solcation_be.entity.Group;
@@ -19,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -47,10 +48,10 @@ public class TravelService {
     @Transactional
     protected Long create(TravelReqDTO dto) {
         Group group = groupRepository.findById(dto.getGroupPk())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 그룹입니다. (groupPk=" + dto.getGroupPk() + ")"));
+                .orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST, "존재하지 않는 그룹입니다. groupId="+dto.getGroupPk()));
 
         TravelCategory category = travelCategoryRepository.findById(dto.getCategoryPk())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리입니다. (categoryPk=" + dto.getCategoryPk() + ")"));
+                .orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST, "존재하지 않는 카테고리입니다. travelCategoryId="+dto.getCategoryPk()));
 
         String folder = "travels/" + LocalDate.now().format(DATE_FMT) + "/";
         MultipartFile photo = dto.getPhoto();
@@ -73,6 +74,12 @@ public class TravelService {
                 .build();
         travelRepository.save(travel);
         return group.getGroupPk();
+    }
+
+    public TravelResDTO getTravelById(Long travelPk) {
+        return travelRepository.findById(travelPk)
+                .map(this::toDto)
+                .orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST, "존재하지 않는 여행입니다. travelId=" + travelPk));
     }
 
     private TravelResDTO toDto(Travel t) {

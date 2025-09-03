@@ -54,8 +54,18 @@ public class Travel {
     @JoinColumn(name = "group_pk", nullable = false)
     private Group group;
 
+    @Builder.Default
     @OneToMany(mappedBy = "travel", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("pdDay ASC, pdOrder ASC")
     private List<PlanDetail> details = new ArrayList<>();
 
+    public void addDetail(PlanDetail d) {
+        details.add(d);
+        d.setTravel(this);
+    }
+
+    public void removeDetail(PlanDetail d) {
+        details.remove(d);
+        d.setTravel(null);
+    }
 }

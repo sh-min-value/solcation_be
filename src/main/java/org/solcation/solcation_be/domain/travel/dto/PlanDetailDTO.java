@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TravelReqDTO {
+public class PlanDetailDTO {
 
     @Schema(description = "그룹 pk", example = "1")
     @NotNull(message = "그룹을 선택해주세요") @Positive
@@ -39,7 +39,7 @@ public class TravelReqDTO {
 
     @Schema(description = "시작일", type = "string", example = "2025-09-20", format = "date")
     @NotNull(message = "시작일을 선택해주세요")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) // @ModelAttribute(multipart)용
     private LocalDate startDate;
 
     @Schema(description = "종료일", type = "string", example = "2025-09-22", format = "date")

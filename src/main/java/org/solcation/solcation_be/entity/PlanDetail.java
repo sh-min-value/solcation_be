@@ -37,5 +37,4 @@ public class PlanDetail {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "tp_pk", nullable = false)
     private Travel travel;
-
 }
