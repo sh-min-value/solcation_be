@@ -2,9 +2,6 @@ package org.solcation.solcation_be.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.solcation.solcation_be.entity.converter.TravelStateConverter;
-
-import java.time.LocalDate;
 
 @Entity
 @Builder
