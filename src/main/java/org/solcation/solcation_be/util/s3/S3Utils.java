@@ -13,6 +13,8 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -72,5 +74,16 @@ public class S3Utils {
     /* 파일 url */
     public String getPublicUrl(String filename, String path) {
         return String.format("https://%s.s3.%s.amazonaws.com/%s", BUCKET_NAME, s3Client.serviceClientConfiguration().region(), path + filename);
+    }
+
+    /* 확장자 확인 확인 및 제한 */
+    public boolean checkExtension(String filename) {
+        if(filename.isEmpty()) {
+            return false;
+        }
+        List<String> possibleExt = Arrays.asList(".jpg", ".jpeg", ".png");
+        String extension = filename.substring(filename.lastIndexOf("."));
+
+        return possibleExt.contains(extension);
     }
 }

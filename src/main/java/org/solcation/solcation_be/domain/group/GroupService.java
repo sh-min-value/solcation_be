@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.common.CustomException;
 import org.solcation.solcation_be.common.ErrorCode;
 import org.solcation.solcation_be.domain.group.dto.AddGroupReqDTO;
+import org.solcation.solcation_be.domain.group.dto.GroupListDTO;
 import org.solcation.solcation_be.entity.Group;
 import org.solcation.solcation_be.entity.GroupCategory;
 import org.solcation.solcation_be.entity.GroupMember;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,6 +36,7 @@ public class GroupService {
     @Value("${cloud.s3.bucket.upload.profile.group}")
     private String UPLOAD_PATH;
 
+    /* 그룹 생성 */
     @Transactional
     public boolean addGroup(AddGroupReqDTO addGroupReqDTO, User user) {
         GroupCategory gc = groupCategoryRepository.findByGcPk(addGroupReqDTO.getGcPk());
@@ -41,7 +44,7 @@ public class GroupService {
         //확장자 확인(png, jpeg, jpg)
         String originalFilename = addGroupReqDTO.getProfileImg().getOriginalFilename();
 
-        if(!checkExtension(originalFilename)){
+        if(!s3Utils.checkExtension(originalFilename)){
             throw new CustomException(ErrorCode.UNSUPPORTED_MEDIA_TYPE);
         }
 
@@ -85,14 +88,25 @@ public class GroupService {
         return true;
     }
 
-    /* 확장자 확인 확인 및 제한 */
-    public boolean checkExtension(String filename) {
-        if(filename.isEmpty()) {
-            return false;
-        }
-        List<String> possibleExt = Arrays.asList(".jpg", ".jpeg", ".png");
-        String extension = filename.substring(filename.lastIndexOf("."));
+    /* 그룹 목록 */
+    public List<GroupListDTO> getList(String userId) {
+        List<GroupListDTO> result = new ArrayList<>();
 
-        return possibleExt.contains(extension);
+        List<Object[]> results = groupRepository.getGroupList(userId);
+
+        for(Object[] obj: results) {
+            GroupListDTO dto = GroupListDTO.builder()
+                    .groupPk((Long) obj[0])
+                    .groupName((String) obj[1])
+                    .profileImg((String) obj[2])
+                    .gcPk((GroupCategory) obj[3])
+                    .groupLeader((User) obj[4])
+                    .totalMembers((int) obj[5])
+                    .scheduled((Long) obj[6])
+                    .build();
+            result.add(dto);
+        }
+
+        return result;
     }
 }
