@@ -54,11 +54,8 @@ public class Travel {
     @JoinColumn(name = "group_pk", nullable = false)
     private Group group;
 
-    // 비즈니스 규칙 체크 예시
-    public void validatePeriod() {
-        if (tpEnd.isBefore(tpStart)) {
-            throw new IllegalArgumentException("여행 종료일은 시작일 이후여야 합니다.");
-        }
-    }
+    @OneToMany(mappedBy = "travel", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("pdDay ASC, pdOrder ASC")
+    private List<PlanDetail> details = new ArrayList<>();
 
 }

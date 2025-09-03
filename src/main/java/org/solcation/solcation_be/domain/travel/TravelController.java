@@ -2,13 +2,12 @@ package org.solcation.solcation_be.domain.travel;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.solcation.solcation_be.domain.travel.dto.TravelReqDTO;
 import org.solcation.solcation_be.domain.travel.dto.TravelResDTO;
 import org.solcation.solcation_be.entity.TRAVELSTATE;
-import org.solcation.solcation_be.repository.TravelRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,4 +33,13 @@ public class TravelController {
         }
         return result;
     }
+
+    @Operation(summary = "그룹 여행 생성")
+    @PostMapping(value="/{groupId}/new/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Long createTravel(@PathVariable Long groupId, @Valid @ModelAttribute TravelReqDTO dto) {
+        dto.setGroupPk(groupId);
+        return travelService.create(dto);
+    }
+
+
 }

@@ -10,5 +10,4 @@ import java.util.List;
 
 @Repository
 public interface TravelCategoryRepository extends JpaRepository<TravelCategory, Long> {
-    TravelCategory findById(long id);
 }

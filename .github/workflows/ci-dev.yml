@@ -3,7 +3,7 @@ name: CI (Gradle + Docker build check)
 on:
   pull_request:
   push:
-    branches: ["**"]
+    branches: ["dev"]
 
 jobs:
   gradle-build-test:
