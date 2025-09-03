@@ -57,7 +57,7 @@ public class MainController {
         return myPageService.getMyPage(userPk);
     }
 
-    @GetMapping("/notifications/preview")
+    @GetMapping("/notification-preview")
     public List<NotificationPreviewDTO> getNotificationPreview(
             @AuthenticationPrincipal JwtPrincipal principal
     ) {
