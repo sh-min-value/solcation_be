@@ -1,15 +1,8 @@
 package org.solcation.solcation_be.domain.travel.dto;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDate;
+import org.solcation.solcation_be.entity.PlanDetail;
+import org.solcation.solcation_be.entity.Travel;
 
 @Getter
 @Setter
@@ -18,41 +11,60 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class PlanDetailDTO {
 
-    @Schema(description = "그룹 pk", example = "1")
-    @NotNull(message = "그룹을 선택해주세요") @Positive
-    private Long groupPk;
+    // PK
+    private Long pdPk;
 
-    @Schema(description = "국가", example = "대한민국")
-    @NotBlank(message = "국가를 선택해주세요")
-    @Size(max = 60)
-    private String country;
+    // 소속 Travel (엔티티 대신 id만)
+    private Long travelId;
 
-    @Schema(description = "도시", example = "제주")
-    @NotBlank(message = "도시를 선택해주세요")
-    @Size(max = 60)
-    private String city;
+    // 일정 기본 정보
+    private int pdDay;
+    private String pdPlace;
+    private String pdAddress;
+    private int pdCost;
 
-    @Schema(description = "여행 제목", example = "제주도 2박3일")
-    @NotBlank(message = "여행 제목을 입력해주세요")
-    @Size(max = 100)
-    private String title;
+    // 정렬/CRDT 메타
+    // BigDecimal → 문자열로 노출(직렬화/정밀도 안전)
+    private String position;
+    private String crdtId;
+    private String clientId;
+    private Long opTs;
+    private boolean tombstone;
 
-    @Schema(description = "시작일", type = "string", example = "2025-09-20", format = "date")
-    @NotNull(message = "시작일을 선택해주세요")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) // @ModelAttribute(multipart)용
-    private LocalDate startDate;
+    private String prevCrdtId;
+    private String nextCrdtId;
+    private int newDay;
 
-    @Schema(description = "종료일", type = "string", example = "2025-09-22", format = "date")
-    @NotNull(message = "종료일을 선택해주세요")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private LocalDate endDate;
+    /** 엔티티 → DTO */
+    public static PlanDetailDTO entityToDTO(PlanDetail e) {
+        return PlanDetailDTO.builder()
+                .pdPk(e.getPdPk())
+                .travelId(e.getTravel() != null ? e.getTravel().getTpPk() : null)
+                .pdDay(e.getPdDay())
+                .pdPlace(e.getPdPlace())
+                .pdAddress(e.getPdAddress())
+                .pdCost(e.getPdCost())
+                .position(e.getPosition() != null ? e.getPosition().toPlainString() : null)
+                .crdtId(e.getCrdtId())
+                .clientId(e.getClientId())
+                .opTs(e.getOpTs())
+                .tombstone(e.isTombstone())
+                .build();
+    }
 
-    @Schema(description = "카테고리 PK", example = "3")
-    @NotNull(message = "테마를 선택해주세요")
-    @Positive(message = "유효한 카테고리를 선택해주세요")
-    private Long categoryPk;
-
-    @Schema(description = "대표 사진 파일", type = "string", format = "binary")
-    @NotNull(message = "이미지를 선택해주세요")
-    private MultipartFile photo;
+    public PlanDetail dtoToEntity(Travel travel) {
+        return PlanDetail.builder()
+                .pdPk(pdPk)
+                .travel(travel)
+                .pdDay(pdDay)
+                .pdPlace(pdPlace)
+                .pdAddress(pdAddress)
+                .pdCost(pdCost)
+                .position(position != null ? new java.math.BigDecimal(position) : null)
+                .crdtId(crdtId)
+                .clientId(clientId)
+                .opTs(opTs)
+                .tombstone(tombstone)
+                .build();
+    }
 }
