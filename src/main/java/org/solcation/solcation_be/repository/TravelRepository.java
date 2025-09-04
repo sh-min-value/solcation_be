@@ -21,4 +21,6 @@ public interface TravelRepository extends JpaRepository<Travel, Long> {
     // 메인페이지 현재 월별 일정 조회
     List<Travel> findAllByGroup_GroupPkInAndTpStartLessThanEqualAndTpEndGreaterThanEqualOrderByTpStartAsc(List<Long> groupPks, LocalDate monthEnd, LocalDate monthStart);
 
+    // 통계 페이지 완료한 여행 렌더링
+    List<Travel> findByGroup_GroupPkAndTpState(Long groupPk, TRAVELSTATE state);
 }
