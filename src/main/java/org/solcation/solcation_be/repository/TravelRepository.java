@@ -6,6 +6,7 @@ import org.solcation.solcation_be.entity.TravelCategory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,5 +17,8 @@ public interface TravelRepository extends JpaRepository<Travel, Long> {
 
     // 그룹 + 상태별 여행 (정렬)
     List<Travel> findAllByGroup_GroupPkAndTpStateOrderByTpStartDesc(Long groupPk, TRAVELSTATE state);
+
+    // 메인페이지 현재 월별 일정 조회
+    List<Travel> findAllByGroup_GroupPkInAndTpStartLessThanEqualAndTpEndGreaterThanEqualOrderByTpStartAsc(List<Long> groupPks, LocalDate monthEnd, LocalDate monthStart);
 
 }
