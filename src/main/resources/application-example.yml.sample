@@ -27,7 +27,7 @@ server:
 security:
   jwt:
     secret: ${SECURITY_JWT_SECRET:local_jwt_secret}
-    access-token-validity-ms: ${SECURITY_JWT_AT_EXPIRE:3600000}   #1hour
+    access-token-validity-ms: ${SECURITY_JWT_AT_EXPIRE:18000000}   #5hours
     refresh-token-validity-ms: ${SECURITY_JWT_RT_EXPIRE:1209600000} #14days
 
 cloud:
