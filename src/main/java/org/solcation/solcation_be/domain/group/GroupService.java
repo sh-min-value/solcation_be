@@ -7,6 +7,7 @@ import org.solcation.solcation_be.common.ErrorCode;
 import org.solcation.solcation_be.domain.group.dto.AddGroupReqDTO;
 import org.solcation.solcation_be.domain.group.dto.GroupInfoDTO;
 import org.solcation.solcation_be.domain.group.dto.GroupListDTO;
+import org.solcation.solcation_be.domain.group.dto.GroupMembersDTO;
 import org.solcation.solcation_be.entity.Group;
 import org.solcation.solcation_be.entity.GroupCategory;
 import org.solcation.solcation_be.entity.GroupMember;
@@ -134,5 +135,26 @@ public class GroupService {
                 .build();
 
         return dto;
+    }
+
+    /* 그룹 메인 - 참여자 목록 */
+    public GroupMembersDTO getGroupMembers(Long groupPk) {
+        //그룹 개설자 조회
+        User groupLeader = groupRepository.findGroupLeaderByGroupPk(groupPk);
+
+        //그룹 멤버 조회
+        List<User> groupMembers = groupMemberRepository
+                .findByGroup_GroupPkAndRoleAndIsAcceptedOrderByUser_UserPkAsc(groupPk, false, true);
+
+        //그룹 대기자 조회
+        List<User> waitingMembers = groupMemberRepository
+                .findByGroup_GroupPkAndRoleAndIsAcceptedOrderByUser_UserPkAsc(groupPk, false, false);
+
+
+        return GroupMembersDTO.builder()
+                .groupLeader(groupLeader)
+                .members(groupMembers)
+                .waitingList(waitingMembers)
+                .build();
     }
 }

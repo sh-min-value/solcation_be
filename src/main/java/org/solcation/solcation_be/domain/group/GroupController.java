@@ -9,6 +9,7 @@ import org.solcation.solcation_be.common.ErrorCode;
 import org.solcation.solcation_be.domain.group.dto.AddGroupReqDTO;
 import org.solcation.solcation_be.domain.group.dto.GroupInfoDTO;
 import org.solcation.solcation_be.domain.group.dto.GroupListDTO;
+import org.solcation.solcation_be.domain.group.dto.GroupMembersDTO;
 import org.solcation.solcation_be.entity.User;
 import org.solcation.solcation_be.repository.UserRepository;
 import org.solcation.solcation_be.security.JwtPrincipal;
@@ -43,5 +44,11 @@ public class GroupController {
     @GetMapping("/{groupId:\\d+}/get")
     public GroupInfoDTO groupMain(@PathVariable("groupId") Long groupId) {
         return groupService.getGroupInfo(groupId);
+    }
+
+    @Operation(summary = "그룹 메인 - 참여자 정보 조회")
+    @GetMapping("/{groupId:\\d+}/members")
+    public GroupMembersDTO getMembers(@PathVariable("groupId") Long groupId) {
+        return groupService.getGroupMembers(groupId);
     }
 }
