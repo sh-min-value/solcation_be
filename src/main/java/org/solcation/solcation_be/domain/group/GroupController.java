@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.common.CustomException;
 import org.solcation.solcation_be.common.ErrorCode;
 import org.solcation.solcation_be.domain.group.dto.AddGroupReqDTO;
+import org.solcation.solcation_be.domain.group.dto.GroupInfoDTO;
 import org.solcation.solcation_be.domain.group.dto.GroupListDTO;
 import org.solcation.solcation_be.entity.User;
 import org.solcation.solcation_be.repository.UserRepository;
@@ -35,8 +36,8 @@ public class GroupController {
         return groupService.getList(user.userId(), searchTerm);
     }
 
-    @GetMapping("/{groupId:\\d+}")
-    public Long groupMain(@PathVariable("groupId") Long groupId) {
-        return groupId;
+    @GetMapping("/{groupId:\\d+}/get")
+    public GroupInfoDTO groupMain(@PathVariable("groupId") Long groupId) {
+        return groupService.getGroupInfo(groupId);
     }
 }

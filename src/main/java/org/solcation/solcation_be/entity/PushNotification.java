@@ -38,4 +38,7 @@ public class PushNotification {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_pk", referencedColumnName = "group_pk")
     private Group groupPk;
+
+    @Column(name = "is_accepted", nullable = true)
+    private Boolean isAccepted;
 }
