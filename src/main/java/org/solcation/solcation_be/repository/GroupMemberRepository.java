@@ -1,7 +1,10 @@
 package org.solcation.solcation_be.repository;
 
 import org.solcation.solcation_be.entity.GroupMember;
+import org.solcation.solcation_be.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,7 +17,6 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
 
     // 속한 그룹 전부 찾기
     List<GroupMember> findByUser_UserPkAndIsAcceptedTrueAndIsOutFalse(Long userPk);
-}
 
     @Query("""
     SELECT g.user
