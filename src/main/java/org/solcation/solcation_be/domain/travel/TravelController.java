@@ -125,48 +125,4 @@ public class TravelController {
         planDetailService.softDelete(crdtId, clientId, opTs);
         return ResponseEntity.noContent().build();
     }
-
-
-    /** 삽입 요청 */
-    public record InsertReq(
-            int pdDay,
-            String prevCrdtId,
-            String nextCrdtId,
-            String pdPlace,
-            String pdAddress,
-            int pdCost,
-            Long tcPk,
-            String clientId,
-            Long opTs
-    ) {}
-
-    /** 같은 날 내 이동 */
-    public record MoveWithinReq(
-            String crdtId,
-            String prevCrdtId,
-            String nextCrdtId,
-            String clientId,
-            Long opTs
-    ) {}
-
-    /** 다른 날로 이동 */
-    public record MoveDayReq(
-            String crdtId,
-            int newDay,
-            String prevCrdtId,
-            String nextCrdtId,
-            String clientId,
-            Long opTs
-    ) {}
-
-    /** 내용 수정 */
-    public record UpdateReq(
-            String crdtId,
-            String pdPlace,
-            String pdAddress,
-            int pdCost,
-            Long tcPk,
-            String clientId,
-            Long opTs
-    ) {}
 }
