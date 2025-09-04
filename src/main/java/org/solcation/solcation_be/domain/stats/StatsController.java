@@ -1,8 +1,7 @@
-package org.solcation.solcation_be.domain.stats.controller;
+package org.solcation.solcation_be.domain.stats;
 
 import lombok.RequiredArgsConstructor;
 import org.solcation.solcation_be.domain.stats.dto.FinishTravelListDTO;
-import org.solcation.solcation_be.domain.stats.service.FinishTravelListService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,10 +14,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StatsController {
 
-    private final FinishTravelListService finishTravelListService;
+    private final StatsService statsService;
 
     @GetMapping("/finished-travels")
     public List<FinishTravelListDTO> getFinishedTravels(@PathVariable Long groupId) {
-        return finishTravelListService.getFinishedTravels(groupId);
+        return statsService.getFinishedTravels(groupId);
     }
 }

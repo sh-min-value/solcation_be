@@ -1,4 +1,4 @@
-package org.solcation.solcation_be.domain.main.controller;
+package org.solcation.solcation_be.domain.main;
 
 import lombok.RequiredArgsConstructor;
 import org.solcation.solcation_be.common.CustomException;
@@ -7,10 +7,6 @@ import org.solcation.solcation_be.domain.main.dto.GroupShortDTO;
 import org.solcation.solcation_be.domain.main.dto.MonthlyPlanDTO;
 import org.solcation.solcation_be.domain.main.dto.MyPageDTO;
 import org.solcation.solcation_be.domain.main.dto.NotificationPreviewDTO;
-import org.solcation.solcation_be.domain.main.service.GroupShortService;
-import org.solcation.solcation_be.domain.main.service.MonthlyPlanService;
-import org.solcation.solcation_be.domain.main.service.MyPageService;
-import org.solcation.solcation_be.domain.main.service.NotificationPreviewService;
 import org.solcation.solcation_be.entity.User;
 import org.solcation.solcation_be.repository.UserRepository;
 import org.solcation.solcation_be.security.JwtPrincipal;
@@ -24,11 +20,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MainController {
 
-    private final GroupShortService groupShortService;
-    private final MyPageService myPageService;
+//    private final MainService groupShortService;
+//    private final MainService myPageService;
+//    private final MainService notificationPreviewService;
+//    private final MainService monthlyPlanService;
+    private final MainService mainService;
     private final UserRepository userRepository;
-    private final NotificationPreviewService notificationPreviewService;
-    private final MonthlyPlanService monthlyPlanService;
 
     @GetMapping("/my-groups")
     public List<GroupShortDTO> getMyGroups(
@@ -38,7 +35,7 @@ public class MainController {
                 .map(User::getUserPk)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        return groupShortService.getUserGroups(userPk);
+        return mainService.getUserGroups(userPk);
     }
 
     @GetMapping("/mypage")
@@ -49,7 +46,7 @@ public class MainController {
                 .map(User::getUserPk)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        return myPageService.getMyPage(userPk);
+        return mainService.getMyPage(userPk);
     }
 
     @GetMapping("/notification-preview")
@@ -60,7 +57,7 @@ public class MainController {
                 .map(User::getUserPk)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        return notificationPreviewService.getNotificationPreview(userPk);
+        return mainService.getNotificationPreview(userPk);
     }
 
     @GetMapping("/monthly-plans")
@@ -73,6 +70,6 @@ public class MainController {
                 .map(User::getUserPk)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        return monthlyPlanService.getMonthlyPlans(userPk, year, month);
+        return mainService.getMonthlyPlans(userPk, year, month);
     }
 }

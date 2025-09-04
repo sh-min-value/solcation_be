@@ -1,4 +1,4 @@
-package org.solcation.solcation_be.domain.stats.service;
+package org.solcation.solcation_be.domain.stats;
 
 import lombok.RequiredArgsConstructor;
 import org.solcation.solcation_be.domain.stats.dto.FinishTravelListDTO;
@@ -11,7 +11,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class FinishTravelListService {
+public class StatsService {
 
     private final TravelRepository travelRepository;
 
