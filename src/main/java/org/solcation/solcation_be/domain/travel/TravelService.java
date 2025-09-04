@@ -55,9 +55,6 @@ public class TravelService {
 
         MultipartFile photo = dto.getPhoto();
         String savedName = s3Utils.uploadObject(photo, photo.getOriginalFilename(), travelFolder);
-        if (savedName == null) {
-            throw new RuntimeException("이미지 업로드에 실패했습니다.");
-        }
 
         String location = dto.getCountry() + " " + dto.getCity();
 
