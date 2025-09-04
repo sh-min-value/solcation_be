@@ -3,13 +3,14 @@ package org.solcation.solcation_be.domain.group.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.solcation.solcation_be.entity.GroupCategory;
+import org.solcation.solcation_be.entity.User;
 
 @Schema(name = "그룹 메인 정보 DTO")
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Setter
 public class GroupInfoDTO {
     //그룹 pk
     @NotNull
@@ -22,6 +23,18 @@ public class GroupInfoDTO {
     //그룹 이미지
     @NotNull
     private String profileImg;
+
+    //그룹 카테고리
+    @NotNull
+    private GroupCategory gcPk;
+
+    //개설자
+    @NotNull
+    private User groupLeader;
+
+    //총 멤버 수
+    @NotNull
+    private int totalMembers;
 
     //완료된 여정
     @NotNull

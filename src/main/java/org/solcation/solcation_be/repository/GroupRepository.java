@@ -1,7 +1,9 @@
 package org.solcation.solcation_be.repository;
 
+import org.solcation.solcation_be.domain.group.dto.GroupInfoDTO;
 import org.solcation.solcation_be.domain.group.dto.GroupListDTO;
 import org.solcation.solcation_be.entity.Group;
+import org.solcation.solcation_be.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -32,4 +34,23 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     """)
     List<Object[]> getGroupListWithSearch(@Param("userId") String userId, @Param("searchTerm") String searchTerm);
 
+    @Query("""
+    SELECT
+      g.groupPk,
+      g.groupName,
+      g.groupImage,
+      g.gcPk,
+      g.groupLeader,
+      g.totalMembers,
+      COALESCE(SUM(CASE WHEN t.tpStart < CURRENT_DATE THEN 1 ELSE 0 END), 0),
+      COALESCE(SUM(CASE WHEN t.tpStart > CURRENT_DATE THEN 1 ELSE 0 END), 0)
+    FROM Group g
+    LEFT JOIN g.travels t
+    WHERE g.groupPk = :groupPk
+    GROUP BY g.groupPk, g.groupName, g.groupImage, g.gcPk, g.groupLeader, g.totalMembers  
+    """)
+    Object getGroupInfoByGroupPk(@Param("groupPk") long groupPk);
+
+    @Query("SELECT g.groupLeader FROM Group g WHERE g.groupPk = :groupPk")
+    User findGroupLeaderByGroupPk(@Param("groupPk") Long groupPk);
 }

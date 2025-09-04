@@ -7,6 +7,7 @@ import org.solcation.solcation_be.common.ErrorCode;
 import org.solcation.solcation_be.domain.group.dto.AddGroupReqDTO;
 import org.solcation.solcation_be.domain.group.dto.GroupInfoDTO;
 import org.solcation.solcation_be.domain.group.dto.GroupListDTO;
+import org.solcation.solcation_be.domain.group.dto.GroupMembersDTO;
 import org.solcation.solcation_be.entity.Group;
 import org.solcation.solcation_be.entity.GroupCategory;
 import org.solcation.solcation_be.entity.GroupMember;
@@ -14,6 +15,7 @@ import org.solcation.solcation_be.entity.User;
 import org.solcation.solcation_be.repository.GroupCategoryRepository;
 import org.solcation.solcation_be.repository.GroupMemberRepository;
 import org.solcation.solcation_be.repository.GroupRepository;
+import org.solcation.solcation_be.repository.PushNotificationRepository;
 import org.solcation.solcation_be.util.s3.S3Utils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,7 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final GroupCategoryRepository groupCategoryRepository;
     private final GroupMemberRepository groupMemberRepository;
+    private final PushNotificationRepository pushNotificationRepository;
     private final S3Utils s3Utils;
 
     @Value("${cloud.s3.bucket.upload.profile.group}")
@@ -112,7 +115,46 @@ public class GroupService {
     }
 
     /* 그룹 메인 - 그룹 정보 렌더링 */
-    public GroupInfoDTO getGroupInfo() {
-        return null;
+    public GroupInfoDTO getGroupInfo(Long groupPk) {
+        //그룹 정보 조회
+        Object[] result = (Object[])groupRepository.getGroupInfoByGroupPk(groupPk);
+
+        //대기 중인 초대 수
+        Long cnt = pushNotificationRepository.countPendingInvitationByGroupPk(groupPk);
+
+        GroupInfoDTO dto = GroupInfoDTO.builder()
+                .groupPk((Long) result[0])
+                .groupName((String) result[1])
+                .profileImg(s3Utils.getPublicUrl((String) result[2], UPLOAD_PATH))
+                .gcPk((GroupCategory) result[3])
+                .groupLeader((User) result[4])
+                .totalMembers((int) result[5])
+                .finished((Long) result[6])
+                .scheduled((Long) result[7])
+                .pending(cnt)
+                .build();
+
+        return dto;
+    }
+
+    /* 그룹 메인 - 참여자 목록 */
+    public GroupMembersDTO getGroupMembers(Long groupPk) {
+        //그룹 개설자 조회
+        User groupLeader = groupRepository.findGroupLeaderByGroupPk(groupPk);
+
+        //그룹 멤버 조회
+        List<User> groupMembers = groupMemberRepository
+                .findByGroup_GroupPkAndRoleAndIsAcceptedOrderByUser_UserPkAsc(groupPk, false, true);
+
+        //그룹 대기자 조회
+        List<User> waitingMembers = groupMemberRepository
+                .findByGroup_GroupPkAndRoleAndIsAcceptedOrderByUser_UserPkAsc(groupPk, false, false);
+
+
+        return GroupMembersDTO.builder()
+                .groupLeader(groupLeader)
+                .members(groupMembers)
+                .waitingList(waitingMembers)
+                .build();
     }
 }
