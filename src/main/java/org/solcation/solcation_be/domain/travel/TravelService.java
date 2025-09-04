@@ -7,10 +7,7 @@ import org.solcation.solcation_be.common.CustomException;
 import org.solcation.solcation_be.common.ErrorCode;
 import org.solcation.solcation_be.domain.travel.dto.TravelReqDTO;
 import org.solcation.solcation_be.domain.travel.dto.TravelResDTO;
-import org.solcation.solcation_be.entity.Group;
-import org.solcation.solcation_be.entity.TRAVELSTATE;
-import org.solcation.solcation_be.entity.Travel;
-import org.solcation.solcation_be.entity.TravelCategory;
+import org.solcation.solcation_be.entity.*;
 import org.solcation.solcation_be.repository.GroupRepository;
 import org.solcation.solcation_be.repository.TravelCategoryRepository;
 import org.solcation.solcation_be.repository.TravelRepository;
@@ -77,6 +74,7 @@ public class TravelService {
         return group.getGroupPk();
     }
 
+    // 단일 여행 조회
     public TravelResDTO getTravelById(Long travelPk) {
         return travelRepository.findById(travelPk)
                 .map(this::toDto)
