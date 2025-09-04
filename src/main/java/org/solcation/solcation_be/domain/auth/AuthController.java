@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final AuthService authService;
 
-    @Operation(description = "로그인")
+    @Operation(summary = "로그인", description = "로그인")
     @PostMapping("/login")
     public LoginResDTO login(@Valid @RequestBody LoginReqDTO reqDTO) {
         return authService.login(reqDTO);
