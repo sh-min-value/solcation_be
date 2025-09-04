@@ -16,30 +16,31 @@ import java.util.Optional;
 public interface PlanDetailRepository extends JpaRepository<PlanDetail, Long> {
 
     // 같은 여행ID, tombstone=false 정렬 조회
-    @Query("select p from PlanDetail p " +
-            "where p.travel.tpPk = :travelId and p.tombstone = false " +
-            "order by p.position asc, p.opTs asc, p.clientId asc, p.crdtId asc")
-    List<PlanDetail> findAliveByTravelOrderByPosition(
-            @Param("travelId") Long travelId);
+    @Query("""
+        select p from PlanDetail p
+        where p.travel.tpPk = :travelId and p.tombstone = false
+        order by p.pdDay asc, p.position asc, p.opTs asc, p.clientId asc, p.crdtId asc
+    """)
+    List<PlanDetail> findAliveByTravelOrderByPosition(@Param("travelId") Long travelId);
 
     // 같은 여행ID, 같은 Day, tombstone=false 만 정렬 조회
-    @Query("select p from PlanDetail p " +
-            "where p.travel.tpPk = :travelId and p.pdDay = :day and p.tombstone = false " +
-            "order by p.position asc, p.opTs asc, p.clientId asc, p.crdtId asc")
+    @Query("""
+        select p from PlanDetail p
+        where p.travel.tpPk = :travelId and p.pdDay = :day and p.tombstone = false
+        order by p.position asc, p.opTs asc, p.clientId asc, p.crdtId asc
+    """)
     List<PlanDetail> findAliveByTravelAndDayOrderByPosition(
             @Param("travelId") Long travelId, @Param("day") Integer day);
 
     Optional<PlanDetail> findByCrdtId(String crdtId);
 
-    // prev/next를 찾을 때 사용 (동일 day, 동일 travel)
-    @Query("select p from PlanDetail p " +
-            "where p.travel.tpPk = :travelId and p.pdDay = :day and p.tombstone = false " +
-            "and p.position < :pos order by p.position desc")
-    List<PlanDetail> findPrev(@Param("travelId") Long travelId, @Param("day") int day, @Param("pos") BigDecimal pos, Pageable pageable);
+    // 같은 여행/같은 day에서 tail(맨 뒤) 하나만
+    Optional<PlanDetail> findTopByTravel_TpPkAndPdDayAndTombstoneFalseOrderByPositionDesc(
+            Long travelId, int pdDay
+    );
 
-    @Query("select p from PlanDetail p " +
-            "where p.travel.tpPk = :travelId and p.pdDay = :day and p.tombstone = false " +
-            "and p.position > :pos order by p.position asc")
-    List<PlanDetail> findNext(@Param("travelId") Long travelId, @Param("day") int day, @Param("pos") BigDecimal pos, Pageable pageable);
-
+    // 같은 여행/같은 day에서 crdtId로 찾기 (prev/next 안전 조회)
+    Optional<PlanDetail> findByCrdtIdAndTravel_TpPkAndPdDayAndTombstoneFalse(
+            String crdtId, Long travelId, int pdDay
+    );
 }

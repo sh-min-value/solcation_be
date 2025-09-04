@@ -68,7 +68,7 @@ public class TravelController {
         return planDetailService.insertBetween(
                 travelId, req.pdDay(),
                 req.prevCrdtId(), req.nextCrdtId(),
-                req.pdPlace(), req.pdAddress(), req.pdCost(),
+                req.pdPlace(), req.pdAddress(), req.pdCost(), req.tcPk(),
                 req.clientId(), req.opTs()
         );
     }
@@ -108,7 +108,7 @@ public class TravelController {
             @Valid @RequestBody UpdateReq req
     ) {
         return planDetailService.updateFields(
-                req.crdtId(), req.pdPlace(), req.pdAddress(), req.pdCost(),
+                req.crdtId(), req.pdPlace(), req.pdAddress(), req.pdCost(), req.tcPk(),
                 req.clientId(), req.opTs()
         );
     }
@@ -120,7 +120,7 @@ public class TravelController {
             @PathVariable Long travelId,
             @PathVariable String crdtId,
             @RequestParam String clientId,
-            @RequestParam long opTs
+            @RequestParam Long opTs
     ) {
         planDetailService.softDelete(crdtId, clientId, opTs);
         return ResponseEntity.noContent().build();
@@ -134,9 +134,10 @@ public class TravelController {
             String nextCrdtId,
             String pdPlace,
             String pdAddress,
-            Integer pdCost,
+            int pdCost,
+            Long tcPk,
             String clientId,
-            long opTs
+            Long opTs
     ) {}
 
     /** 같은 날 내 이동 */
@@ -145,7 +146,7 @@ public class TravelController {
             String prevCrdtId,
             String nextCrdtId,
             String clientId,
-            long opTs
+            Long opTs
     ) {}
 
     /** 다른 날로 이동 */
@@ -155,7 +156,7 @@ public class TravelController {
             String prevCrdtId,
             String nextCrdtId,
             String clientId,
-            long opTs
+            Long opTs
     ) {}
 
     /** 내용 수정 */
@@ -163,8 +164,9 @@ public class TravelController {
             String crdtId,
             String pdPlace,
             String pdAddress,
-            Integer pdCost,
+            int pdCost,
+            Long tcPk,
             String clientId,
-            long opTs
+            Long opTs
     ) {}
 }
