@@ -1,5 +1,6 @@
 package org.solcation.solcation_be.repository;
 
+import org.solcation.solcation_be.domain.stats.dto.FinishTravelListDTO;
 import org.solcation.solcation_be.entity.TRAVELSTATE;
 import org.solcation.solcation_be.entity.Travel;
 import org.solcation.solcation_be.entity.TravelCategory;
@@ -22,5 +23,5 @@ public interface TravelRepository extends JpaRepository<Travel, Long> {
     List<Travel> findAllByGroup_GroupPkInAndTpStartLessThanEqualAndTpEndGreaterThanEqualOrderByTpStartAsc(List<Long> groupPks, LocalDate monthEnd, LocalDate monthStart);
 
     // 통계 페이지 완료한 여행 렌더링
-    List<Travel> findByGroup_GroupPkAndTpState(Long groupPk, TRAVELSTATE state);
+    List<Travel> findByGroup_GroupPkAndTpStateOrderByTpEndDesc(Long groupPk, TRAVELSTATE tpState);
 }
