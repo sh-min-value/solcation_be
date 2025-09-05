@@ -5,10 +5,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.solcation.solcation_be.domain.notification.dto.NotificationPageRes;
 import org.solcation.solcation_be.domain.notification.dto.PushNotificationDTO;
 import org.solcation.solcation_be.entity.PushNotification;
 import org.solcation.solcation_be.security.JwtPrincipal;
 import org.solcation.solcation_be.util.redis.RedisPublisher;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -60,5 +62,20 @@ public class NotificationController {
     @GetMapping("/list/invitation")
     public List<PushNotificationDTO> getInvitationList(@AuthenticationPrincipal JwtPrincipal jwtPrincipal) {
         return  notificationService.getInvitationList(jwtPrincipal.userPk());
+    }
+
+    /* 최근 7일 알림 목록 렌더링 */
+    @Operation(summary = "최근 7일 알림 목록 렌더링")
+    @GetMapping("/list/recent/7days")
+    public NotificationPageRes getRecent7daysList(@AuthenticationPrincipal JwtPrincipal jwtPrincipal, @PathParam("pageNo") int pageNo, @PathParam("pageSize") int pageSize) {
+        Page<PushNotificationDTO> p = notificationService.getRecent7daysList(jwtPrincipal.userPk(), pageNo, pageSize);
+        return NotificationPageRes.from(p);
+    }
+
+    /* 최근 30일(8일 ~ 30일) 알림 목록 렌더링 */
+    @Operation(summary = "최근 30일(8-30일) 알림 목록 렌더링")
+    @GetMapping("/list/recent/30days")
+    public void getRecent30daysList(@AuthenticationPrincipal JwtPrincipal jwtPrincipal, @PathParam("pageNo") int pageNo, @PathParam("pageSize") int pageSize) {
+
     }
 }
