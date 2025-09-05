@@ -3,6 +3,7 @@ package org.solcation.solcation_be.domain.notification.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.solcation.solcation_be.entity.AlarmCategory;
 import org.solcation.solcation_be.entity.Group;
 
 import java.time.LocalDateTime;
@@ -23,17 +24,18 @@ public class PushNotificationDTO {
     private LocalDateTime pnTime;
 
     @NotNull
-    private String acName;
+    private String content;
 
     @NotNull
     private String acDest;
 
     @NotNull
-    private String content;
+    private String groupName;
 
     @NotNull
-    private Group group;
+    private String groupImage;
 
-    @NotNull
     private Boolean isAccepted;
+
+    private LocalDateTime readAt;
 }

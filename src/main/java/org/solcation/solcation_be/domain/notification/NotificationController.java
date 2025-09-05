@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.solcation.solcation_be.domain.notification.dto.PushNotificationDTO;
 import org.solcation.solcation_be.entity.PushNotification;
 import org.solcation.solcation_be.security.JwtPrincipal;
 import org.solcation.solcation_be.util.redis.RedisPublisher;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.util.List;
 
 @Tag(name = "알림 컨트롤러")
 @Slf4j
@@ -51,5 +54,11 @@ public class NotificationController {
     @PostMapping("/check")
     public void check(@PathParam("pnPk") Long pnPk, @AuthenticationPrincipal JwtPrincipal jwtPrincipal) {
         notificationService.updateCheck(pnPk, jwtPrincipal.userPk());
+    }
+
+    @Operation(summary = "그룹 초대 목록 렌더링")
+    @GetMapping("/list/invitation")
+    public List<PushNotificationDTO> getInvitationList(@AuthenticationPrincipal JwtPrincipal jwtPrincipal) {
+        return  notificationService.getInvitationList(jwtPrincipal.userPk());
     }
 }

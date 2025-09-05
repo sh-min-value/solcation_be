@@ -4,10 +4,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.common.CustomException;
 import org.solcation.solcation_be.common.ErrorCode;
+import org.solcation.solcation_be.domain.notification.dto.PushNotificationDTO;
+import org.solcation.solcation_be.entity.ALARMCODE;
+import org.solcation.solcation_be.entity.AlarmCategory;
 import org.solcation.solcation_be.entity.PushNotification;
 import org.solcation.solcation_be.repository.PushNotificationRepository;
+import org.solcation.solcation_be.util.category.AlarmCategoryLookup;
 import org.solcation.solcation_be.util.redis.RedisPublisher;
 import org.solcation.solcation_be.util.redis.RedisSubscriber;
+import org.solcation.solcation_be.util.s3.S3Utils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -15,6 +20,8 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @RequiredArgsConstructor
@@ -24,6 +31,8 @@ public class NotificationService {
     private final SseManager sseManager;
     private final PushNotificationRepository notificationRepository;
     private final RedisPublisher redisPublisher;
+    private final PushNotificationRepository pushNotificationRepository;
+    private final AlarmCategoryLookup alarmCategoryLookup;
 
     /* sse 연결 (emitter 생성) */
     public SseEmitter connectSse(Long userPk) {
@@ -53,4 +62,31 @@ public class NotificationService {
         notification.updateIsAccepted(true, LocalDateTime.now());
         notificationRepository.save(notification);
     }
+
+    /* 그룹 초대 목록 렌더링 */
+    public List<PushNotificationDTO> getInvitationList(Long userPk) {
+        //userPk일치, acpk = 1, isAccepted = false
+        AlarmCategory ac = alarmCategoryLookup.get(ALARMCODE.GROUP_INVITE);
+        List<PushNotification> result = pushNotificationRepository.findByUserPk_UserPkAndAcPkAndIsAcceptedOrderByPnTimeDesc(userPk, ac, false);
+        List<PushNotificationDTO> list = new ArrayList<>();
+
+        result.forEach(i -> list.add(PushNotificationDTO.builder()
+                .pnPk(i.getPnPk())
+                .title(i.getPnTitle())
+                .pnTime(i.getPnTime())
+                .acDest(i.getAcPk().getAcDest())
+                .content(i.getPnContent())
+                .groupName(i.getGroupPk().getGroupName())
+                .groupImage(i.getGroupPk().getGroupImage())
+                .isAccepted(i.getIsAccepted())
+                .readAt(i.getReadAt())
+                .build()
+        ));
+
+        return list;
+    }
+
+    /* 최근 7일 알림 목록 렌더링 */
+
+    /* 최근 30일(8일 ~ 30일) 알림 목록 렌더링 */
 }
