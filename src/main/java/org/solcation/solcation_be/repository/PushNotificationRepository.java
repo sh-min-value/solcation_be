@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PushNotificationRepository extends JpaRepository<PushNotification, Long> {
@@ -18,4 +19,6 @@ public interface PushNotificationRepository extends JpaRepository<PushNotificati
     WHERE group_pk = :groupPk AND ac_pk = 1 AND is_accepted = false
     """, nativeQuery = true)
     Long countPendingInvitationByGroupPk(@Param("groupPk") long groupPk);
+
+    Optional<PushNotification> findByPnPkAndUserPk_UserPk(Long pnPk, Long userPk);
 }
