@@ -42,6 +42,7 @@ public class Group {
     @JoinColumn(name = "group_leader", referencedColumnName = "user_pk")
     private User groupLeader;
 
+    @Builder.Default
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
     private List<Travel> travels = new ArrayList<>();
 }
