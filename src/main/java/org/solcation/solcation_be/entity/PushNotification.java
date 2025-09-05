@@ -41,4 +41,7 @@ public class PushNotification {
 
     @Column(name = "is_accepted", nullable = true)
     private Boolean isAccepted;
+
+    @Column(name = "read_at", nullable = true)
+    private LocalDateTime readAt;
 }

@@ -40,6 +40,7 @@ public class SecurityConfig {
                         // 인증 발급/회원가입/소셜 콜백 등 공개
                         .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/auth/**").permitAll()
+//                        .requestMatchers(HttpMethod.GET, "/notification/conn").permitAll() //todo: 없애기
                         //그룹 멤버 인증
                         .requestMatchers(groupMatcher).access(new GroupAuthorizationManager(groupAuth))
                         // 그 외는 인증 필요

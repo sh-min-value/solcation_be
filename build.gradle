@@ -71,6 +71,10 @@ dependencies {
     /* aws */
     implementation 'software.amazon.awssdk:s3:2.33.0'
     implementation 'software.amazon.awssdk:sts:2.33.0'
+
+    /* redis */
+    implementation 'org.springframework.data:spring-data-redis'
+    implementation 'io.lettuce:lettuce-core'
 }
 
 tasks.named('test') {
