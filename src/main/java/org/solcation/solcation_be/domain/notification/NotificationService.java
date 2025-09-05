@@ -2,6 +2,8 @@ package org.solcation.solcation_be.domain.notification;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.solcation.solcation_be.common.CustomException;
+import org.solcation.solcation_be.common.ErrorCode;
 import org.solcation.solcation_be.entity.PushNotification;
 import org.solcation.solcation_be.repository.PushNotificationRepository;
 import org.solcation.solcation_be.util.redis.RedisPublisher;
@@ -11,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.time.LocalDateTime;
 
 
 @RequiredArgsConstructor
@@ -40,5 +44,13 @@ public class NotificationService {
                 redisPublisher.publish(pushNotification.getPnPk(), userPk);
             }
         });
+    }
+
+    /* 알림 확인 여부 업데이트 */
+    @Transactional
+    public void updateCheck(Long pnPk, Long userPk) {
+        PushNotification notification = (PushNotification) notificationRepository.findByPnPkAndUserPk_UserPk(pnPk, userPk).orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST));
+        notification.updateIsAccepted(true, LocalDateTime.now());
+        notificationRepository.save(notification);
     }
 }

@@ -2,6 +2,7 @@ package org.solcation.solcation_be.domain.notification;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.entity.PushNotification;
@@ -44,5 +45,11 @@ public class NotificationController {
 
         redisPublisher.saveNotificationWithTTL(1L, pushNotification);
         redisPublisher.publish(pushNotification.getPnPk(), 1L);
+    }
+
+    @Operation(summary = "알림 확인 여부 업데이트")
+    @PostMapping("/check")
+    public void check(@PathParam("pnPk") Long pnPk, @AuthenticationPrincipal JwtPrincipal jwtPrincipal) {
+        notificationService.updateCheck(pnPk, jwtPrincipal.userPk());
     }
 }

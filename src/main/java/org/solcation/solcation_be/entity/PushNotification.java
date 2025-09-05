@@ -44,4 +44,9 @@ public class PushNotification {
 
     @Column(name = "read_at", nullable = true)
     private LocalDateTime readAt;
+
+    public void updateIsAccepted(Boolean isAccepted, LocalDateTime readAt) {
+        this.isAccepted = isAccepted;
+        this.readAt = readAt;
+    }
 }
