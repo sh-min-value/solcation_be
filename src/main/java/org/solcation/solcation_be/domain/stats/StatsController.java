@@ -2,6 +2,7 @@ package org.solcation.solcation_be.domain.stats;
 
 import lombok.RequiredArgsConstructor;
 import org.solcation.solcation_be.domain.stats.dto.FinishTravelListDTO;
+import org.solcation.solcation_be.domain.stats.dto.TravelSpentStatsDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,5 +20,15 @@ public class StatsController {
     @GetMapping("/finished-travels")
     public List<FinishTravelListDTO> getFinishedTravels(@PathVariable Long groupId) {
         return statsService.getFinishedTravels(groupId);
+    }
+
+    @GetMapping("/{travelId}/category-spent")
+    public List<TravelSpentStatsDTO> getTravelSpentCategories(@PathVariable Long groupId, @PathVariable Long travelId) {
+        return statsService.getTravelSpentStats(travelId);
+    }
+
+    @GetMapping("/{travelId}/total-spent")
+    public int getTravelTotalSpent(@PathVariable Long groupId, @PathVariable Long travelId) {
+        return statsService.getTravelTotalSpent(travelId);
     }
 }
