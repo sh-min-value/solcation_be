@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class TravelFullSpentStatsDTO {
+public class TravelSpentStatsDTO {
     private int pdCost;
     private String tcName;
 }
