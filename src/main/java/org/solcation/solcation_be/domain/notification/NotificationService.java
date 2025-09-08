@@ -65,6 +65,7 @@ public class NotificationService {
     }
 
     /* 그룹 초대 목록 렌더링 */
+    @Transactional
     public List<PushNotificationDTO> getInvitationList(Long userPk) {
         AlarmCategory ac = alarmCategoryLookup.get(ALARMCODE.GROUP_INVITE);
         List<PushNotification> result = pushNotificationRepository.findByUserPk_UserPkAndAcPkAndIsAcceptedOrderByPnTimeDesc(userPk, ac, false);
@@ -87,6 +88,7 @@ public class NotificationService {
     }
 
     /* 최근 7일 알림 목록 렌더링 */
+    @Transactional
     public Page<PushNotificationDTO> getRecent7daysList(Long userPk, int pageNo, int pageSize) {
         //현재 시간 기준으로 7일 전까지 / 그룹 초대 제외
         AlarmCategory ac = alarmCategoryLookup.get(ALARMCODE.GROUP_INVITE);
@@ -100,7 +102,20 @@ public class NotificationService {
     }
 
     /* 최근 30일(8일 ~ 30일) 알림 목록 렌더링 */
-    public void getRecent30daysList(Long userPk) {
+    @Transactional
+    public Page<PushNotificationDTO> getRecent30daysList(Long userPk, int pageNo, int pageSize) {
+        //현재 시간 기준으로 8일 전 ~ 30일 전까지 / 그룹 초대 제외
         AlarmCategory ac = alarmCategoryLookup.get(ALARMCODE.GROUP_INVITE);
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        LocalDateTime now =  LocalDateTime.now();
+
+        LocalDateTime to = now.minusDays(8);
+        log.info("to: {}", to.toString());
+
+        LocalDateTime from = now.minusDays(30);
+        log.info("from: {}", from.toString());
+
+        return pushNotificationRepository.findRecent(userPk, from, to, ac.getAcPk(), pageable);
     }
 }

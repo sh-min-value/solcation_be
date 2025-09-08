@@ -75,7 +75,8 @@ public class NotificationController {
     /* 최근 30일(8일 ~ 30일) 알림 목록 렌더링 */
     @Operation(summary = "최근 30일(8-30일) 알림 목록 렌더링")
     @GetMapping("/list/recent/30days")
-    public void getRecent30daysList(@AuthenticationPrincipal JwtPrincipal jwtPrincipal, @PathParam("pageNo") int pageNo, @PathParam("pageSize") int pageSize) {
-
+    public NotificationPageRes getRecent30daysList(@AuthenticationPrincipal JwtPrincipal jwtPrincipal, @PathParam("pageNo") int pageNo, @PathParam("pageSize") int pageSize) {
+        Page<PushNotificationDTO> p = notificationService.getRecent30daysList(jwtPrincipal.userPk(), pageNo, pageSize);
+        return NotificationPageRes.from(p);
     }
 }
