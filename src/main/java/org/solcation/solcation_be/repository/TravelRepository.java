@@ -1,6 +1,8 @@
 package org.solcation.solcation_be.repository;
 
 import org.solcation.solcation_be.entity.enums.TRAVELSTATE;
+import org.solcation.solcation_be.domain.stats.dto.FinishTravelListDTO;
+import org.solcation.solcation_be.entity.PlanDetail;
 import org.solcation.solcation_be.entity.Travel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -21,4 +23,7 @@ public interface TravelRepository extends JpaRepository<Travel, Long> {
 
     // 통계 페이지 완료한 여행 렌더링
     List<Travel> findByGroup_GroupPkAndTpStateOrderByTpEndDesc(Long groupPk, TRAVELSTATE tpState);
+
+    // 우리 그룹과 같은 여행지, 우리 그룹을 제외한 다른 그룹들의 여행
+    List<Travel> findByTpLocationAndGroup_GroupPkNotAndTpState(String tpLocation, Long excludeGroupPk, TRAVELSTATE state);
 }

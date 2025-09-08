@@ -39,4 +39,7 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
     GroupMember findByUser(@Param("user") User user);
 
     Optional<GroupMember> findByGroup_GroupPkAndUser_UserPkAndIsAcceptedIsNull(@Param("groupPk") Long groupPk, @Param("userPk") Long userPk);
+
+    // 그룹 멤버 수
+    long countByGroup_GroupPkAndIsAcceptedTrueAndIsOutFalse(Long groupPk);
 }
