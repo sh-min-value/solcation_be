@@ -1,13 +1,14 @@
 package org.solcation.solcation_be.entity.converter;
 
 import jakarta.persistence.Converter;
+import org.solcation.solcation_be.entity.enums.DEPOSITCYCLE;
 import org.solcation.solcation_be.entity.enums.TRAVELSTATE;
 import org.solcation.solcation_be.util.entity.AbstractLegacyEnumAttributeConverter;
 
 @Converter(autoApply=true)
-public class TravelStateConverter extends AbstractLegacyEnumAttributeConverter<TRAVELSTATE> {
+public class DepositCycleConverter extends AbstractLegacyEnumAttributeConverter<DEPOSITCYCLE> {
 
-    protected TravelStateConverter() {
-        super(TRAVELSTATE.class);
+    protected DepositCycleConverter() {
+        super(DEPOSITCYCLE.class);
     }
 }

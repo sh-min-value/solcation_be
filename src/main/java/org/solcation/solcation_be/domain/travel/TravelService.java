@@ -8,6 +8,7 @@ import org.solcation.solcation_be.common.ErrorCode;
 import org.solcation.solcation_be.domain.travel.dto.TravelReqDTO;
 import org.solcation.solcation_be.domain.travel.dto.TravelResDTO;
 import org.solcation.solcation_be.entity.*;
+import org.solcation.solcation_be.entity.enums.TRAVELSTATE;
 import org.solcation.solcation_be.repository.GroupRepository;
 import org.solcation.solcation_be.repository.TravelCategoryRepository;
 import org.solcation.solcation_be.repository.TravelRepository;

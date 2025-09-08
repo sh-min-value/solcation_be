@@ -23,4 +23,7 @@ public class GroupCategory {
 
     @Column(name = "gc_icon", nullable = false)
     private String gcIcon;
+
+    @Column(name = "gc_code", nullable = false, length = 50)
+    private String gcCode;
 }

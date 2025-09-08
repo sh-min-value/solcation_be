@@ -6,10 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.solcation.solcation_be.entity.converter.TravelStateConverter;
+import org.solcation.solcation_be.entity.enums.TRAVELSTATE;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Builder
@@ -21,7 +20,7 @@ import java.util.List;
                 @Index(name = "idx_travel_group", columnList = "group_pk"),
                 @Index(name = "idx_travel_start", columnList = "tp_start")
         })
-public class Travel {
+public class Travel extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tp_pk")

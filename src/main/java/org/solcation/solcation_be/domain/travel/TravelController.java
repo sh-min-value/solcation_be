@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.solcation.solcation_be.domain.travel.dto.PlanDetailDTO;
 import org.solcation.solcation_be.domain.travel.dto.TravelReqDTO;
 import org.solcation.solcation_be.domain.travel.dto.TravelResDTO;
-import org.solcation.solcation_be.entity.TRAVELSTATE;
+import org.solcation.solcation_be.entity.enums.TRAVELSTATE;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

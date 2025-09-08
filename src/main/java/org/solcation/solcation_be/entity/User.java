@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.solcation.solcation_be.entity.converter.UserGenderConverter;
 import org.solcation.solcation_be.entity.converter.UserRoleConverter;
+import org.solcation.solcation_be.entity.enums.GENDER;
+import org.solcation.solcation_be.entity.enums.ROLE;
 
 import java.time.LocalDate;
 

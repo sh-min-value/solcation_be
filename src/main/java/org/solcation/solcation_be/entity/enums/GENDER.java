@@ -1,16 +1,14 @@
-package org.solcation.solcation_be.entity;
+package org.solcation.solcation_be.entity.enums;
 
 import org.solcation.solcation_be.util.entity.LegacyCommonType;
 
-public enum TRAVELSTATE implements LegacyCommonType {
-    BEFORE(0, "BEFORE"),
-    ONGOING(1, "ONGOING"),
-    FINISH(2, "FINISH");
+public enum GENDER implements LegacyCommonType {
+    M(0, "M"), F(1, "F");
 
     private final int code;
     private final String label;
 
-    TRAVELSTATE(int code, String label) {
+    GENDER(int code, String label) {
         this.code = code;
         this.label = label;
     }
