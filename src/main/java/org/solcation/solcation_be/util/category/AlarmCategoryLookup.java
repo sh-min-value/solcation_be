@@ -18,7 +18,7 @@ public class AlarmCategoryLookup {
     @PostConstruct
     void load() {
         for (var c: ALARMCODE.values()) {
-            cache.put(c, repository.findByAcName(c.name()).orElseThrow(() -> new IllegalStateException("Missing " + c)));
+            cache.put(c, repository.findByAcCode(c.name()).orElseThrow(() -> new IllegalStateException("Missing " + c)));
         }
     }
 

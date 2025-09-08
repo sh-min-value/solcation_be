@@ -17,8 +17,8 @@ public class AlarmCategory {
     @Column(name = "ac_pk")
     private Long acPk;
 
-    @Column(name = "ac_name", nullable = false, length = 50)
-    private String acName;
+    @Column(name = "ac_code", nullable = false, length = 50)
+    private String acCode;
 
     @Column(name = "ac_dest", nullable = false, length = 50)
     private String acDest;

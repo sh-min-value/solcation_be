@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface AlarmCategoryRepository extends JpaRepository<AlarmCategory,Long> {
-    Optional<AlarmCategory> findByAcName(String acName);
+    Optional<AlarmCategory> findByAcCode(String acCode);
 }

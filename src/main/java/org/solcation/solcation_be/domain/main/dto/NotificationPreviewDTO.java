@@ -5,7 +5,7 @@ import lombok.*;
 @Getter
 @Builder
 public class NotificationPreviewDTO {
-    private String acName;
+    private String acCode;
     private String groupName;
     private String groupLeader;
 }

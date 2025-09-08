@@ -90,7 +90,7 @@ public class MainService {
         var top2 = pushNotificationRepository.findTop2ByUserPk_UserPkOrderByPnTimeDesc(userPk);
         return top2.stream()
                 .map(n -> NotificationPreviewDTO.builder()
-                        .acName(n.getAcPk().getAcName())
+                        .acCode(n.getAcPk().getAcCode())
                         .groupName(n.getGroupPk().getGroupName())
                         .groupLeader(n.getGroupPk().getGroupLeader().getUserName())
                         .build())
