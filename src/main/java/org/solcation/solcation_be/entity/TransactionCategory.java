@@ -22,4 +22,6 @@ public class TransactionCategory {
     @Column(name="tc_icon")
     private String tcIcon; //파일 경로
 
+    @Column(name = "tc_code", nullable = false, length = 50)
+    private String tcCode;
 }

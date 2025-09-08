@@ -22,4 +22,6 @@ public class TravelCategory {
     @Column(name="tpc_icon")
     private String tpcIcon; //파일 경로
 
+    @Column(name = "tpc_code", nullable = false, length = 50)
+    private String tpcCode;
 }
