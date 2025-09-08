@@ -60,9 +60,12 @@ public class StatsService {
     }
 
     // 소비 총계
-    public int getTravelTotalSpent(Long travelId) {
-        List<PlanDetail> details = planDetailRepository.findAliveByTravelOrderByPosition(travelId);
-        return details.stream().mapToInt(PlanDetail::getPdCost).sum();
+    public long getTravelTotalSpent(Long travelId) {
+        return planDetailRepository.findAliveByTravelOrderByPosition(travelId).stream()
+                .map(PlanDetail::getPdCost)
+                .filter(java.util.Objects::nonNull)
+                .mapToLong(Integer::longValue)
+                .sum();
     }
 
     // 다른 그룹과 비교
