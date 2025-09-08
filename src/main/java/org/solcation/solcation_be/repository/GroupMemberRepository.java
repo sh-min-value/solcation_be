@@ -25,4 +25,7 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
     ORDER BY g.user.userPk ASC
     """)
     List<User> findByGroup_GroupPkAndRoleAndIsAcceptedOrderByUser_UserPkAsc(@Param("groupPk") Long groupPk, @Param("role") Boolean role, @Param("isAccepted") Boolean isAccepted);
+
+    // 그룹 멤버 수
+    long countByGroup_GroupPkAndIsAcceptedTrueAndIsOutFalse(Long groupPk);
 }

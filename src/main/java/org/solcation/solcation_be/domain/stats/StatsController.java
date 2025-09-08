@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/groups/{groupId:\\d+}/stats")
@@ -30,5 +31,10 @@ public class StatsController {
     @GetMapping("/{travelId}/total-spent")
     public int getTravelTotalSpent(@PathVariable Long groupId, @PathVariable Long travelId) {
         return statsService.getTravelTotalSpent(travelId);
+    }
+
+    @GetMapping("/{travelId}/compare")
+    public Map<String, Integer> getPerPersonPerDayCompare(@PathVariable Long groupId, @PathVariable Long travelId) {
+        return statsService.getPerPersonPerDayCompare(travelId);
     }
 }
