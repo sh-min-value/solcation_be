@@ -2,7 +2,7 @@ package org.solcation.solcation_be.util.category;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.solcation.solcation_be.entity.ALARMCODE;
+import org.solcation.solcation_be.entity.enums.ALARMCODE;
 import org.solcation.solcation_be.entity.AlarmCategory;
 import org.solcation.solcation_be.repository.AlarmCategoryRepository;
 import org.springframework.stereotype.Component;

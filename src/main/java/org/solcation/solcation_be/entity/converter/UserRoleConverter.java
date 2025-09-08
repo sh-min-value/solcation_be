@@ -1,7 +1,7 @@
 package org.solcation.solcation_be.entity.converter;
 
 import jakarta.persistence.Converter;
-import org.solcation.solcation_be.entity.ROLE;
+import org.solcation.solcation_be.entity.enums.ROLE;
 import org.solcation.solcation_be.util.entity.AbstractLegacyEnumAttributeConverter;
 
 @Converter(autoApply=true)

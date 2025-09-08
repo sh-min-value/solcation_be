@@ -1,4 +1,4 @@
-package org.solcation.solcation_be.entity;
+package org.solcation.solcation_be.entity.enums;
 
 import lombok.Getter;
 

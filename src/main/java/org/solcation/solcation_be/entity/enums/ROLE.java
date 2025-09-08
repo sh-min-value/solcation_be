@@ -1,14 +1,15 @@
-package org.solcation.solcation_be.entity;
+package org.solcation.solcation_be.entity.enums;
 
 import org.solcation.solcation_be.util.entity.LegacyCommonType;
 
-public enum GENDER implements LegacyCommonType {
-    M(0, "M"), F(1, "F");
+public enum ROLE implements LegacyCommonType {
+    ADMIN(0, "ADMIN"),
+    USER(1, "USER");
 
     private final int code;
     private final String label;
 
-    GENDER(int code, String label) {
+    ROLE(int code, String label) {
         this.code = code;
         this.label = label;
     }

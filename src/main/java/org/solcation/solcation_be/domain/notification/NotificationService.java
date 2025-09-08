@@ -1,23 +1,19 @@
 package org.solcation.solcation_be.domain.notification;
 
-import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.common.CustomException;
 import org.solcation.solcation_be.common.ErrorCode;
 import org.solcation.solcation_be.domain.notification.dto.PushNotificationDTO;
-import org.solcation.solcation_be.entity.ALARMCODE;
+import org.solcation.solcation_be.entity.enums.ALARMCODE;
 import org.solcation.solcation_be.entity.AlarmCategory;
 import org.solcation.solcation_be.entity.PushNotification;
 import org.solcation.solcation_be.repository.PushNotificationRepository;
 import org.solcation.solcation_be.util.category.AlarmCategoryLookup;
 import org.solcation.solcation_be.util.redis.RedisPublisher;
-import org.solcation.solcation_be.util.redis.RedisSubscriber;
-import org.solcation.solcation_be.util.s3.S3Utils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;

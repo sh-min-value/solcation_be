@@ -2,7 +2,7 @@ package org.solcation.solcation_be.domain.stats;
 
 import lombok.RequiredArgsConstructor;
 import org.solcation.solcation_be.domain.stats.dto.FinishTravelListDTO;
-import org.solcation.solcation_be.entity.TRAVELSTATE;
+import org.solcation.solcation_be.entity.enums.TRAVELSTATE;
 import org.solcation.solcation_be.entity.Travel;
 import org.solcation.solcation_be.repository.TravelRepository;
 import org.springframework.stereotype.Service;

@@ -1,15 +1,12 @@
 package org.solcation.solcation_be.repository;
 
-import org.solcation.solcation_be.domain.stats.dto.FinishTravelListDTO;
-import org.solcation.solcation_be.entity.TRAVELSTATE;
+import org.solcation.solcation_be.entity.enums.TRAVELSTATE;
 import org.solcation.solcation_be.entity.Travel;
-import org.solcation.solcation_be.entity.TravelCategory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface TravelRepository extends JpaRepository<Travel, Long> {
