@@ -1,14 +1,11 @@
 package org.solcation.solcation_be.repository;
 
 import org.solcation.solcation_be.entity.PlanDetail;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +18,7 @@ public interface PlanDetailRepository extends JpaRepository<PlanDetail, Long> {
         where p.travel.tpPk = :travelId and p.tombstone = false
         order by p.pdDay asc, p.position asc, p.opTs asc, p.clientId asc, p.crdtId asc
     """)
-    List<PlanDetail> findAliveByTravelOrderByPosition(@Param("travelId") Long travelId);
+    List<PlanDetail> findAliveByTravelOrderByPdDayAscPositionAsc(@Param("travelId") Long travelId);
 
     // 같은 여행ID, 같은 Day, tombstone=false 만 정렬 조회
     @Query("""
@@ -29,7 +26,7 @@ public interface PlanDetailRepository extends JpaRepository<PlanDetail, Long> {
         where p.travel.tpPk = :travelId and p.pdDay = :day and p.tombstone = false
         order by p.position asc, p.opTs asc, p.clientId asc, p.crdtId asc
     """)
-    List<PlanDetail> findAliveByTravelAndDayOrderByPosition(
+    List<PlanDetail> findAliveByTravelAndDayByPdDayAscPositionAsc(
             @Param("travelId") Long travelId, @Param("day") Integer day);
 
     Optional<PlanDetail> findByCrdtId(String crdtId);

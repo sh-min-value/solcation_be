@@ -1,15 +1,17 @@
-package org.solcation.solcation_be.domain.travel;
+package org.solcation.solcation_be.domain.travel.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.solcation.solcation_be.common.CustomException;
 import org.solcation.solcation_be.common.ErrorCode;
+import org.solcation.solcation_be.domain.travel.dto.PlanDetailDTO;
 import org.solcation.solcation_be.domain.travel.dto.TravelReqDTO;
 import org.solcation.solcation_be.domain.travel.dto.TravelResDTO;
 import org.solcation.solcation_be.entity.*;
 import org.solcation.solcation_be.entity.enums.TRAVELSTATE;
 import org.solcation.solcation_be.repository.GroupRepository;
+import org.solcation.solcation_be.repository.PlanDetailRepository;
 import org.solcation.solcation_be.repository.TravelCategoryRepository;
 import org.solcation.solcation_be.repository.TravelRepository;
 import org.solcation.solcation_be.util.s3.S3Utils;
@@ -30,6 +32,7 @@ public class TravelService {
     private final TravelRepository travelRepository;
     private final TravelCategoryRepository travelCategoryRepository;
     private final GroupRepository groupRepository;
+    private final PlanDetailRepository planDetailRepository;
     private final S3Utils s3Utils;
 
     @Value("${cloud.s3.bucket.upload.profile.travel}")
@@ -48,12 +51,12 @@ public class TravelService {
 
     // 여행 생성
     @Transactional
-    protected Long create(TravelReqDTO dto) {
+    public Long create(TravelReqDTO dto) {
         Group group = groupRepository.findById(dto.getGroupPk())
-                .orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST, "존재하지 않는 그룹입니다. groupId="+dto.getGroupPk()));
+                .orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST));
 
         TravelCategory category = travelCategoryRepository.findById(dto.getCategoryPk())
-                .orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST, "존재하지 않는 카테고리입니다. travelCategoryId="+dto.getCategoryPk()));
+                .orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST));
 
         String location = dto.getCountry() + " " + dto.getCity();
 
@@ -100,7 +103,14 @@ public class TravelService {
     public TravelResDTO getTravelById(Long travelPk) {
         return travelRepository.findById(travelPk)
                 .map(this::toDto)
-                .orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST, "존재하지 않는 여행입니다. travelId=" + travelPk));
+                .orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST));
+    }
+
+    // 세부계획 조회
+    @Transactional(readOnly = true)
+    public List<PlanDetailDTO> getTravelPlans(Long travelPk) {
+        return planDetailRepository.findAliveByTravelOrderByPdDayAscPositionAsc(travelPk)
+                .stream().map(PlanDetailDTO::entityToDTO).toList();
     }
 
     private TravelResDTO toDto(Travel t) {

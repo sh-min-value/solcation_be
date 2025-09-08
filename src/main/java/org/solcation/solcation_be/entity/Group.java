@@ -44,5 +44,6 @@ public class Group extends BaseEntity {
 
     @Builder.Default
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
+    @Builder.Default
     private List<Travel> travels = new ArrayList<>();
 }
