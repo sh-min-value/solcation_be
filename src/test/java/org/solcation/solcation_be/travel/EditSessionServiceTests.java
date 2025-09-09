@@ -13,10 +13,13 @@ import org.redisson.client.codec.StringCodec;
 import org.redisson.codec.JsonJacksonCodec;
 import org.redisson.config.Config;
 
+import org.solcation.solcation_be.auth.AuthTests;
+import org.solcation.solcation_be.config.AuditingTestConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -39,17 +42,12 @@ import org.solcation.solcation_be.util.redis.RedisKeys;
 @SpringJUnitConfig
 @ContextConfiguration(classes = EditSessionServiceTests.TestConfig.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Import(AuditingTestConfig.class)
 class EditSessionServiceTests {
-    @MockBean
-    private JpaMetamodelMappingContext jpaMappingContext;
 
     @TestConfiguration
     static class TestConfig {
-        @Bean
-        public AuditorAware<Long> testAuditorAware() {
-            // createdBy/updatedBy에 들어갈 값 (고정)
-            return () -> Optional.of(1L);
-        }
+
         @Bean ObjectMapper objectMapper() { return new ObjectMapper(); }
 
         @Bean RedissonClient redissonClient(ObjectMapper om) {

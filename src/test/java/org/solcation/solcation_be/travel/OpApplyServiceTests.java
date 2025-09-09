@@ -10,11 +10,13 @@ import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.StringCodec;
 import org.redisson.codec.JsonJacksonCodec;
 import org.redisson.config.Config;
+import org.solcation.solcation_be.config.AuditingTestConfig;
 import org.solcation.solcation_be.domain.travel.service.OpApplyService;
 import org.solcation.solcation_be.domain.travel.ws.OpMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -29,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringJUnitConfig
 @ContextConfiguration(classes = OpApplyServiceTests.TestConfig.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Import(AuditingTestConfig.class)
 class OpApplyServiceTests {
 
     @TestConfiguration

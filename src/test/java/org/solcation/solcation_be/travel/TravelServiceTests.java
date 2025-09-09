@@ -2,14 +2,14 @@ package org.solcation.solcation_be.travel;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.solcation.solcation_be.config.AuditingTestConfig;
 import org.solcation.solcation_be.domain.travel.dto.TravelReqDTO;
 import org.solcation.solcation_be.domain.travel.dto.TravelResDTO;
 import org.solcation.solcation_be.domain.travel.service.TravelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.AuditorAware;
+import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,20 +17,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Slf4j
 @SpringBootTest
+@Import(AuditingTestConfig.class)
 class TravelServiceTests {
 
     @Autowired
     private TravelService travelService;
-
-    // 앱 본체에 @EnableJpaAuditing 있음: 테스트에선 Auditor만 mock으로 주입
-    @MockBean
-    AuditorAware<Long> auditorAware;
-
-    @org.junit.jupiter.api.BeforeEach
-    void setUpAuditor() {
-        org.mockito.Mockito.when(auditorAware.getCurrentAuditor())
-                .thenReturn(java.util.Optional.of(1L));
-    }
 
     @Test
     @Transactional
@@ -56,7 +47,7 @@ class TravelServiceTests {
 
         TravelResDTO res = travelService.getTravelById(travelPk);
         assertNotNull(res, "조회 결과가 null이면 안됨");
-        assertEquals("한라봉 푸파", res.getTitle());   // ★ 입력값과 동일하게 검증
+        assertEquals("한라봉 푸파", res.getTitle());
         log.info("조회 결과: {}", res);
     }
 }
