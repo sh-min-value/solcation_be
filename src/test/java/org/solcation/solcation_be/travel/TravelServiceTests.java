@@ -1,55 +1,62 @@
 package org.solcation.solcation_be.travel;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.solcation.solcation_be.domain.travel.dto.TravelReqDTO;
 import org.solcation.solcation_be.domain.travel.dto.TravelResDTO;
 import org.solcation.solcation_be.domain.travel.service.TravelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
+import org.springframework.data.domain.AuditorAware;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Slf4j
 @SpringBootTest
-@Transactional   // 테스트 후 롤백
-public class TravelServiceTests {
+class TravelServiceTests {
 
     @Autowired
     private TravelService travelService;
 
+    // 앱 본체에 @EnableJpaAuditing 있음: 테스트에선 Auditor만 mock으로 주입
+    @MockBean
+    AuditorAware<Long> auditorAware;
+
+    @org.junit.jupiter.api.BeforeEach
+    void setUpAuditor() {
+        org.mockito.Mockito.when(auditorAware.getCurrentAuditor())
+                .thenReturn(java.util.Optional.of(1L));
+    }
 
     @Test
-    void 여행_생성_및_조회() {
-        // given
+    @Transactional
+    void createTravelReq() {
         MockMultipartFile photo = new MockMultipartFile(
-                "photo",                         // form field name
-                "test.jpg",                      // original filename
-                "image/jpeg",                    // content type
-                "dummy-image-content".getBytes() // file content
+                "photo", "test.jpg", "image/jpeg", "dummy-image-content".getBytes()
         );
 
         TravelReqDTO req = TravelReqDTO.builder()
                 .groupPk(13L)
-                .categoryPk(1L)
-                .title("제주도 여행")
+                .country("대한민국")
+                .city("제주시")
+                .title("한라봉 푸파")
+                .startDate(java.time.LocalDate.of(2025, 9, 20))
+                .endDate(java.time.LocalDate.of(2025, 9, 22))
+                .categoryPk(3L)
                 .photo(photo)
+                .participant(2)
                 .build();
 
-        // when : 생성
         Long travelPk = travelService.create(req);
         assertNotNull(travelPk, "여행 생성 후 travelPk가 null이면 안됨");
 
-        // then : 조회
         TravelResDTO res = travelService.getTravelById(travelPk);
         assertNotNull(res, "조회 결과가 null이면 안됨");
-        assertEquals("제주도 여행", res.getTitle());
+        assertEquals("한라봉 푸파", res.getTitle());   // ★ 입력값과 동일하게 검증
         log.info("조회 결과: {}", res);
     }
 }

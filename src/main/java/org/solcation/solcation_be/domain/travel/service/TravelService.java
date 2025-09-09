@@ -95,9 +95,7 @@ public class TravelService {
                 .participant(dto.getParticipant())
                 .build();
 
-        travelRepository.save(travel);
-
-        return group.getGroupPk();
+        return travelRepository.save(travel).getTpPk();
     }
 
     // 단일 여행 조회
