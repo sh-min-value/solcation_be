@@ -8,6 +8,8 @@ import org.solcation.solcation_be.domain.auth.AuthService;
 import org.solcation.solcation_be.domain.auth.dto.LoginReqDTO;
 import org.solcation.solcation_be.domain.auth.dto.LoginResDTO;
 import org.solcation.solcation_be.domain.auth.dto.SignupReqDTO;
+import org.solcation.solcation_be.entity.User;
+import org.solcation.solcation_be.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -20,10 +22,13 @@ public class AuthTests {
     @Autowired
     private AuthService authService;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Test
     public void signupTest() {
         SignupReqDTO req = SignupReqDTO.builder()
-                .userId("admin2")
+                .userId("admin")
                 .userPw("1234")
                 .streetAddr("서울시 마포구")
                 .addrDetail("하늘땅")
@@ -50,5 +55,11 @@ public class AuthTests {
         LoginResDTO resDto = authService.login(reqDto);
 
         log.info("login successful: {}", resDto.getAccessToken());
+    }
+
+    @Test
+    public void getUserTest() {
+        User user = userRepository.findByUserId("admin3").orElseThrow(() -> new RuntimeException("user not found"));
+        log.info("user - 주소: {}", user.getStreetAddr());
     }
 }

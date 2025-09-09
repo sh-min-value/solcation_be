@@ -9,6 +9,7 @@ import org.solcation.solcation_be.entity.converter.UserGenderConverter;
 import org.solcation.solcation_be.entity.converter.UserRoleConverter;
 import org.solcation.solcation_be.entity.enums.GENDER;
 import org.solcation.solcation_be.entity.enums.ROLE;
+import org.solcation.solcation_be.util.security.AesGcmAttributeConverter;
 
 import java.time.LocalDate;
 
@@ -39,6 +40,7 @@ public class User {
     )
     private String userPw;
 
+    @Convert(converter = AesGcmAttributeConverter.class)
     @Column(
             name = "street_addr",
             nullable = false,
