@@ -50,10 +50,10 @@ public class SharedAccount {
     private int depositAmount;
 
     @Convert(converter = AesGcmAttributeConverter.class)
-    @Column(name = "account_num", nullable = false, length = 20)
+    @Column(name = "account_num", nullable = false)
     private String accountNum;
 
     @Convert(converter = AesGcmAttributeConverter.class)
-    @Column(name = "sa_pw", nullable = false, length = 6)
+    @Column(name = "sa_pw", nullable = false)
     private String saPw;
 }

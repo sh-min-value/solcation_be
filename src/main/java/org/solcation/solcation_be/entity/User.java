@@ -43,20 +43,17 @@ public class User {
     @Convert(converter = AesGcmAttributeConverter.class)
     @Column(
             name = "street_addr",
-            nullable = false,
-            length = 100
+            nullable = false
     )
     private String streetAddr;
 
     @Convert(converter = AesGcmAttributeConverter.class)
     @Column(
             name = "addr_detail",
-            nullable = false,
-            length = 100
+            nullable = false
     )
     private String addrDetail;
 
-    @Convert(converter = AesGcmAttributeConverter.class)
     @Column(
             name = "postal_code",
             nullable = false,
@@ -68,7 +65,6 @@ public class User {
     @Column(
             name = "tel",
             nullable = false,
-            length = 11,
             unique = true
     )
     private String tel;
@@ -103,8 +99,7 @@ public class User {
     @Convert(converter = AesGcmAttributeConverter.class)
     @Column(
             name = "email",
-            nullable = false,
-            length = 100
+            nullable = false
     )
     private String email;
 

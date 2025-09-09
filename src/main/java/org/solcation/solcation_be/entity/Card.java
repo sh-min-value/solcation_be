@@ -19,7 +19,7 @@ public class Card {
     private Long sacPk;
 
     @Convert(converter = AesGcmAttributeConverter.class)
-    @Column(name = "sac_num", nullable = false, length = 20)
+    @Column(name = "sac_num", nullable = false)
     private String sacNum;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -33,11 +33,11 @@ public class Card {
     private LocalDateTime expirationPeriod;
 
     @Convert(converter = AesGcmAttributeConverter.class)
-    @Column(name = "sac_cvc", nullable = false, length = 3)
+    @Column(name = "sac_cvc", nullable = false)
     private String cvc;
 
     @Convert(converter = AesGcmAttributeConverter.class)
-    @Column(name = "sac_pw", nullable = false, length = 6)
+    @Column(name = "sac_pw", nullable = false)
     private String pw;
 
     @Column(name = "cancellation", nullable = false)
