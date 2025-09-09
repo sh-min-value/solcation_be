@@ -8,14 +8,11 @@ import org.solcation.solcation_be.domain.group.dto.AddGroupReqDTO;
 import org.solcation.solcation_be.domain.group.dto.GroupInfoDTO;
 import org.solcation.solcation_be.domain.group.dto.GroupListDTO;
 import org.solcation.solcation_be.domain.group.dto.GroupMembersDTO;
-import org.solcation.solcation_be.entity.Group;
-import org.solcation.solcation_be.entity.GroupCategory;
-import org.solcation.solcation_be.entity.GroupMember;
-import org.solcation.solcation_be.entity.User;
-import org.solcation.solcation_be.repository.GroupCategoryRepository;
-import org.solcation.solcation_be.repository.GroupMemberRepository;
-import org.solcation.solcation_be.repository.GroupRepository;
-import org.solcation.solcation_be.repository.PushNotificationRepository;
+import org.solcation.solcation_be.domain.notification.NotificationService;
+import org.solcation.solcation_be.entity.*;
+import org.solcation.solcation_be.entity.enums.ALARMCODE;
+import org.solcation.solcation_be.repository.*;
+import org.solcation.solcation_be.util.category.AlarmCategoryLookup;
 import org.solcation.solcation_be.util.s3.S3Utils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +33,10 @@ public class GroupService {
     private final GroupCategoryRepository groupCategoryRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final PushNotificationRepository pushNotificationRepository;
+    private final UserRepository userRepository;
     private final S3Utils s3Utils;
+    private final NotificationService notificationService;
+    private final AlarmCategoryLookup alarmCategoryLookup;
 
     @Value("${cloud.s3.bucket.upload.profile.group}")
     private String UPLOAD_PATH;
@@ -156,5 +157,29 @@ public class GroupService {
                 .members(groupMembers)
                 .waitingList(waitingMembers)
                 .build();
+    }
+
+    /* 그룹 메인 - 초대 전송 */
+    public void inviteMembers(Long groupId, String tel) {
+        //전화번호로 회원 조회
+        User invitee = (User) userRepository.findByTel(tel).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        //그룹 조회
+        Group group = groupRepository.findByGroupPk(groupId);
+
+        //초대 전송(알림 전송, 알림 저장)
+        AlarmCategory ac = alarmCategoryLookup.get(ALARMCODE.GROUP_INVITE);
+
+        PushNotification pn = PushNotification.builder()
+                .pnTitle(ALARMCODE.GROUP_INVITE.getTitle())
+                .pnTime(LocalDateTime.now())
+                .pnContent(ALARMCODE.GROUP_INVITE.getContent())
+                .acPk(ac)
+                .userPk(invitee)
+                .groupPk(group)
+                .isAccepted(false)
+                .build();
+
+        notificationService.saveNotification(invitee.getUserPk(), pn);
     }
 }

@@ -53,4 +53,10 @@ public class GroupController {
     public GroupMembersDTO getMembers(@PathVariable("groupId") Long groupId) {
         return groupService.getGroupMembers(groupId);
     }
+
+    @Operation(summary = "그룹 메인 - 그룹 초대 전송")
+    @PostMapping("/{groupId:\\d+}/invite")
+    public void inviteMembers(@PathVariable("groupId") Long groupId, @PathParam("tel") String tel) {
+        groupService.inviteMembers(groupId, tel);
+    }
 }

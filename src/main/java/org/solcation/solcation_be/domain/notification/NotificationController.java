@@ -30,18 +30,18 @@ public class NotificationController {
     private final NotificationService notificationService;
     private final RedisPublisher redisPublisher;
 
-    //테스트용
-    @Operation(summary = "sse 연결", description = "emitter 생성")
-    @GetMapping(value = "/conn", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter connectSse() {
-        return notificationService.connectSse(1L);
-    }
-
+//    //테스트용
 //    @Operation(summary = "sse 연결", description = "emitter 생성")
 //    @GetMapping(value = "/conn", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-//    public SseEmitter connectSse(@AuthenticationPrincipal JwtPrincipal  jwtPrincipal) {
-//        return notificationService.connectSse(jwtPrincipal.userPk());
+//    public SseEmitter connectSse() {
+//        return notificationService.connectSse(1L);
 //    }
+
+    @Operation(summary = "sse 연결", description = "emitter 생성")
+    @GetMapping(value = "/conn", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter connectSse(@AuthenticationPrincipal JwtPrincipal  jwtPrincipal) {
+        return notificationService.connectSse(jwtPrincipal.userPk());
+    }
 
     @Operation(summary = "알림 생성 후 Redis 저장 + pubish 테스트")
     @PostMapping("/test")
@@ -75,7 +75,8 @@ public class NotificationController {
     /* 최근 30일(8일 ~ 30일) 알림 목록 렌더링 */
     @Operation(summary = "최근 30일(8-30일) 알림 목록 렌더링")
     @GetMapping("/list/recent/30days")
-    public void getRecent30daysList(@AuthenticationPrincipal JwtPrincipal jwtPrincipal, @PathParam("pageNo") int pageNo, @PathParam("pageSize") int pageSize) {
-
+    public NotificationPageRes getRecent30daysList(@AuthenticationPrincipal JwtPrincipal jwtPrincipal, @PathParam("pageNo") int pageNo, @PathParam("pageSize") int pageSize) {
+        Page<PushNotificationDTO> p = notificationService.getRecent30daysList(jwtPrincipal.userPk(), pageNo, pageSize);
+        return NotificationPageRes.from(p);
     }
 }

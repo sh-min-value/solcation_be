@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface GroupRepository extends JpaRepository<Group, Long> {
@@ -53,4 +54,6 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
 
     @Query("SELECT g.groupLeader FROM Group g WHERE g.groupPk = :groupPk")
     User findGroupLeaderByGroupPk(@Param("groupPk") Long groupPk);
+
+    Group findByGroupPk(Long groupPk);
 }

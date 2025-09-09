@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.domain.notification.SseManager;
 import org.solcation.solcation_be.domain.notification.dto.PublishDTO;
+import org.solcation.solcation_be.domain.notification.dto.PushNotificationDTO;
 import org.solcation.solcation_be.entity.PushNotification;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -21,7 +22,7 @@ import java.util.concurrent.ScheduledExecutorService;
 @RequiredArgsConstructor
 @Component
 public class RedisSubscriber {
-    private final RedisTemplate redisTemplate;
+    private final RedisTemplate<String, PushNotificationDTO> redisTemplate;
     private final ScheduledExecutorService exService = Executors.newScheduledThreadPool(10);
     private final SseManager sseManager;
 
@@ -36,9 +37,9 @@ public class RedisSubscriber {
     public void processMessage(Long pnPk, Long userPk, int attempt) {
         exService.submit(() -> {
            try {
-               PushNotification pn = null;
+               PushNotificationDTO pn = null;
                for(int i = 0; i < attempt; i++) {
-                   pn = (PushNotification) redisTemplate.opsForValue().get(String.valueOf(pnPk));
+                   pn = (PushNotificationDTO) redisTemplate.opsForValue().get(String.valueOf(pnPk));
 
                    if(pn != null) {
                        break;
