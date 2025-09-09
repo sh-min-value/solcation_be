@@ -23,7 +23,9 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,7 +66,7 @@ public class NotificationService {
     @Transactional
     public void updateCheck(Long pnPk, Long userPk) {
         PushNotification notification = (PushNotification) notificationRepository.findByPnPkAndUserPk_UserPk(pnPk, userPk).orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST));
-        notification.updateIsAccepted(true, LocalDateTime.now());
+        notification.updateIsAccepted(true, Instant.now());
         notificationRepository.save(notification);
     }
 
@@ -97,10 +99,13 @@ public class NotificationService {
         //현재 시간 기준으로 7일 전까지 / 그룹 초대 제외
         AlarmCategory ac = alarmCategoryLookup.get(ALARMCODE.GROUP_INVITE);
         Pageable pageable = PageRequest.of(pageNo, pageSize);
-        LocalDateTime to = LocalDateTime.now();
+
+        Instant to = Instant.now();
         log.info("to: {}", to.toString());
-        LocalDateTime from = to.minusDays(7);
+
+        Instant from = to.minus(7, ChronoUnit.DAYS);
         log.info("from: {}", from.toString());
+
         return pushNotificationRepository.findRecent(userPk, from, to, ac.getAcPk(), pageable);
 
     }
@@ -112,12 +117,12 @@ public class NotificationService {
         AlarmCategory ac = alarmCategoryLookup.get(ALARMCODE.GROUP_INVITE);
         Pageable pageable = PageRequest.of(pageNo, pageSize);
 
-        LocalDateTime now =  LocalDateTime.now();
+        Instant now = Instant.now();
 
-        LocalDateTime to = now.minusDays(8);
+        Instant to = now.minus(8, ChronoUnit.DAYS);
         log.info("to: {}", to.toString());
 
-        LocalDateTime from = now.minusDays(30);
+        Instant from = now.minus(40, ChronoUnit.DAYS);
         log.info("from: {}", from.toString());
 
         return pushNotificationRepository.findRecent(userPk, from, to, ac.getAcPk(), pageable);
@@ -128,7 +133,7 @@ public class NotificationService {
     public void updateGroupInvite(UpdateGroupInviteReqDTO dto, Long userPk) {
         //알림 읽음으로 업데이트
         PushNotification pn = notificationRepository.findByPnPk(dto.getPnPk());
-        pn.updateIsAccepted(true, LocalDateTime.now());
+        pn.updateIsAccepted(true, Instant.now());
         notificationRepository.save(pn);
 
         //그룹 멤버 is_accepted 업데이트

@@ -61,11 +61,11 @@ public class User {
     )
     private String postalCode;
 
-    @Convert(converter = AesGcmAttributeConverter.class)
     @Column(
             name = "tel",
             nullable = false,
-            unique = true
+            unique = true,
+            length = 11
     )
     private String tel;
 
