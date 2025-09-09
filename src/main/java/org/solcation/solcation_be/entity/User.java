@@ -48,6 +48,7 @@ public class User {
     )
     private String streetAddr;
 
+    @Convert(converter = AesGcmAttributeConverter.class)
     @Column(
             name = "addr_detail",
             nullable = false,
@@ -55,6 +56,7 @@ public class User {
     )
     private String addrDetail;
 
+    @Convert(converter = AesGcmAttributeConverter.class)
     @Column(
             name = "postal_code",
             nullable = false,
@@ -62,6 +64,7 @@ public class User {
     )
     private String postalCode;
 
+    @Convert(converter = AesGcmAttributeConverter.class)
     @Column(
             name = "tel",
             nullable = false,
@@ -97,6 +100,7 @@ public class User {
     @Convert(converter = UserRoleConverter.class)
     private ROLE role;
 
+    @Convert(converter = AesGcmAttributeConverter.class)
     @Column(
             name = "email",
             nullable = false,

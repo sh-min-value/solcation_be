@@ -6,6 +6,7 @@ import org.solcation.solcation_be.entity.converter.DepositCycleConverter;
 import org.solcation.solcation_be.entity.converter.DepositDayConverter;
 import org.solcation.solcation_be.entity.converter.UserRoleConverter;
 import org.solcation.solcation_be.entity.enums.DEPOSITCYCLE;
+import org.solcation.solcation_be.util.security.AesGcmAttributeConverter;
 
 import java.time.LocalDateTime;
 
@@ -48,9 +49,11 @@ public class SharedAccount {
     @Column(name = "deposit_amount", nullable = true)
     private int depositAmount;
 
+    @Convert(converter = AesGcmAttributeConverter.class)
     @Column(name = "account_num", nullable = false, length = 20)
     private String accountNum;
 
+    @Convert(converter = AesGcmAttributeConverter.class)
     @Column(name = "sa_pw", nullable = false, length = 6)
     private String saPw;
 }

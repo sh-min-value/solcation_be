@@ -2,6 +2,7 @@ package org.solcation.solcation_be.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.solcation.solcation_be.util.security.AesGcmAttributeConverter;
 
 import java.time.LocalDateTime;
 
@@ -17,6 +18,7 @@ public class Card {
     @Column(name = "sac_pk")
     private Long sacPk;
 
+    @Convert(converter = AesGcmAttributeConverter.class)
     @Column(name = "sac_num", nullable = false, length = 20)
     private String sacNum;
 
@@ -30,9 +32,11 @@ public class Card {
     @Column(name = "expiration_period", nullable = false)
     private LocalDateTime expirationPeriod;
 
+    @Convert(converter = AesGcmAttributeConverter.class)
     @Column(name = "sac_cvc", nullable = false, length = 3)
     private String cvc;
 
+    @Convert(converter = AesGcmAttributeConverter.class)
     @Column(name = "sac_pw", nullable = false, length = 6)
     private String pw;
 
