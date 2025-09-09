@@ -19,15 +19,15 @@ public class RedissonConfig {
     @Value("${spring.data.redis.port}")
     private int port;
 
-    @Value("${spring.data.redis.password}")
-    private String password;
+//    @Value("${spring.data.redis.password}")
+//    private String password;
 
     @Bean(destroyMethod = "shutdown")
     public RedissonClient redissonClient() {
         Config config = new Config();
         config.useSingleServer()
-                .setAddress("redis://" + host + ":" + port)
-                .setPassword(password);
+                .setAddress("redis://" + host + ":" + port);
+//                .setPassword(password);
 
         config.setCodec(new JsonJacksonCodec());
         return Redisson.create(config);

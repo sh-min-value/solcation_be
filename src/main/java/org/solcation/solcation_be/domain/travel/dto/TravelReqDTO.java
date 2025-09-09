@@ -55,4 +55,7 @@ public class TravelReqDTO {
     @Schema(description = "대표 사진 파일", type = "string", format = "binary")
     @NotNull(message = "이미지를 선택해주세요")
     private MultipartFile photo;
+
+    @Schema(description = "여행 인원", type="int")
+    private  int participant;
 }

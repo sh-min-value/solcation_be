@@ -52,4 +52,7 @@ public class Travel extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_pk", nullable = false)
     private Group group;
+
+    @Column(name="participant")
+    private int participant;
 }

@@ -92,6 +92,7 @@ public class TravelService {
                 .tpState(TRAVELSTATE.BEFORE)
                 .travelCategory(category)
                 .group(group)
+                .participant(dto.getParticipant())
                 .build();
 
         travelRepository.save(travel);
@@ -124,6 +125,7 @@ public class TravelService {
                 .state(t.getTpState().getLabel())
                 .categoryId(t.getTravelCategory().getTpcPk())
                 .categoryName(t.getTravelCategory().getTpcName())
+                .participant(t.getParticipant())
                 .build();
     }
 
