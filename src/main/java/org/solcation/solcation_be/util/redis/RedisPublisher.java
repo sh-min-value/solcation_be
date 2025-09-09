@@ -54,11 +54,7 @@ public class RedisPublisher {
                             .readAt(notification.getReadAt())
                             .build();
 
-            if(ALARMCODE.GROUP_INVITE.name().equals(notification.getAcPk().getAcCode())) {
-                redisTemplate.opsForValue().set(KEY_PREFIX + key, dto, TTL, TimeUnit.DAYS); //그룹 초대 ttl: 30분
-            } else {
-                redisTemplate.opsForValue().set(KEY_PREFIX + key, dto, TTL, TimeUnit.MINUTES); //이외 알림 ttl: 30분
-            }
+            redisTemplate.opsForValue().set(KEY_PREFIX + key, dto, TTL, TimeUnit.DAYS);
 
             log.info("Save message: [{}] at time: {} with notification pk: {}", CHANNEL, Instant.now(), notification.getPnPk());
         } catch (Exception e) {
