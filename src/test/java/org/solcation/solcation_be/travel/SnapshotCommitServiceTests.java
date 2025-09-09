@@ -45,8 +45,7 @@ class SnapshotCommitServiceTests {
         @Bean
         RedissonClient redissonClient(ObjectMapper objectMapper) {
             Config cfg = new Config();
-            cfg.useSingleServer().setAddress("redis://localhost:6379")
-                    .setPassword("1234");
+            cfg.useSingleServer().setAddress("redis://localhost:6379");
             cfg.setCodec(new JsonJacksonCodec(objectMapper));
             return Redisson.create(cfg);
         }

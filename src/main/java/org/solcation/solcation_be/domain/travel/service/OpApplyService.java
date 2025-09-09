@@ -18,7 +18,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import org.solcation.solcation_be.domain.travel.dto.PlanDetailDTO;
-import org.solcation.solcation_be.domain.travel.redis.RedisKeys;
+import org.solcation.solcation_be.util.redis.RedisKeys;
 import org.solcation.solcation_be.domain.travel.util.Positioning;
 import org.solcation.solcation_be.domain.travel.ws.OpMessage;
 
@@ -31,7 +31,7 @@ public class OpApplyService {
     private final SimpMessagingTemplate messaging;
 
     public void handleOp(long travelId, OpMessage op) {
-        // === 멱등 ===
+        // 멱등
         RBucket<String> seen = redisson.getBucket(RedisKeys.op(op.opId()));
         if (!seen.trySet("1", 24, TimeUnit.HOURS)) {
             return; // 이미 처리한 op
@@ -110,8 +110,8 @@ public class OpApplyService {
             if (!l2.tryLock(1, 5, TimeUnit.SECONDS)) throw new CustomException(ErrorCode.BUSY_RESOURCE);
 
             // 스냅샷 로드
-            var srcBucket = redisson.getBucket(RedisKeys.snapshot(travelId, oldDay));
-            var dstBucket = redisson.getBucket(RedisKeys.snapshot(travelId, newDay));
+            var srcBucket = redisson.getBucket(RedisKeys.snapshot(travelId, oldDay), StringCodec.INSTANCE);
+            var dstBucket = redisson.getBucket(RedisKeys.snapshot(travelId, newDay), StringCodec.INSTANCE);
             Snapshot src = readSnap((String) srcBucket.get()); if (src == null) src = new Snapshot(new ArrayList<>(), "0-0");
             Snapshot dst = readSnap((String) dstBucket.get()); if (dst == null) dst = new Snapshot(new ArrayList<>(), "0-0");
 
