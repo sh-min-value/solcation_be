@@ -79,18 +79,18 @@ public class StatsService {
             return new TravelSpendCompareDTO(0L, 0L, 0L);
         }
 
-        Long our    = toLong(row[0]);
+        Long our = toLong(row[0]);
         Long others = toLong(row[1]);
-        Long diff   = toLong(row[2]);
+        Long diff = toLong(row[2]);
 
         return new TravelSpendCompareDTO(our, others, diff);
     }
 
+    // 네이티브 쿼리 결과 long으로 통일
     private Long toLong(Object v) {
         if (v == null) return 0L;
         if (v instanceof Number) return ((Number) v).longValue();
         if (v instanceof Object[] arr && arr.length > 0 && arr[0] instanceof Number) {
-            // 혹시 또 한 번 싸여서 들어온 경우 방어
             return ((Number) arr[0]).longValue();
         } try {
             return Long.parseLong(String.valueOf(v));
