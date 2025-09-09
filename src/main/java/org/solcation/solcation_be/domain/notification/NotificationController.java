@@ -7,16 +7,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.domain.notification.dto.NotificationPageRes;
 import org.solcation.solcation_be.domain.notification.dto.PushNotificationDTO;
+import org.solcation.solcation_be.domain.notification.dto.UpdateGroupInviteReqDTO;
 import org.solcation.solcation_be.entity.PushNotification;
 import org.solcation.solcation_be.security.JwtPrincipal;
 import org.solcation.solcation_be.util.redis.RedisPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
@@ -72,5 +70,12 @@ public class NotificationController {
     public NotificationPageRes getRecent30daysList(@AuthenticationPrincipal JwtPrincipal jwtPrincipal, @PathParam("pageNo") int pageNo, @PathParam("pageSize") int pageSize) {
         Page<PushNotificationDTO> p = notificationService.getRecent30daysList(jwtPrincipal.userPk(), pageNo, pageSize);
         return NotificationPageRes.from(p);
+    }
+
+    /* 그룹 초대 수락/거절 업데이트 */
+    @Operation(summary = "그룹 초대 수락/거절 업데이트")
+    @PostMapping("/update-invite")
+    public void updateGroupInvite(@RequestBody UpdateGroupInviteReqDTO dto, @AuthenticationPrincipal JwtPrincipal jwtPrincipal) {
+        notificationService.updateGroupInvite(dto,  jwtPrincipal.userPk());
     }
 }

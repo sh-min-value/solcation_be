@@ -46,7 +46,7 @@ public class GroupMember extends BaseEntity {
                 .build();
     }
 
-    public void updateReject() {
-        this.isAccepted = false;
+    public void updateIsAccepted(Boolean isAccepted) {
+        this.isAccepted = isAccepted;
     }
 }

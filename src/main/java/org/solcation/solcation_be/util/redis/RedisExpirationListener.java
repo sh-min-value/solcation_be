@@ -38,7 +38,7 @@ public class RedisExpirationListener extends KeyExpirationEventMessageListener {
             User user = pushNotificationRepository.findByPnPk(pnPk).getUserPk();
             GroupMember gm = groupMemberRepository.findByUser(user);
 
-            gm.updateReject();
+            gm.updateIsAccepted(false);
 
             groupMemberRepository.save(gm);
         }

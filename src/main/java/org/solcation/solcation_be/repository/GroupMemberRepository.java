@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> {
@@ -36,4 +37,6 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
     List<User> findByGroup_GroupPkAndNotRejected(@Param("groupPk") Long groupPk);
 
     GroupMember findByUser(@Param("user") User user);
+
+    Optional<GroupMember> findByGroup_GroupPkAndUser_UserPkAndIsAcceptedIsNull(@Param("groupPk") Long groupPk, @Param("userPk") Long userPk);
 }
