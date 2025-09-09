@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -167,6 +168,15 @@ public class GroupService {
         //그룹 조회
         Group group = groupRepository.findByGroupPk(groupId);
 
+        //멤버 - isAccepted(true) | 거절 - isAccepted(false) | 대기 - isAccepted(null): 멤버/대기중인 회원 리스트에 존재 시 에러
+        List<User> groupMemebers = groupMemberRepository.findByGroup_GroupPkAndNotRejected(group.getGroupPk());
+
+        boolean exists = groupMemebers.stream().anyMatch(gm -> Objects.equals(invitee.getUserPk(), gm.getUserPk()));
+
+        if(exists) {
+            throw new CustomException(ErrorCode.BAD_REQUEST);
+        }
+
         //초대 전송(알림 전송, 알림 저장)
         AlarmCategory ac = alarmCategoryLookup.get(ALARMCODE.GROUP_INVITE);
 
@@ -181,5 +191,9 @@ public class GroupService {
                 .build();
 
         notificationService.saveNotification(invitee.getUserPk(), pn);
+
+        //대기 중인 그룹 멤버 추가
+        GroupMember groupMember = GroupMember.invitee(group, invitee);
+        groupMemberRepository.save(groupMember);
     }
 }

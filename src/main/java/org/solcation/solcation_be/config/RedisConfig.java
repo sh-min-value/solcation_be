@@ -3,6 +3,7 @@ package org.solcation.solcation_be.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.solcation.solcation_be.domain.notification.dto.PublishDTO;
 import org.solcation.solcation_be.domain.notification.dto.PushNotificationDTO;
+import org.solcation.solcation_be.util.redis.RedisExpirationListener;
 import org.solcation.solcation_be.util.redis.RedisSubscriber;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -91,5 +92,11 @@ public class RedisConfig {
                 },
                 new PatternTopic(CHANNEL));
         return container;
+    }
+
+    /* 이벤트 리스너 등록 */
+    @Bean
+    public RedisExpirationListener redisExpirationListener(RedisMessageListenerContainer container) {
+        return new RedisExpirationListener(container);
     }
 }

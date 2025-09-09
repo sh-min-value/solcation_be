@@ -25,6 +25,7 @@ public class RedisSubscriber {
     private final RedisTemplate<String, PushNotificationDTO> redisTemplate;
     private final ScheduledExecutorService exService = Executors.newScheduledThreadPool(10);
     private final SseManager sseManager;
+    private final String KEY_PREFIX = "pn:";
 
     public void onMessage(String channel, PublishDTO message) {
         log.info("Received message from channel: [{}] at time: {} with message: {}", channel, Instant.now(), message.getPnPk());
@@ -39,7 +40,7 @@ public class RedisSubscriber {
            try {
                PushNotificationDTO pn = null;
                for(int i = 0; i < attempt; i++) {
-                   pn = (PushNotificationDTO) redisTemplate.opsForValue().get(String.valueOf(pnPk));
+                   pn = (PushNotificationDTO) redisTemplate.opsForValue().get(KEY_PREFIX + String.valueOf(pnPk));
 
                    if(pn != null) {
                        break;
