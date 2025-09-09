@@ -2,9 +2,8 @@ package org.solcation.solcation_be.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.solcation.solcation_be.entity.converter.DepositCycleConverter;
 import org.solcation.solcation_be.entity.converter.TransactionTypeConverter;
-import org.solcation.solcation_be.entity.enums.DEPOSITCYCLE;
+import org.solcation.solcation_be.entity.enums.TRANSACTIONTYPE;
 
 import java.time.LocalDateTime;
 
@@ -29,7 +28,7 @@ public class Transaction {
 
     @Column(name = "transaction_type", nullable = true)
     @Convert(converter = TransactionTypeConverter.class)
-    private DEPOSITCYCLE transactionType;
+    private TRANSACTIONTYPE transactionType;
 
     @Column(name = "deposit_destination", nullable = true, length = 50)
     private String depositDestination;
