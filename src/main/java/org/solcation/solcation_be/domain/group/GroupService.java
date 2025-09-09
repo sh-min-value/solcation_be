@@ -13,6 +13,7 @@ import org.solcation.solcation_be.entity.*;
 import org.solcation.solcation_be.entity.enums.ALARMCODE;
 import org.solcation.solcation_be.repository.*;
 import org.solcation.solcation_be.util.category.AlarmCategoryLookup;
+import org.solcation.solcation_be.util.category.GroupCategoryLookup;
 import org.solcation.solcation_be.util.s3.S3Utils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,7 @@ public class GroupService {
     private final S3Utils s3Utils;
     private final NotificationService notificationService;
     private final AlarmCategoryLookup alarmCategoryLookup;
+    private final GroupCategoryLookup groupCategoryLookup;
 
     @Value("${cloud.s3.bucket.upload.profile.group}")
     private String UPLOAD_PATH;
@@ -45,7 +47,7 @@ public class GroupService {
     /* 그룹 생성 */
     @Transactional
     public boolean addGroup(AddGroupReqDTO addGroupReqDTO, User user) {
-        GroupCategory gc = groupCategoryRepository.findByGcPk(addGroupReqDTO.getGcPk());
+        GroupCategory gc = groupCategoryLookup.get(addGroupReqDTO.getGcPk());
 
         //확장자 확인(png, jpeg, jpg)
         String originalFilename = addGroupReqDTO.getProfileImg().getOriginalFilename();
