@@ -30,18 +30,18 @@ public class NotificationController {
     private final NotificationService notificationService;
     private final RedisPublisher redisPublisher;
 
-    //테스트용
-    @Operation(summary = "sse 연결", description = "emitter 생성")
-    @GetMapping(value = "/conn", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter connectSse() {
-        return notificationService.connectSse(1L);
-    }
-
+//    //테스트용
 //    @Operation(summary = "sse 연결", description = "emitter 생성")
 //    @GetMapping(value = "/conn", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-//    public SseEmitter connectSse(@AuthenticationPrincipal JwtPrincipal  jwtPrincipal) {
-//        return notificationService.connectSse(jwtPrincipal.userPk());
+//    public SseEmitter connectSse() {
+//        return notificationService.connectSse(1L);
 //    }
+
+    @Operation(summary = "sse 연결", description = "emitter 생성")
+    @GetMapping(value = "/conn", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter connectSse(@AuthenticationPrincipal JwtPrincipal  jwtPrincipal) {
+        return notificationService.connectSse(jwtPrincipal.userPk());
+    }
 
     @Operation(summary = "알림 생성 후 Redis 저장 + pubish 테스트")
     @PostMapping("/test")

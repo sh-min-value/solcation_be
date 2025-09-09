@@ -50,7 +50,7 @@ public class NotificationService {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
-                redisPublisher.saveNotificationWithTTL(userPk, pushNotification);
+                redisPublisher.saveNotificationWithTTL(pushNotification.getPnPk(), pushNotification);
                 redisPublisher.publish(pushNotification.getPnPk(), userPk);
             }
         });

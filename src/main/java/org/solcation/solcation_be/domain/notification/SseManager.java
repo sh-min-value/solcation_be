@@ -2,6 +2,7 @@ package org.solcation.solcation_be.domain.notification;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.solcation.solcation_be.domain.notification.dto.PushNotificationDTO;
 import org.solcation.solcation_be.entity.PushNotification;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -75,7 +76,7 @@ public class SseManager {
     }
 
     /* 메시지 전송 */
-    public void sendNotificationToEmitter(Long userPk, PushNotification notification) {
+    public void sendNotificationToEmitter(Long userPk, PushNotificationDTO notification) {
         List<SseEmitter> emitters = emitterList.getOrDefault(userPk, new CopyOnWriteArrayList<>());
 
         if(!emitters.isEmpty()) {
