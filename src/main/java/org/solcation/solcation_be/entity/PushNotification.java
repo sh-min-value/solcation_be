@@ -39,7 +39,7 @@ public class PushNotification extends BaseEntity {
     @JoinColumn(name = "group_pk", referencedColumnName = "group_pk")
     private Group groupPk;
 
-    @Column(name = "is_accepted", nullable = true)
+    @Column(name = "is_accepted", nullable = false)
     private Boolean isAccepted;
 
     @Column(name = "read_at", nullable = true)

@@ -45,4 +45,5 @@ public interface PushNotificationRepository extends JpaRepository<PushNotificati
     """)
     Page<PushNotificationDTO> findRecent(@Param("userPk") Long userPk, @Param("fromTime") LocalDateTime fromTime, @Param("toTime") LocalDateTime toTime, @Param("acPk") Long acPk, Pageable pageable);
 
+    PushNotification findByPnPk(@Param("pnPk") Long pnPk);
 }

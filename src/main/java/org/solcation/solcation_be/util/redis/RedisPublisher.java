@@ -9,6 +9,7 @@ import org.solcation.solcation_be.common.ErrorCode;
 import org.solcation.solcation_be.domain.notification.dto.PublishDTO;
 import org.solcation.solcation_be.domain.notification.dto.PushNotificationDTO;
 import org.solcation.solcation_be.entity.PushNotification;
+import org.solcation.solcation_be.entity.enums.ALARMCODE;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -28,6 +29,7 @@ public class RedisPublisher {
     private String CHANNEL;
 
     private final Long TTL = 30L;
+    private final String KEY_PREFIX = "pn:";
 
     /* 메시지를 특정 채널에 발행(pnPk, userPk): userPk에 해당하는 유저에게 발행 */
     public void publish(Long pnPk, Long userPk) {
@@ -52,8 +54,8 @@ public class RedisPublisher {
                             .readAt(notification.getReadAt())
                             .build();
 
+            redisTemplate.opsForValue().set(KEY_PREFIX + key, dto, TTL, TimeUnit.DAYS);
 
-            redisTemplate.opsForValue().set(key, dto, TTL, TimeUnit.DAYS);
             log.info("Save message: [{}] at time: {} with notification pk: {}", CHANNEL, Instant.now(), notification.getPnPk());
         } catch (Exception e) {
             log.error("Exception in saveNotificationWithTTL - message: {}", e.getMessage());

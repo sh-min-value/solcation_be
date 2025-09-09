@@ -27,7 +27,7 @@ public class GroupMember extends BaseEntity {
     @Column(name = "role", nullable = false)
     private Boolean role;
 
-    @Column(name = "is_accepted", nullable = false)
+    @Column(name = "is_accepted", nullable = true)
     private Boolean isAccepted;
 
     @Column(name = "is_out", nullable = false)
@@ -36,4 +36,17 @@ public class GroupMember extends BaseEntity {
     @Column(name = "has_card", nullable = false)
     private Boolean hasCard;
 
+    public static GroupMember invitee(Group group, User invitee) {
+        return GroupMember.builder()
+                .group(group)
+                .user(invitee)
+                .role(false)
+                .isOut(false)
+                .hasCard(false)
+                .build();
+    }
+
+    public void updateIsAccepted(Boolean isAccepted) {
+        this.isAccepted = isAccepted;
+    }
 }

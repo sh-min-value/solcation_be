@@ -5,9 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.common.CustomException;
 import org.solcation.solcation_be.common.ErrorCode;
 import org.solcation.solcation_be.domain.notification.dto.PushNotificationDTO;
+import org.solcation.solcation_be.domain.notification.dto.UpdateGroupInviteReqDTO;
+import org.solcation.solcation_be.entity.GroupMember;
 import org.solcation.solcation_be.entity.enums.ALARMCODE;
 import org.solcation.solcation_be.entity.AlarmCategory;
 import org.solcation.solcation_be.entity.PushNotification;
+import org.solcation.solcation_be.repository.GroupMemberRepository;
 import org.solcation.solcation_be.repository.PushNotificationRepository;
 import org.solcation.solcation_be.util.category.AlarmCategoryLookup;
 import org.solcation.solcation_be.util.redis.RedisPublisher;
@@ -30,9 +33,10 @@ import java.util.List;
 @Slf4j
 public class NotificationService {
     private final SseManager sseManager;
-    private final PushNotificationRepository notificationRepository;
     private final RedisPublisher redisPublisher;
+    private final PushNotificationRepository notificationRepository;
     private final PushNotificationRepository pushNotificationRepository;
+    private final GroupMemberRepository groupMemberRepository;
     private final AlarmCategoryLookup alarmCategoryLookup;
 
     /* sse 연결 (emitter 생성) */
@@ -117,5 +121,19 @@ public class NotificationService {
         log.info("from: {}", from.toString());
 
         return pushNotificationRepository.findRecent(userPk, from, to, ac.getAcPk(), pageable);
+    }
+
+    /* 그룹 초대 수락/거절 */
+    @Transactional
+    public void updateGroupInvite(UpdateGroupInviteReqDTO dto, Long userPk) {
+        //알림 읽음으로 업데이트
+        PushNotification pn = notificationRepository.findByPnPk(dto.getPnPk());
+        pn.updateIsAccepted(true, LocalDateTime.now());
+        notificationRepository.save(pn);
+
+        //그룹 멤버 is_accepted 업데이트
+        GroupMember gm = groupMemberRepository.findByGroup_GroupPkAndUser_UserPkAndIsAcceptedIsNull(dto.getGroupPk(), userPk).orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST));
+        gm.updateIsAccepted(dto.getDecision());
+        groupMemberRepository.save(gm);
     }
 }
