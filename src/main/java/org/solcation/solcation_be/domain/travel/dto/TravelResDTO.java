@@ -23,6 +23,7 @@ public class TravelResDTO {
     private String state;
     private Long categoryId;
     private String categoryName;
+    private int participant;
 
 
 

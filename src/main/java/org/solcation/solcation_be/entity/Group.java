@@ -42,7 +42,7 @@ public class Group extends BaseEntity {
     @JoinColumn(name = "group_leader", referencedColumnName = "user_pk")
     private User groupLeader;
 
-    @Builder.Default
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
+    @Builder.Default
     private List<Travel> travels = new ArrayList<>();
 }
