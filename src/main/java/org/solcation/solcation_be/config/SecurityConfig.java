@@ -43,6 +43,9 @@ public class SecurityConfig {
 //                        .requestMatchers(HttpMethod.GET, "/notification/conn").permitAll() //todo: 없애기
                         //그룹 멤버 인증
                         .requestMatchers(groupMatcher).access(new GroupAuthorizationManager(groupAuth))
+                        // WebSocket 핸드셰이크 허용
+                        .requestMatchers("/ws").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
                         // 그 외는 인증 필요
                         .anyRequest().authenticated()
                 )

@@ -72,6 +72,14 @@ dependencies {
     implementation 'software.amazon.awssdk:s3:2.33.0'
     implementation 'software.amazon.awssdk:sts:2.33.0'
 
+    /* websocket */
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
+    /* redisson */
+    implementation 'org.redisson:redisson-spring-boot-starter:3.28.0'
+    implementation 'org.redisson:redisson:3.27.2'
+
     /* redis */
     implementation 'org.springframework.data:spring-data-redis'
     implementation 'io.lettuce:lettuce-core'
