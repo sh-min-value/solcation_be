@@ -107,6 +107,7 @@ public class CardService {
         CardInfoDTO result = CardInfoDTO.builder()
                 .cardNum(card.getSacNum())
                 .totalCost(total)
+                .created_at(card.getCreatedAt())
                 .build();
 
         return result;
