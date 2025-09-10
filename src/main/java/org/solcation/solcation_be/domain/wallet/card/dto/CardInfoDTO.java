@@ -12,5 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CardInfoDTO {
-    private String cardNumber;
+    //카드 번호
+    private String cardNum;
+
+    //이번달 이용 금액
+    private int totalCost;
 }

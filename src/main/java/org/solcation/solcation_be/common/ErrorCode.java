@@ -28,6 +28,7 @@ public enum ErrorCode {
     NOT_FOUND_END_POINT(40400, HttpStatus.NOT_FOUND, "존재하지 않는 API입니다."), //DEFAULT
     NOT_EXIST(40004, HttpStatus.NOT_FOUND, "존재하지 않습니다."),
     NOT_FOUND_ACCOUNT(40001, HttpStatus.NOT_FOUND, "계좌가 존재하지 않습니다."),
+    NOT_FOUND_CARD(40002, HttpStatus.NOT_FOUND, "카드가 존재하지 않습니다."),
 
     // 405 Method Not Allowed
     METHOD_NOT_ALLOWED(40500, HttpStatus.METHOD_NOT_ALLOWED, "허용되지 않은 HTTP 메서드입니다."), //DEFAULT

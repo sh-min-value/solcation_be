@@ -37,4 +37,11 @@ public class CardController {
     public void getCardTransactionsByFiltering(@PathVariable("groupId") Long groupId) {
 
     }
+
+    /* 카드 해지 */
+    @Operation(summary = "카드 해지")
+    @PostMapping("/cancel")
+    public void cancelCard(@PathVariable("groupId") Long groupId, @AuthenticationPrincipal JwtPrincipal principal) {
+        cardService.cancelCard(groupId, principal);
+    }
 }

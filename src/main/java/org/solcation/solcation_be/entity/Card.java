@@ -43,7 +43,7 @@ public class Card extends BaseEntity{
     private Boolean cancellation;
 
     @Column(name = "cancellation_date", nullable = true)
-    private LocalDateTime cancellationDate;
+    private Instant cancellationDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "gm_pk", referencedColumnName = "gm_pk")
@@ -69,5 +69,10 @@ public class Card extends BaseEntity{
     public void setExpiration(YearMonth expiration) {
         this.expirationYear = (short) expiration.getYear();
         this.expirationMonth = (byte) expiration.getMonthValue();
+    }
+
+    public void updateCancellation() {
+        this.cancellation = true;
+        this.cancellationDate = Instant.now();
     }
 }

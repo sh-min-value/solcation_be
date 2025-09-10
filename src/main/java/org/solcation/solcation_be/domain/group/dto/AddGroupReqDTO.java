@@ -11,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Setter
 public class AddGroupReqDTO {
     //그룹 카테고리
     @NotNull

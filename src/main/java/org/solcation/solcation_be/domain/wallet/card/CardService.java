@@ -81,13 +81,29 @@ public class CardService {
     /* 카드 정보 렌더링 */
     @Transactional
     public void getCardInfo() {
+        //이번 달 카드 이용 총 금액 조회
 
+        //카드 번호 조회
     }
 
     /* 카드 거래 내역 렌더링(필터링 포함) */
     @Transactional
     public void getCardTransactionsByFiltering() {
 
+    }
+
+    /* 카드 해지 */
+    @Transactional
+    public void cancelCard(Long groupPk, JwtPrincipal principal) {
+        //groupPk, userPk로 카드 조회
+        Group group = groupRepository.findByGroupPk(groupPk);
+        User user = userRepository.findByUserId(principal.userId()).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        Card card = cardRepository.findBySaPk_GroupAndGmPk_UserAndCancellationFalse(group, user).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CARD));
+
+        //cancellation(1), cancellation_date(now) 수정
+        card.updateCancellation();
+
+        cardRepository.save(card);
     }
 
     /** 카드 번호 생성(Luhn 알고리즘)
