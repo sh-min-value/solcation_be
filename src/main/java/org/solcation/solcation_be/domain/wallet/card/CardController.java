@@ -2,8 +2,10 @@ package org.solcation.solcation_be.domain.wallet.card;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.solcation.solcation_be.domain.wallet.card.dto.CardInfoDTO;
 import org.solcation.solcation_be.domain.wallet.card.dto.OpenCardReqDTO;
 import org.solcation.solcation_be.security.JwtPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,15 +22,15 @@ public class CardController {
 
     @Operation(summary = "카드 개설")
     @PostMapping("/open")
-    public void OpenCard(@PathVariable("groupId") Long groupId, @RequestBody OpenCardReqDTO dto, @AuthenticationPrincipal JwtPrincipal principal) {
+    public void OpenCard(@PathVariable("groupId") Long groupId, @Valid @RequestBody OpenCardReqDTO dto, @AuthenticationPrincipal JwtPrincipal principal) {
         cardService.openCard(groupId, principal, dto);
     }
 
     /* 카드 정보 렌더링 */
     @Operation(summary = "카드 정보 렌더링")
     @GetMapping("/info")
-    public void getCardInfo(@PathVariable("groupId") Long groupId) {
-
+    public CardInfoDTO getCardInfo(@PathVariable("groupId") Long groupId, @AuthenticationPrincipal JwtPrincipal principal) {
+        return cardService.getCardInfo(groupId, principal);
     }
 
     /* 카드 거래 내역 렌더링(필터링 포함) */
