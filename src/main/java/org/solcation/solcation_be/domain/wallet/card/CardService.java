@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.common.CustomException;
 import org.solcation.solcation_be.common.ErrorCode;
 import org.solcation.solcation_be.domain.wallet.card.dto.CardInfoDTO;
+import org.solcation.solcation_be.domain.wallet.card.dto.CardTransactionDTO;
 import org.solcation.solcation_be.domain.wallet.card.dto.OpenCardReqDTO;
 import org.solcation.solcation_be.entity.*;
 import org.solcation.solcation_be.entity.enums.TRANSACTIONCODE;
@@ -107,7 +108,7 @@ public class CardService {
         CardInfoDTO result = CardInfoDTO.builder()
                 .cardNum(card.getSacNum())
                 .totalCost(total)
-                .created_at(card.getCreatedAt())
+                .createdAt(card.getCreatedAt())
                 .build();
 
         return result;
@@ -115,8 +116,8 @@ public class CardService {
 
     /* 카드 거래 내역 렌더링(필터링 포함) */
     @Transactional
-    public void getCardTransactionsByFiltering() {
-
+    public CardTransactionDTO getCardTransactionsByFiltering() {
+        return null;
     }
 
     /* 카드 해지 */

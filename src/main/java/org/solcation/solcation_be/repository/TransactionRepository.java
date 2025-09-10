@@ -132,6 +132,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
         """, nativeQuery = true)
     Object[] compareTravelSpend(@Param("tpPk") Long tpPk);
 
+    //기간 동안의 총 거래액 추출
     @Query("""
     SELECT COALESCE(SUM(t.satAmount) , 0)
     FROM Transaction t
