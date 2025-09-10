@@ -24,7 +24,4 @@ public class TravelResDTO {
     private Long categoryId;
     private String categoryName;
     private int participant;
-
-
-
 }

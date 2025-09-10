@@ -22,7 +22,6 @@ public class WsClientRunner {
         long travelId = Long.parseLong(System.getProperty("travelId", "1"));
         int day = Integer.parseInt(System.getProperty("day", "1"));
 
-        // 유효한 JWT로 교체하세요.
         String jwt = System.getProperty("token",
                 "YOUR_TOKEN");
         if (jwt == null || jwt.isBlank() || jwt.startsWith("PASTE_")) {
@@ -34,7 +33,6 @@ public class WsClientRunner {
         String sendDest = "/app/group/" + groupId + "/travel/" + travelId + "/edit/op";
         WebSocketStompClient stomp = new WebSocketStompClient(new StandardWebSocketClient());
         stomp.setMessageConverter(new MappingJackson2MessageConverter());
-        // Heartbeat & 스케줄러(옵션이지만 안정화)
         stomp.setTaskScheduler(new ConcurrentTaskScheduler());
         stomp.setDefaultHeartbeat(new long[]{10000, 10000});
 
@@ -56,7 +54,6 @@ public class WsClientRunner {
                     }
                 });
 
-                // 바로 보내도 되지만, 구독이 서버에 등록될 시간 100ms 주기(안 줘도 보통 OK)
                 Executors.newSingleThreadScheduledExecutor().schedule(() -> {
                     var op = Map.of(
                             "type", "insert",
@@ -75,7 +72,6 @@ public class WsClientRunner {
                     );
                     StompHeaders sendHeaders = new StompHeaders();
                     sendHeaders.setDestination(sendDest);
-                    // ★ 중요: JSON 명시
                     sendHeaders.setContentType(MimeTypeUtils.APPLICATION_JSON);
                     session.send(sendHeaders, op);
                     System.out.println(">> SENT insert op");

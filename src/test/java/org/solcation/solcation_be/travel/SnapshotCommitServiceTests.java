@@ -8,6 +8,7 @@ import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.codec.JsonJacksonCodec;
 import org.redisson.config.Config;
+import org.solcation.solcation_be.config.AuditingTestConfig;
 import org.solcation.solcation_be.domain.travel.dto.PlanDetailDTO;
 import org.solcation.solcation_be.domain.travel.service.OpApplyService;
 import org.solcation.solcation_be.domain.travel.service.SnapshotCommitService;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -32,7 +34,8 @@ import static org.mockito.Mockito.*;
 
 
 @ActiveProfiles("test")
-@SpringJUnitConfig // = @ExtendWith(SpringExtension.class) + @ContextConfiguration
+@SpringJUnitConfig
+@Import(AuditingTestConfig.class)
 @ContextConfiguration(classes = SnapshotCommitServiceTests.TestConfig.class)
 class SnapshotCommitServiceTests {
     @TestConfiguration
@@ -45,8 +48,7 @@ class SnapshotCommitServiceTests {
         @Bean
         RedissonClient redissonClient(ObjectMapper objectMapper) {
             Config cfg = new Config();
-            cfg.useSingleServer().setAddress("redis://localhost:6379")
-                    .setPassword("1234");
+            cfg.useSingleServer().setAddress("redis://localhost:6379");
             cfg.setCodec(new JsonJacksonCodec(objectMapper));
             return Redisson.create(cfg);
         }

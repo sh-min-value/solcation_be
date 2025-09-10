@@ -18,7 +18,7 @@ import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
 
 import org.solcation.solcation_be.domain.travel.dto.PlanDetailDTO;
-import org.solcation.solcation_be.domain.travel.redis.RedisKeys;
+import org.solcation.solcation_be.util.redis.RedisKeys;
 import org.solcation.solcation_be.entity.PlanDetail;
 import org.solcation.solcation_be.entity.Travel;
 import org.solcation.solcation_be.repository.PlanDetailRepository;
@@ -42,7 +42,7 @@ public class SnapshotCommitService {
         RLock lock = redisson.getLock(RedisKeys.saveLock(travelId, day));
         try {
             if (!lock.tryLock(5, 30, TimeUnit.SECONDS)) {
-                throw new CustomException(ErrorCode.BUSY_RESOURCE);
+                throw new CustomException(ErrorCode.LOCKED);
             }
 
             var snapBucket = redisson.getBucket(RedisKeys.snapshot(travelId, day));
@@ -98,7 +98,6 @@ public class SnapshotCommitService {
         days.stream().map(Integer::parseInt).sorted().forEach(d -> save(travelId, d, clientId));
     }
 
-    /* 내부 VO + JSON */
     private record Snapshot(java.util.List<PlanDetailDTO> items, String lastStreamId) {}
     private <T> T readJson(String s, Class<T> c){ try { return s==null?null:om.readValue(s,c);} catch(Exception e){ throw new RuntimeException(e);} }
 }

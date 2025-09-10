@@ -14,13 +14,12 @@ import org.solcation.solcation_be.util.security.AesGcmAttributeConverter;
 
 
 @Entity
-@Builder
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "shared_account_tb")
-public class SharedAccount extends BaseEntity {
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
+public class SharedAccount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sa_pk")
