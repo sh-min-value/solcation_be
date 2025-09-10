@@ -42,7 +42,7 @@ public class SnapshotCommitService {
         RLock lock = redisson.getLock(RedisKeys.saveLock(travelId, day));
         try {
             if (!lock.tryLock(5, 30, TimeUnit.SECONDS)) {
-                throw new CustomException(ErrorCode.BUSY_RESOURCE);
+                throw new CustomException(ErrorCode.LOCKED);
             }
 
             var snapBucket = redisson.getBucket(RedisKeys.snapshot(travelId, day));

@@ -1,16 +1,13 @@
 package org.solcation.solcation_be.repository;
 
-import org.solcation.solcation_be.domain.wallet.account.dto.DepositCycleDTO;
 import org.solcation.solcation_be.entity.SharedAccount;
+import org.solcation.solcation_be.entity.enums.DEPOSITCYCLE;
+import org.solcation.solcation_be.entity.enums.DEPOSITDAY;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface SharedAccountRepository extends JpaRepository<SharedAccount, Long> {
@@ -24,8 +21,8 @@ public interface SharedAccountRepository extends JpaRepository<SharedAccount, Lo
             "    sa.depositDay = :depositDay, " +
             "    sa.depositAmount = :depositAmount " +
             "WHERE sa.saPk = :saPk")
-    int updateDepositCycle(Long saPk, Boolean depositAlarm, String depositCycle,
-                           LocalDateTime depositDate, String depositDay, int depositAmount);
+    void updateDepositCycle(Long saPk, Boolean depositAlarm, DEPOSITCYCLE depositCycle,
+                           Integer depositDate, DEPOSITDAY depositDay, int depositAmount);
 
 
 }

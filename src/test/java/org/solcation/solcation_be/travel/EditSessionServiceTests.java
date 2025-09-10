@@ -13,15 +13,10 @@ import org.redisson.client.codec.StringCodec;
 import org.redisson.codec.JsonJacksonCodec;
 import org.redisson.config.Config;
 
-import org.solcation.solcation_be.auth.AuthTests;
-import org.solcation.solcation_be.config.AuditingTestConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.AuditorAware;
-import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -30,14 +25,15 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
+import org.solcation.solcation_be.config.AuditingTestConfig;
 import org.solcation.solcation_be.domain.travel.dto.PlanDetailDTO;
 import org.solcation.solcation_be.domain.travel.service.EditSessionService;
 import org.solcation.solcation_be.domain.travel.ws.JoinPayload;
 import org.solcation.solcation_be.entity.PlanDetail;
 import org.solcation.solcation_be.repository.PlanDetailRepository;
 import org.solcation.solcation_be.util.redis.RedisKeys;
+
 @ActiveProfiles("test")
 @SpringJUnitConfig
 @ContextConfiguration(classes = EditSessionServiceTests.TestConfig.class)

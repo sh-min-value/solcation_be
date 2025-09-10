@@ -45,7 +45,7 @@ public class SharedAccountService {
     public SharedAccountResDTO getSharedAccountInfo(Long groupId) {
         SharedAccount res = sharedAccountRepository.findByGroup_GroupPk(groupId);
         if (res == null) {
-            throw new CustomException(ErrorCode.NOT_EXIST);
+            throw new CustomException(ErrorCode.NOT_FOUND_ACCOUNT);
         }
         SharedAccountResDTO dto = SharedAccountResDTO.builder()
                 .saPk(res.getSaPk())
@@ -65,8 +65,7 @@ public class SharedAccountService {
     @Transactional
     public Long createSharedAccount(Long groupId, SharedAccountReqDTO dto) {
         var group = groupRepository.findByGroupPk(groupId);
-        if (group == null) throw new CustomException(ErrorCode.NOT_EXIST);
-        if(sharedAccountRepository.findByGroup_GroupPk(groupId)!=null) throw new CustomException(ErrorCode.ALREADY_EXIST);
+        if(sharedAccountRepository.findByGroup_GroupPk(groupId)!=null) throw new CustomException(ErrorCode.ACCOUNT_ALREADY_EXISTS);
         MultipartFile signature = dto.getSignature();
         //확장자 확인(png, jpeg, jpg)
         String originalFilename = signature.getOriginalFilename();
@@ -110,19 +109,18 @@ public class SharedAccountService {
     @Transactional
     public void updateDepositCycle(Long groupId, DepositCycleDTO dto) {
         SharedAccount res = sharedAccountRepository.findByGroup_GroupPk(groupId);
-        if (res == null) throw new CustomException(ErrorCode.NOT_EXIST);
+        if (res == null) throw new CustomException(ErrorCode.NOT_FOUND_ACCOUNT);
 
 
-        res.setDepositAlarm(dto.getDepositAlarm());
-        res.setDepositCycle(dto.getDepositCycle());
-        if (dto.getDepositCycle() == DEPOSITCYCLE.MONTH) {
-            res.setDepositDate(dto.getDepositDate()); // Integer
-            res.setDepositDay(null);
-        } else if (dto.getDepositCycle() == DEPOSITCYCLE.WEEK) {
-            res.setDepositDay(dto.getDepositDay());
-            res.setDepositDate(null);                 // Integer라서 가능
-        }
-        res.setDepositAmount(dto.getDepositAmount());
+        Integer cycleCode = (dto.getDepositCycle() != null) ? dto.getDepositCycle().getCode() : null;
+        Integer dayCode   = (dto.getDepositDay()    != null) ? dto.getDepositDay().getCode()    : null;
+
+        sharedAccountRepository.updateDepositCycle(dto.getSaPk(),
+                dto.getDepositAlarm(),
+                dto.getDepositCycle(),
+                dto.getDepositDate(),
+                dto.getDepositDay(),
+                dto.getDepositAmount());
     }
 
     private String generateAccountNumber(Long groupId) {

@@ -26,7 +26,10 @@ public enum ErrorCode {
 
     // 404 Not Found
     NOT_FOUND_END_POINT(40400, HttpStatus.NOT_FOUND, "존재하지 않는 API입니다."), //DEFAULT
-    NOT_EXIST(40004, HttpStatus.NOT_FOUND, "존재하지 않습니다."),
+    NOT_FOUND_ACCOUNT(40401, HttpStatus.NOT_FOUND, "계좌가 존재하지 않습니다."),
+    NOT_FOUND_PLAN(40403, HttpStatus.NOT_FOUND, "여행 계획이 없습니다."),
+    NOT_FOUND_CATEGORY(40404, HttpStatus.NOT_FOUND, "존재하지 않는 카테고리입니다"),
+    NOT_FOUND_GROUP(40405, HttpStatus.NOT_FOUND, "존재하지 않는 세부 계획입니다"),
 
     // 405 Method Not Allowed
     METHOD_NOT_ALLOWED(40500, HttpStatus.METHOD_NOT_ALLOWED, "허용되지 않은 HTTP 메서드입니다."), //DEFAULT
@@ -36,6 +39,7 @@ public enum ErrorCode {
 
     // 409 Conflict
     CONFLICT(40900, HttpStatus.CONFLICT, "자원이 충돌하였습니다."), //DEFAULT
+    ACCOUNT_ALREADY_EXISTS(40902, HttpStatus.CONFLICT, "계좌가 이미 존재합니다."),
 
     // 410 Gone
     GONE(41000, HttpStatus.GONE, "만료되었습니다."),
@@ -50,9 +54,7 @@ public enum ErrorCode {
     LOCKED(42300, HttpStatus.LOCKED, "자원에 접근할 수 없습니다."),
 
     // 500 Internal Server Error
-    INTERNAL_SERVER_ERROR(500, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다."),
-    BUSY_RESOURCE(50001, HttpStatus.INTERNAL_SERVER_ERROR, "수정중입니다."),
-    ALREADY_EXIST(50002, HttpStatus.INTERNAL_SERVER_ERROR, "중복으로 생성할 수 없습니다.");
+    INTERNAL_SERVER_ERROR(500, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다.");
 
     private final Integer code;
     private final HttpStatus httpStatus;

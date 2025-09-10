@@ -1,7 +1,5 @@
 package org.solcation.solcation_be.domain.travel.util;
 
-import org.solcation.solcation_be.common.CustomException;
-import org.solcation.solcation_be.common.ErrorCode;
 import org.solcation.solcation_be.domain.travel.dto.PlanDetailDTO;
 
 import java.math.BigDecimal;
@@ -28,13 +26,14 @@ public final class Positioning {
         return prev.add(BigDecimal.ONE, MC);
     }
 
-    /* ===== 유틸 ===== */
-    private PlanDetailDTO find(List<PlanDetailDTO> list, String crdtId) {
-        return list.stream().filter(x -> crdtId.equals(x.getCrdtId()))
-                .findFirst().orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST));
+    public static String normalize(String s) {
+        if (s == null) return null;
+        String t = s.trim();
+        return (t.isEmpty() || "0".equals(t) || "null".equalsIgnoreCase(t)) ? null : t;
     }
 
-    private BigDecimal computePos(List<PlanDetailDTO> all, int day, String prev, String next) {
+    /** 같은 day 내에서 prev/next 기준으로 신규 position 계산 */
+    public static BigDecimal computePos(List<PlanDetailDTO> all, int day, String prev, String next) {
         var alive = all.stream()
                 .filter(x -> !x.isTombstone() && x.getPdDay() == day)
                 .sorted(Comparator.comparing(a -> new BigDecimal(a.getPosition())))
@@ -42,7 +41,7 @@ public final class Positioning {
 
         if (prev == null && next == null) {
             if (alive.isEmpty()) return new BigDecimal("1");
-            var tail = alive.get(alive.size()-1);
+            var tail = alive.get(alive.size() - 1);
             return Positioning.after(new BigDecimal(tail.getPosition()));
         }
         if (prev == null) {
@@ -53,9 +52,12 @@ public final class Positioning {
             var p = alive.stream().filter(x -> x.getCrdtId().equals(prev)).findFirst().orElseThrow();
             return Positioning.after(new BigDecimal(p.getPosition()));
         }
+
         var p = alive.stream().filter(x -> x.getCrdtId().equals(prev)).findFirst().orElseThrow();
         var n = alive.stream().filter(x -> x.getCrdtId().equals(next)).findFirst().orElseThrow();
+
         var mid = Positioning.mid(new BigDecimal(p.getPosition()), new BigDecimal(n.getPosition()));
+        // mid가 범위를 벗어나면 재배치(리넘버링) 후 재귀
         if (mid.compareTo(new BigDecimal(p.getPosition())) <= 0 || mid.compareTo(new BigDecimal(n.getPosition())) >= 0) {
             BigDecimal step = new BigDecimal("10"), cur = step;
             for (var a : alive) { a.setPosition(cur.toPlainString()); cur = cur.add(step); }
@@ -64,6 +66,5 @@ public final class Positioning {
         return mid;
     }
 
-    private String norm(String s) { if (s==null) return null; var t=s.trim(); return (t.isEmpty()||"0".equals(t)||"null".equalsIgnoreCase(t))?null:t; }
-
+    private Positioning() {}
 }

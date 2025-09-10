@@ -17,9 +17,7 @@ import java.time.LocalDate;
 
 @Schema(name = "모임통장 계좌 DTO")
 @Getter
-@Setter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class SharedAccountReqDTO {
     @Schema(description = "그룹 PK", example = "13")
