@@ -10,7 +10,7 @@ import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
 
 import org.solcation.solcation_be.domain.travel.dto.PlanDetailDTO;
-import org.solcation.solcation_be.domain.travel.redis.RedisKeys;
+import org.solcation.solcation_be.util.redis.RedisKeys;
 import org.solcation.solcation_be.domain.travel.ws.JoinPayload;
 import org.solcation.solcation_be.repository.PlanDetailRepository;
 

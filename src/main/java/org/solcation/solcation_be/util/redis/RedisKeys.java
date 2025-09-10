@@ -1,4 +1,4 @@
-package org.solcation.solcation_be.domain.travel.redis;
+package org.solcation.solcation_be.util.redis;
 
 public final class RedisKeys {
     private RedisKeys() {}

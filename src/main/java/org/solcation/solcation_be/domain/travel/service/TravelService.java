@@ -53,10 +53,9 @@ public class TravelService {
     @Transactional
     public Long create(TravelReqDTO dto) {
         Group group = groupRepository.findById(dto.getGroupPk())
-                .orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST));
-
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_GROUP));
         TravelCategory category = travelCategoryRepository.findById(dto.getCategoryPk())
-                .orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CATEGORY));
 
         String location = dto.getCountry() + " " + dto.getCity();
 
@@ -95,16 +94,14 @@ public class TravelService {
                 .participant(dto.getParticipant())
                 .build();
 
-        travelRepository.save(travel);
-
-        return group.getGroupPk();
+        return travelRepository.save(travel).getTpPk();
     }
 
     // 단일 여행 조회
     public TravelResDTO getTravelById(Long travelPk) {
         return travelRepository.findById(travelPk)
                 .map(this::toDto)
-                .orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_PLAN));
     }
 
     // 세부계획 조회

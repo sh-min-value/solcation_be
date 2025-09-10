@@ -18,7 +18,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import org.solcation.solcation_be.domain.travel.dto.PlanDetailDTO;
-import org.solcation.solcation_be.domain.travel.redis.RedisKeys;
+import org.solcation.solcation_be.util.redis.RedisKeys;
 import org.solcation.solcation_be.domain.travel.util.Positioning;
 import org.solcation.solcation_be.domain.travel.ws.OpMessage;
 
@@ -31,7 +31,7 @@ public class OpApplyService {
     private final SimpMessagingTemplate messaging;
 
     public void handleOp(long travelId, OpMessage op) {
-        // === 멱등 ===
+        // 멱등
         RBucket<String> seen = redisson.getBucket(RedisKeys.op(op.opId()));
         if (!seen.trySet("1", 24, TimeUnit.HOURS)) {
             return; // 이미 처리한 op
@@ -52,7 +52,7 @@ public class OpApplyService {
     private void applySingleDay(long travelId, OpMessage op, int day) {
         RLock lock = redisson.getLock(RedisKeys.editLock(travelId, day));
         try {
-            if (!lock.tryLock(1, 5, TimeUnit.SECONDS)) throw new CustomException(ErrorCode.BUSY_RESOURCE);
+            if (!lock.tryLock(1, 5, TimeUnit.SECONDS)) throw new CustomException(ErrorCode.LOCKED);
 
             // 스냅샷 로드
             RBucket<String> snapBucket =
@@ -96,7 +96,6 @@ public class OpApplyService {
         }
     }
 
-
     // moveDay : 두 날짜 스냅샷을 모두 수정 (락 순서 보장)
     private void applyMoveDay(long travelId, OpMessage op, int oldDay, int newDay) {
         int d1 = Math.min(oldDay, newDay);
@@ -106,29 +105,29 @@ public class OpApplyService {
         RLock l2 = redisson.getLock(RedisKeys.editLock(travelId, d2));
 
         try {
-            if (!l1.tryLock(1, 5, TimeUnit.SECONDS)) throw new CustomException(ErrorCode.BUSY_RESOURCE);
-            if (!l2.tryLock(1, 5, TimeUnit.SECONDS)) throw new CustomException(ErrorCode.BUSY_RESOURCE);
+            if (!l1.tryLock(1, 5, TimeUnit.SECONDS)) throw new CustomException(ErrorCode.LOCKED);
+            if (!l2.tryLock(1, 5, TimeUnit.SECONDS)) throw new CustomException(ErrorCode.LOCKED);
 
             // 스냅샷 로드
-            var srcBucket = redisson.getBucket(RedisKeys.snapshot(travelId, oldDay));
-            var dstBucket = redisson.getBucket(RedisKeys.snapshot(travelId, newDay));
+            var srcBucket = redisson.getBucket(RedisKeys.snapshot(travelId, oldDay), StringCodec.INSTANCE);
+            var dstBucket = redisson.getBucket(RedisKeys.snapshot(travelId, newDay), StringCodec.INSTANCE);
             Snapshot src = readSnap((String) srcBucket.get()); if (src == null) src = new Snapshot(new ArrayList<>(), "0-0");
             Snapshot dst = readSnap((String) dstBucket.get()); if (dst == null) dst = new Snapshot(new ArrayList<>(), "0-0");
 
             var itemsSrc = new ArrayList<>(src.items());
             var itemsDst = new ArrayList<>(dst.items());
 
-            // payload에서 대상 항목
-            String id = (String) op.payload().get("crdtId");
-            String prev = norm((String) op.payload().get("prevCrdtId"));
-            String next = norm((String) op.payload().get("nextCrdtId"));
+            // payload에서 대상 항목/위치 힌트
+            String id   = (String) op.payload().get("crdtId");
+            String prev = Positioning.normalize((String) op.payload().get("prevCrdtId"));
+            String next = Positioning.normalize((String) op.payload().get("nextCrdtId"));
 
             // 소스에서 제거
             PlanDetailDTO t = find(itemsSrc, id);
             itemsSrc.remove(t);
 
-            // 타겟에 삽입 (position 계산)
-            BigDecimal pos = computePos(itemsDst, newDay, prev, next);
+            // 타겟에서 position 계산 후 필드 갱신
+            BigDecimal pos = Positioning.computePos(itemsDst, newDay, prev, next);
             t.setPdDay(newDay);
             t.setPosition(pos.toPlainString());
             t.setClientId(op.clientId());
@@ -156,7 +155,7 @@ public class OpApplyService {
             dstBucket.set(writeJson(new Snapshot(itemsDst, sidIn.toString())));
 
             // dirty days 표시
-            var set = redisson.getSet(RedisKeys.dirtyDays(travelId));
+            var set = redisson.getSet(RedisKeys.dirtyDays(travelId), StringCodec.INSTANCE);
             set.add(String.valueOf(oldDay));
             set.add(String.valueOf(newDay));
 
@@ -178,10 +177,10 @@ public class OpApplyService {
         Map<String,Object> p = op.payload();
         switch (op.type()) {
             case "insert" -> {
-                String prev = norm((String)p.get("prevCrdtId"));
-                String next = norm((String)p.get("nextCrdtId"));
+                String prev = Positioning.normalize((String)p.get("prevCrdtId"));
+                String next = Positioning.normalize((String)p.get("nextCrdtId"));
                 int day = (int) p.getOrDefault("pdDay", op.day());
-                BigDecimal pos = computePos(list, day, prev, next);
+                BigDecimal pos = Positioning.computePos(list, day, prev, next);
                 String crdtId = java.util.UUID.randomUUID() + ":" + op.clientId();
 
                 PlanDetailDTO dto = PlanDetailDTO.builder()
@@ -200,10 +199,10 @@ public class OpApplyService {
             }
             case "move" -> {
                 String id = (String)p.get("crdtId");
-                String prev = norm((String)p.get("prevCrdtId"));
-                String next = norm((String)p.get("nextCrdtId"));
+                String prev = Positioning.normalize((String)p.get("prevCrdtId"));
+                String next = Positioning.normalize((String)p.get("nextCrdtId"));
                 var t = find(list, id);
-                BigDecimal pos = computePos(list, t.getPdDay(), prev, next);
+                BigDecimal pos = Positioning.computePos(list, t.getPdDay(), prev, next);
                 t.setPosition(pos.toPlainString());
                 t.setClientId(op.clientId());
                 t.setOpTs(op.opTs());
@@ -268,43 +267,10 @@ public class OpApplyService {
         );
     }
 
-    /* ===== 유틸 ===== */
     private PlanDetailDTO find(List<PlanDetailDTO> list, String crdtId) {
         return list.stream().filter(x -> crdtId.equals(x.getCrdtId()))
                 .findFirst().orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST));
     }
-
-    private BigDecimal computePos(List<PlanDetailDTO> all, int day, String prev, String next) {
-        var alive = all.stream()
-                .filter(x -> !x.isTombstone() && x.getPdDay() == day)
-                .sorted(Comparator.comparing(a -> new BigDecimal(a.getPosition())))
-                .toList();
-
-        if (prev == null && next == null) {
-            if (alive.isEmpty()) return new BigDecimal("1");
-            var tail = alive.get(alive.size()-1);
-            return Positioning.after(new BigDecimal(tail.getPosition()));
-        }
-        if (prev == null) {
-            var n = alive.stream().filter(x -> x.getCrdtId().equals(next)).findFirst().orElseThrow();
-            return Positioning.before(new BigDecimal(n.getPosition()));
-        }
-        if (next == null) {
-            var p = alive.stream().filter(x -> x.getCrdtId().equals(prev)).findFirst().orElseThrow();
-            return Positioning.after(new BigDecimal(p.getPosition()));
-        }
-        var p = alive.stream().filter(x -> x.getCrdtId().equals(prev)).findFirst().orElseThrow();
-        var n = alive.stream().filter(x -> x.getCrdtId().equals(next)).findFirst().orElseThrow();
-        var mid = Positioning.mid(new BigDecimal(p.getPosition()), new BigDecimal(n.getPosition()));
-        if (mid.compareTo(new BigDecimal(p.getPosition())) <= 0 || mid.compareTo(new BigDecimal(n.getPosition())) >= 0) {
-            BigDecimal step = new BigDecimal("10"), cur = step;
-            for (var a : alive) { a.setPosition(cur.toPlainString()); cur = cur.add(step); }
-            return computePos(all, day, prev, next);
-        }
-        return mid;
-    }
-
-    private String norm(String s) { if (s==null) return null; var t=s.trim(); return (t.isEmpty()||"0".equals(t)||"null".equalsIgnoreCase(t))?null:t; }
 
     /* 내부 VO + JSON */
     private record Snapshot(java.util.List<PlanDetailDTO> items, String lastStreamId) {}
