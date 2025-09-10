@@ -27,6 +27,7 @@ public enum ErrorCode {
     // 404 Not Found
     NOT_FOUND_END_POINT(40400, HttpStatus.NOT_FOUND, "존재하지 않는 API입니다."), //DEFAULT
     NOT_EXIST(40004, HttpStatus.NOT_FOUND, "존재하지 않습니다."),
+    NOT_FOUND_ACCOUNT(40001, HttpStatus.NOT_FOUND, "계좌가 존재하지 않습니다."),
 
     // 405 Method Not Allowed
     METHOD_NOT_ALLOWED(40500, HttpStatus.METHOD_NOT_ALLOWED, "허용되지 않은 HTTP 메서드입니다."), //DEFAULT
@@ -36,6 +37,7 @@ public enum ErrorCode {
 
     // 409 Conflict
     CONFLICT(40900, HttpStatus.CONFLICT, "자원이 충돌하였습니다."), //DEFAULT
+    CARD_ALREADY_EXISTS(40901, HttpStatus.CONFLICT, "카드가 이미 존재합니다."),
 
     // 410 Gone
     GONE(41000, HttpStatus.GONE, "만료되었습니다."),
