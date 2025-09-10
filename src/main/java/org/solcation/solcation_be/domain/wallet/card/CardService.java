@@ -101,6 +101,7 @@ public class CardService {
         Instant to = nowYm.plusMonths(1).atDay(1)
                 .atStartOfDay(ZoneOffset.UTC).toInstant();
 
+        log.info("From: {} / to: {}", from, to);
         Long total = transactionRepository.findTotalAmountForPeriod(sa, TRANSACTIONTYPE.CARD, user, card, from, to);
 
         CardInfoDTO result = CardInfoDTO.builder()

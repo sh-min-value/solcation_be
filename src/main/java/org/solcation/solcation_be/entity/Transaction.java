@@ -5,6 +5,7 @@ import lombok.*;
 import org.solcation.solcation_be.entity.converter.TransactionTypeConverter;
 import org.solcation.solcation_be.entity.enums.TRANSACTIONTYPE;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
@@ -24,7 +25,7 @@ public class Transaction {
     private SharedAccount saPk;
 
     @Column(name = "sat_time", nullable = false)
-    private LocalDateTime satTime;
+    private Instant satTime;
 
     @Column(name = "transaction_type", nullable = true)
     @Convert(converter = TransactionTypeConverter.class)
