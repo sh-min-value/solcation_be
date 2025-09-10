@@ -3,10 +3,10 @@ package org.solcation.solcation_be.domain.notification.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.solcation.solcation_be.entity.AlarmCategory;
-import org.solcation.solcation_be.entity.Group;
+import org.solcation.solcation_be.common.annotation.KstDateTime;
 
-import java.time.LocalDateTime;
+
+import java.time.Instant;
 
 @Schema(name = "알림 DTO")
 @Getter
@@ -21,7 +21,8 @@ public class PushNotificationDTO {
     private String title;
 
     @NotNull
-    private LocalDateTime pnTime;
+    @KstDateTime
+    private Instant pnTime;
 
     @NotNull
     private String content;
@@ -37,5 +38,6 @@ public class PushNotificationDTO {
 
     private Boolean isAccepted;
 
-    private LocalDateTime readAt;
+    @KstDateTime
+    private Instant readAt;
 }

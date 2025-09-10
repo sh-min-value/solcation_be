@@ -3,6 +3,7 @@ package org.solcation.solcation_be.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,7 +23,7 @@ public class PushNotification extends BaseEntity {
     private String pnTitle;
 
     @Column(name = "pn_time", nullable = false)
-    private LocalDateTime pnTime;
+    private Instant pnTime;
 
     @Column(name = "pn_content", nullable = false, length = 100)
     private String pnContent;
@@ -43,9 +44,9 @@ public class PushNotification extends BaseEntity {
     private Boolean isAccepted;
 
     @Column(name = "read_at", nullable = true)
-    private LocalDateTime readAt;
+    private Instant readAt;
 
-    public void updateIsAccepted(Boolean isAccepted, LocalDateTime readAt) {
+    public void updateIsAccepted(Boolean isAccepted, Instant readAt) {
         this.isAccepted = isAccepted;
         this.readAt = readAt;
     }

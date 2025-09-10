@@ -8,19 +8,19 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
     @CreatedDate
-    private LocalDateTime createdDate;
+    private Instant createdDate;
 
     @CreatedBy
     private Long createdBy;
 
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     @LastModifiedBy
     private Long lastModifiedBy;

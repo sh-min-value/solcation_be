@@ -13,6 +13,7 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -45,7 +46,7 @@ public class RedisExpirationListener extends KeyExpirationEventMessageListener {
 
         //push_notification_tb is_accepted true로 업데이트
         PushNotification pn = pushNotificationRepository.findByPnPk(pnPk);
-        pn.updateIsAccepted(true, LocalDateTime.now());
+        pn.updateIsAccepted(true, Instant.now());
         pushNotificationRepository.save(pn);
     }
 }

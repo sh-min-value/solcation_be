@@ -37,3 +37,11 @@ cloud:
       secret-key:
     region:
       static: ap-northeast-2
+
+encryption:
+  aesgcm:
+    passphrase: ${ENCRYPTION_PASSPHRASE:have-to-change}
+    iterations:
+    key-length:
+    salt-length:
+    iv-length:

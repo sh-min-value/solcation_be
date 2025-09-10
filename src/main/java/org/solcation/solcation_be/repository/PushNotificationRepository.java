@@ -11,6 +11,7 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +44,7 @@ public interface PushNotificationRepository extends JpaRepository<PushNotificati
       and p.acPk.acPk <> :acPk
     order by p.pnTime desc
     """)
-    Page<PushNotificationDTO> findRecent(@Param("userPk") Long userPk, @Param("fromTime") LocalDateTime fromTime, @Param("toTime") LocalDateTime toTime, @Param("acPk") Long acPk, Pageable pageable);
+    Page<PushNotificationDTO> findRecent(@Param("userPk") Long userPk, @Param("fromTime") Instant fromTime, @Param("toTime") Instant toTime, @Param("acPk") Long acPk, Pageable pageable);
 
     PushNotification findByPnPk(@Param("pnPk") Long pnPk);
 }

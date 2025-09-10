@@ -9,6 +9,7 @@ import org.solcation.solcation_be.entity.converter.UserGenderConverter;
 import org.solcation.solcation_be.entity.converter.UserRoleConverter;
 import org.solcation.solcation_be.entity.enums.GENDER;
 import org.solcation.solcation_be.entity.enums.ROLE;
+import org.solcation.solcation_be.util.security.AesGcmAttributeConverter;
 
 import java.time.LocalDate;
 
@@ -39,17 +40,17 @@ public class User {
     )
     private String userPw;
 
+    @Convert(converter = AesGcmAttributeConverter.class)
     @Column(
             name = "street_addr",
-            nullable = false,
-            length = 100
+            nullable = false
     )
     private String streetAddr;
 
+    @Convert(converter = AesGcmAttributeConverter.class)
     @Column(
             name = "addr_detail",
-            nullable = false,
-            length = 100
+            nullable = false
     )
     private String addrDetail;
 
@@ -63,8 +64,8 @@ public class User {
     @Column(
             name = "tel",
             nullable = false,
-            length = 11,
-            unique = true
+            unique = true,
+            length = 11
     )
     private String tel;
 
@@ -95,10 +96,10 @@ public class User {
     @Convert(converter = UserRoleConverter.class)
     private ROLE role;
 
+    @Convert(converter = AesGcmAttributeConverter.class)
     @Column(
             name = "email",
-            nullable = false,
-            length = 100
+            nullable = false
     )
     private String email;
 
