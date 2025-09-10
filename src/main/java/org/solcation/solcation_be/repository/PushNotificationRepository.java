@@ -28,8 +28,11 @@ public interface PushNotificationRepository extends JpaRepository<PushNotificati
     Long countPendingInvitationByGroupPk(@Param("groupPk") long groupPk);
 
     Optional<PushNotification> findByPnPkAndUserPk_UserPk(Long pnPk, Long userPk);
+
+    //유저가 읽지 않은 그룹 초대 목록 조회
     List<PushNotification> findByUserPk_UserPkAndAcPkAndIsAcceptedOrderByPnTimeDesc(Long userPk, AlarmCategory acPk, Boolean isAccepted);
 
+    //최근 N일 알림 목록 렌더링 (읽음 무관)
     @Query("""
     select new org.solcation.solcation_be.domain.notification.dto.PushNotificationDTO(
       p.pnPk, p.pnTitle, p.pnTime, p.pnContent,
