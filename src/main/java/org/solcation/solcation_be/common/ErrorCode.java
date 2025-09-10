@@ -51,7 +51,8 @@ public enum ErrorCode {
 
     // 500 Internal Server Error
     INTERNAL_SERVER_ERROR(500, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다."),
-    BUSY_RESOURCE(50001, HttpStatus.INTERNAL_SERVER_ERROR, "수정중입니다.");
+    BUSY_RESOURCE(50001, HttpStatus.INTERNAL_SERVER_ERROR, "수정중입니다."),
+    ALREADY_EXIST(50002, HttpStatus.INTERNAL_SERVER_ERROR, "중복으로 생성할 수 없습니다.");
 
     private final Integer code;
     private final HttpStatus httpStatus;
