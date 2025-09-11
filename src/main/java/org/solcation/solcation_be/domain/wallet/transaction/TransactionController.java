@@ -8,10 +8,7 @@ import jakarta.validation.constraints.Size;
 import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.solcation.solcation_be.domain.wallet.transaction.dto.TransactionCategoryDTO;
-import org.solcation.solcation_be.domain.wallet.transaction.dto.TransactionDTO;
-import org.solcation.solcation_be.domain.wallet.transaction.dto.TransactionDetailDTO;
-import org.solcation.solcation_be.domain.wallet.transaction.dto.UpdateMemoReqDTO;
+import org.solcation.solcation_be.domain.wallet.transaction.dto.*;
 import org.solcation.solcation_be.entity.TransactionCategory;
 import org.solcation.solcation_be.entity.enums.TRANSACTIONTYPE;
 import org.solcation.solcation_be.security.JwtPrincipal;
@@ -50,7 +47,7 @@ public class TransactionController {
     }
 
     @Operation(summary = "거래 상세 메모 수정")
-    @PostMapping("/updateMemo")
+    @PostMapping("/update-memo")
     public void updateMemo(@PathVariable("groupId") Long groupId, @Valid @RequestBody UpdateMemoReqDTO dto) {
         transactionService.updateMemo(dto);
     }
@@ -60,4 +57,11 @@ public class TransactionController {
     public List<TransactionCategoryDTO> getTransactionCategories(@PathVariable("groupId") Long groupId) {
         return transactionService.getTransactionCategories();
     }
+
+    @Operation(summary = "지출 카테고리 변경")
+    @PostMapping("/update-category")
+    public void updateTransactionCategory(@PathVariable("groupId") Long groupId, @RequestBody UpdateCategoryReqDTO dto) {
+        transactionService.updateTransactionCategory(dto);
+    }
+
 }

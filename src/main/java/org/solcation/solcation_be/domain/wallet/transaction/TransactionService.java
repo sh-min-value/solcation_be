@@ -8,10 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.solcation.solcation_be.common.CustomException;
 import org.solcation.solcation_be.common.ErrorCode;
-import org.solcation.solcation_be.domain.wallet.transaction.dto.TransactionCategoryDTO;
-import org.solcation.solcation_be.domain.wallet.transaction.dto.TransactionDTO;
-import org.solcation.solcation_be.domain.wallet.transaction.dto.TransactionDetailDTO;
-import org.solcation.solcation_be.domain.wallet.transaction.dto.UpdateMemoReqDTO;
+import org.solcation.solcation_be.domain.wallet.transaction.dto.*;
 import org.solcation.solcation_be.entity.*;
 import org.solcation.solcation_be.entity.enums.TRANSACTIONTYPE;
 import org.solcation.solcation_be.repository.*;
@@ -164,8 +161,12 @@ public class TransactionService {
     }
 
     /* 지출 카테고리 변경 */
-    public void updateTransactionCategory() {
+    public void updateTransactionCategory(UpdateCategoryReqDTO dto) {
+        Transaction t  = transactionRepository.findBySatPk(dto.getSatPk());
+        TransactionCategory tc = transactionCategoryLookup.get(dto.getTcPk());
 
+        t.updateCategory(tc);
+        transactionRepository.save(t);
     }
 
     /* 메모 수정 */

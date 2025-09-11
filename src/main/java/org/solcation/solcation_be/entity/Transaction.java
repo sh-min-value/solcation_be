@@ -6,7 +6,6 @@ import org.solcation.solcation_be.entity.converter.TransactionTypeConverter;
 import org.solcation.solcation_be.entity.enums.TRANSACTIONTYPE;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "shared_account_transaction_tb")
@@ -70,5 +69,9 @@ public class Transaction {
 
     public void updateMemo(String memo) {
         this.satMemo = memo;
+    }
+
+    public void updateCategory(TransactionCategory tc) {
+        this.tcPk = tc;
     }
 }
