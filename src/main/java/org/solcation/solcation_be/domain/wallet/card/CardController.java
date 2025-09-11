@@ -33,13 +33,6 @@ public class CardController {
         return cardService.getCardInfo(groupId, principal);
     }
 
-    /* 카드 거래 내역 렌더링(필터링 포함) */
-    @Operation(summary = "카드 거래 내역 렌더링(필터링 포함)")
-    @GetMapping("/transactions")
-    public void getCardTransactionsByFiltering(@PathVariable("groupId") Long groupId) {
-
-    }
-
     /* 카드 해지 */
     @Operation(summary = "카드 해지")
     @PostMapping("/cancel")

@@ -112,12 +112,6 @@ public class CardService {
         return result;
     }
 
-    /* 카드 거래 내역 렌더링(필터링 포함) */
-    @Transactional
-    public CardTransactionDTO getCardTransactionsByFiltering() {
-        return null;
-    }
-
     /* 카드 해지 */
     @Transactional
     public void cancelCard(Long groupPk, JwtPrincipal principal) {

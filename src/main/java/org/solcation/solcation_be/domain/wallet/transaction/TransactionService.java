@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.solcation.solcation_be.common.CustomException;
 import org.solcation.solcation_be.common.ErrorCode;
-import org.solcation.solcation_be.domain.wallet.card.dto.CardTransactionsReqDTO;
 import org.solcation.solcation_be.domain.wallet.transaction.dto.TransactionDTO;
 import org.solcation.solcation_be.entity.*;
 import org.solcation.solcation_be.entity.enums.TRANSACTIONTYPE;
