@@ -33,7 +33,7 @@ public class AuthTests {
                 .streetAddr("서울시 마포구")
                 .addrDetail("하늘땅")
                 .postalCode("12345")
-                .tel("01012345678")
+                .tel("01012121212")
                 .userName("홍길동")
                 .dateOfBirth(LocalDate.now())
                 .gender("m")

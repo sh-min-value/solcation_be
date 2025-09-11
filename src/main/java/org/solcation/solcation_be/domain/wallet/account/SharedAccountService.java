@@ -21,13 +21,8 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.SecureRandom;
-import java.time.Clock;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.Objects;
-
-import static java.time.ZoneOffset.UTC;
 
 @Slf4j
 @Service
@@ -52,8 +47,8 @@ public class SharedAccountService {
                 .groupPk(groupId)
                 .balance(res.getBalance())
                 .depositAlarm(res.getDepositAlarm())
-                .depositCycle(res.getDepositCycle() != null ? DEPOSITCYCLE.valueOf(res.getDepositCycle().name()) : null)
-                .depositDate(res.getDepositDate())
+                .depositCycle(DEPOSITCYCLE.valueOf(res.getDepositCycle().name()))
+                .depositDate(res.getDepositDate() != null ? res.getDepositDate() : null)
                 .depositDay(res.getDepositDay() != null ? DEPOSITDAY.valueOf(res.getDepositDay().name()) : null)
                 .depositAmount(res.getDepositAmount())
                 .accountNum(res.getAccountNum())
@@ -94,7 +89,7 @@ public class SharedAccountService {
                 .group(group)
                 .accountNum(generateAccountNumber(groupId))
                 .balance(0)
-                .createdAt(Instant.now(Clock.systemUTC()))
+                .createdAt(Instant.now())
                 .depositAlarm(false)
                 .saPw(dto.getSaPw())
                 .build();
