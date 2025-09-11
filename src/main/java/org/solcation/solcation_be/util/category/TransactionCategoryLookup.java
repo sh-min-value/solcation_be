@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -43,4 +44,5 @@ public class TransactionCategoryLookup {
 
     public TransactionCategory get(TRANSACTIONCODE code) { return cache.get(code); }
     public TransactionCategory get(Long tcPk) { return pkCache.get(tcPk); }
+    public List<TransactionCategory> getList() { return new ArrayList<>(pkCache.values()); }
 }

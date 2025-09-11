@@ -8,9 +8,11 @@ import jakarta.validation.constraints.Size;
 import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.solcation.solcation_be.domain.wallet.transaction.dto.TransactionCategoryDTO;
 import org.solcation.solcation_be.domain.wallet.transaction.dto.TransactionDTO;
 import org.solcation.solcation_be.domain.wallet.transaction.dto.TransactionDetailDTO;
 import org.solcation.solcation_be.domain.wallet.transaction.dto.UpdateMemoReqDTO;
+import org.solcation.solcation_be.entity.TransactionCategory;
 import org.solcation.solcation_be.entity.enums.TRANSACTIONTYPE;
 import org.solcation.solcation_be.security.JwtPrincipal;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -18,6 +20,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.List;
 
 @Tag(name = "거래 내역 컨트롤러")
@@ -50,5 +53,11 @@ public class TransactionController {
     @PostMapping("/updateMemo")
     public void updateMemo(@PathVariable("groupId") Long groupId, @Valid @RequestBody UpdateMemoReqDTO dto) {
         transactionService.updateMemo(dto);
+    }
+
+    @Operation(summary = "거래 카테고리 목록 렌더링")
+    @GetMapping("/categories")
+    public List<TransactionCategoryDTO> getTransactionCategories(@PathVariable("groupId") Long groupId) {
+        return transactionService.getTransactionCategories();
     }
 }

@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.solcation.solcation_be.common.CustomException;
 import org.solcation.solcation_be.common.ErrorCode;
+import org.solcation.solcation_be.domain.wallet.transaction.dto.TransactionCategoryDTO;
 import org.solcation.solcation_be.domain.wallet.transaction.dto.TransactionDTO;
 import org.solcation.solcation_be.domain.wallet.transaction.dto.TransactionDetailDTO;
 import org.solcation.solcation_be.domain.wallet.transaction.dto.UpdateMemoReqDTO;
@@ -15,6 +16,7 @@ import org.solcation.solcation_be.entity.*;
 import org.solcation.solcation_be.entity.enums.TRANSACTIONTYPE;
 import org.solcation.solcation_be.repository.*;
 import org.solcation.solcation_be.security.JwtPrincipal;
+import org.solcation.solcation_be.util.category.TransactionCategoryLookup;
 import org.solcation.solcation_be.util.timezone.ZonedTimeRange;
 import org.solcation.solcation_be.util.timezone.ZonedTimeUtil;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,7 @@ public class TransactionService {
     private final SharedAccountRepository sharedAccountRepository;
     private final CardRepository cardRepository;
     private final JPAQueryFactory queryFactory;
+    private final TransactionCategoryLookup  transactionCategoryLookup;
 
 
     /* 전체 거래 내역 렌더링(필터링 포함 - 거래 유형으로 필터링) */
@@ -148,7 +151,17 @@ public class TransactionService {
     }
 
     /* 카테고리 목록 렌더링 */
-
+    public List<TransactionCategoryDTO> getTransactionCategories() {
+        List<TransactionCategory> list = transactionCategoryLookup.getList();
+        List<TransactionCategoryDTO> result = new ArrayList<>();
+        list.forEach(i -> result.add(TransactionCategoryDTO.builder()
+                .tcPk(i.getTcPk())
+                .tcName(i.getTcName())
+                .tcIcon(i.getTcIcon())
+                .tcCode(i.getTcCode())
+                .build()));
+        return result;
+    }
 
     /* 지출 카테고리 변경 */
     public void updateTransactionCategory() {
