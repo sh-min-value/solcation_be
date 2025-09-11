@@ -2,6 +2,7 @@ package org.solcation.solcation_be.entity;
 
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.time.Instant;
 
 import lombok.*;
@@ -11,6 +12,7 @@ import org.solcation.solcation_be.entity.converter.DepositDayConverter;
 import org.solcation.solcation_be.entity.enums.DEPOSITCYCLE;
 import org.solcation.solcation_be.entity.enums.DEPOSITDAY;
 import org.solcation.solcation_be.util.security.AesGcmAttributeConverter;
+import org.springframework.data.domain.Auditable;
 
 
 @Entity
@@ -19,7 +21,7 @@ import org.solcation.solcation_be.util.security.AesGcmAttributeConverter;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class SharedAccount {
+public class SharedAccount extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sa_pk")
