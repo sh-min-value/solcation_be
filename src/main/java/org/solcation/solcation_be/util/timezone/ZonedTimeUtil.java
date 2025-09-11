@@ -60,4 +60,11 @@ public final class ZonedTimeUtil {
         ZonedDateTime endZdt = end.plusDays(1).atStartOfDay(ZONE_ID);
         return new ZonedTimeRange(startZdt.toInstant(), endZdt.toInstant());
     }
+
+    /**
+     * 현재 날짜
+     */
+    public static LocalDate now() {
+        return LocalDate.now(ZONE_ID);
+    }
 }

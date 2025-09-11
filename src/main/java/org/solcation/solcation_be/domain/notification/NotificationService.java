@@ -14,6 +14,8 @@ import org.solcation.solcation_be.repository.GroupMemberRepository;
 import org.solcation.solcation_be.repository.PushNotificationRepository;
 import org.solcation.solcation_be.util.category.AlarmCategoryLookup;
 import org.solcation.solcation_be.util.redis.RedisPublisher;
+import org.solcation.solcation_be.util.timezone.ZonedTimeRange;
+import org.solcation.solcation_be.util.timezone.ZonedTimeUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +26,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -100,11 +103,13 @@ public class NotificationService {
         AlarmCategory ac = alarmCategoryLookup.get(ALARMCODE.GROUP_INVITE);
         Pageable pageable = PageRequest.of(pageNo, pageSize);
 
-        Instant to = Instant.now();
-        log.info("to: {}", to.toString());
+        ZonedTimeRange r = ZonedTimeUtil.week(ZonedTimeUtil.now());
 
-        Instant from = to.minus(7, ChronoUnit.DAYS);
+        Instant from = r.start();
         log.info("from: {}", from.toString());
+
+        Instant to = r.end();
+        log.info("to: {}", to.toString());
 
         return pushNotificationRepository.findRecent(userPk, from, to, ac.getAcPk(), pageable);
 
@@ -117,13 +122,14 @@ public class NotificationService {
         AlarmCategory ac = alarmCategoryLookup.get(ALARMCODE.GROUP_INVITE);
         Pageable pageable = PageRequest.of(pageNo, pageSize);
 
-        Instant now = Instant.now();
+        LocalDate now = ZonedTimeUtil.now();
+        ZonedTimeRange r = ZonedTimeUtil.custom(now.minusDays(30), now.minusDays(8));
 
-        Instant to = now.minus(8, ChronoUnit.DAYS);
-        log.info("to: {}", to.toString());
-
-        Instant from = now.minus(40, ChronoUnit.DAYS);
+        Instant from = r.start();
         log.info("from: {}", from.toString());
+
+        Instant to = r.end();
+        log.info("to: {}", to.toString());
 
         return pushNotificationRepository.findRecent(userPk, from, to, ac.getAcPk(), pageable);
     }

@@ -2,6 +2,8 @@ package org.solcation.solcation_be.util.category;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.solcation.solcation_be.common.CustomException;
+import org.solcation.solcation_be.common.ErrorCode;
 import org.solcation.solcation_be.entity.TravelCategory;
 import org.solcation.solcation_be.entity.enums.TRAVELCODE;
 import org.solcation.solcation_be.repository.TravelCategoryRepository;
@@ -41,6 +43,7 @@ public class TravelCategoryLookup {
         pkCache = Collections.unmodifiableMap(byPk);
     }
 
-    public TravelCategory get(TRAVELCODE code) { return cache.get(code); }
-    public TravelCategory get(Long tpcPk) { return pkCache.get(tpcPk); }
+    public TravelCategory get(TRAVELCODE code) { return Optional.ofNullable(cache.get(code)).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CATEGORY)); }
+    public TravelCategory get(Long tpcPk) { return Optional.ofNullable(pkCache.get(tpcPk)).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CATEGORY)); }
+    public List<TravelCategory> getList() { return new ArrayList<>(pkCache.values()); }
 }
