@@ -13,6 +13,8 @@ import org.solcation.solcation_be.entity.enums.TRANSACTIONTYPE;
 import org.solcation.solcation_be.repository.*;
 import org.solcation.solcation_be.security.JwtPrincipal;
 import org.solcation.solcation_be.util.category.TransactionCategoryLookup;
+import org.solcation.solcation_be.util.timezone.ZonedTimeRange;
+import org.solcation.solcation_be.util.timezone.ZonedTimeUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,14 +98,10 @@ public class CardService {
         Card card = cardRepository.findBySaPk_GroupAndGmPk_UserAndCancellationFalse(group, user).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CARD));
 
         //이번 달 카드 이용 총 금액 조회 (sa_pk, transaction_type, user_pk, tc_pk, sac_pk, gm_pk, 이번달) -> sat_amount
-        YearMonth nowYm = YearMonth.now(ZoneOffset.UTC);
-        Instant from = nowYm.atDay(1)
-                .atStartOfDay(ZoneOffset.UTC).toInstant();
-        Instant to = nowYm.plusMonths(1).atDay(1)
-                .atStartOfDay(ZoneOffset.UTC).toInstant();
-
-        log.info("From: {} / to: {}", from, to);
-        Long total = transactionRepository.findTotalAmountForPeriod(sa, TRANSACTIONTYPE.CARD, user, card, from, to);
+        YearMonth nowYm = YearMonth.from(ZonedTimeUtil.now());
+        ZonedTimeRange r = ZonedTimeUtil.month(nowYm);
+        log.info("From: {} / to: {}", r.start(), r.end());
+        Long total = transactionRepository.findTotalAmountForPeriod(sa, TRANSACTIONTYPE.CARD, user, card, r.start(), r.end());
 
         CardInfoDTO result = CardInfoDTO.builder()
                 .cardNum(card.getSacNum())

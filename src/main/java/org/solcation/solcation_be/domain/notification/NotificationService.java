@@ -103,7 +103,7 @@ public class NotificationService {
         AlarmCategory ac = alarmCategoryLookup.get(ALARMCODE.GROUP_INVITE);
         Pageable pageable = PageRequest.of(pageNo, pageSize);
 
-        ZonedTimeRange r = ZonedTimeUtil.week(LocalDate.now());
+        ZonedTimeRange r = ZonedTimeUtil.week(ZonedTimeUtil.now());
 
         Instant from = r.start();
         log.info("from: {}", from.toString());
@@ -122,7 +122,8 @@ public class NotificationService {
         AlarmCategory ac = alarmCategoryLookup.get(ALARMCODE.GROUP_INVITE);
         Pageable pageable = PageRequest.of(pageNo, pageSize);
 
-        ZonedTimeRange r = ZonedTimeUtil.custom(LocalDate.now().minusDays(30), LocalDate.now().minusDays(8));
+        LocalDate now = ZonedTimeUtil.now();
+        ZonedTimeRange r = ZonedTimeUtil.custom(now.minusDays(30), now.minusDays(8));
 
         Instant from = r.start();
         log.info("from: {}", from.toString());
