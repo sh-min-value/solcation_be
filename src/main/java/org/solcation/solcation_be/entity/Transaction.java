@@ -67,4 +67,8 @@ public class Transaction {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "gm_pk", referencedColumnName = "gm_pk")
     private GroupMember gmPk;
+
+    public void updateMemo(String memo) {
+        this.satMemo = memo;
+    }
 }

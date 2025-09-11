@@ -144,4 +144,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
                                                    @Param("userPk") User user,
                                                    @Param("sacPk") Card sacPk,
                                   @Param("from") Instant from, @Param("to") Instant to);
+
+    //pk로 조회
+    Transaction findBySatPk(@Param("satPk") Long satPk);
 }

@@ -10,6 +10,7 @@ import org.solcation.solcation_be.common.CustomException;
 import org.solcation.solcation_be.common.ErrorCode;
 import org.solcation.solcation_be.domain.wallet.transaction.dto.TransactionDTO;
 import org.solcation.solcation_be.domain.wallet.transaction.dto.TransactionDetailDTO;
+import org.solcation.solcation_be.domain.wallet.transaction.dto.UpdateMemoReqDTO;
 import org.solcation.solcation_be.entity.*;
 import org.solcation.solcation_be.entity.enums.TRANSACTIONTYPE;
 import org.solcation.solcation_be.repository.*;
@@ -146,13 +147,18 @@ public class TransactionService {
                 .fetchOne();
     }
 
+    /* 카테고리 목록 렌더링 */
+
+
     /* 지출 카테고리 변경 */
     public void updateTransactionCategory() {
 
     }
 
     /* 메모 수정 */
-    public void updateMemo() {
-
+    public void updateMemo(UpdateMemoReqDTO dto) {
+        Transaction t = transactionRepository.findBySatPk(dto.getSatPk());
+        t.updateMemo(dto.getMemo());
+        transactionRepository.save(t);
     }
 }
