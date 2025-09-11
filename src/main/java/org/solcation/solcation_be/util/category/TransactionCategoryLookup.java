@@ -2,6 +2,8 @@ package org.solcation.solcation_be.util.category;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.solcation.solcation_be.common.CustomException;
+import org.solcation.solcation_be.common.ErrorCode;
 import org.solcation.solcation_be.entity.TransactionCategory;
 import org.solcation.solcation_be.entity.enums.TRANSACTIONCODE;
 import org.solcation.solcation_be.repository.TransactionCategoryRepository;
@@ -42,7 +44,7 @@ public class TransactionCategoryLookup {
         pkCache = Collections.unmodifiableMap(byPk);
     }
 
-    public TransactionCategory get(TRANSACTIONCODE code) { return cache.get(code); }
-    public TransactionCategory get(Long tcPk) { return pkCache.get(tcPk); }
+    public TransactionCategory get(TRANSACTIONCODE code) { return Optional.ofNullable(cache.get(code)).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CATEGORY)); }
+    public TransactionCategory get(Long tcPk) { return Optional.ofNullable(pkCache.get(tcPk)).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CATEGORY)); }
     public List<TransactionCategory> getList() { return new ArrayList<>(pkCache.values()); }
 }
