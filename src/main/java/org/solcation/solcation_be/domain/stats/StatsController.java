@@ -6,10 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.solcation.solcation_be.domain.stats.dto.CategorySpentDTO;
 import org.solcation.solcation_be.domain.stats.dto.FinishTravelListDTO;
 import org.solcation.solcation_be.domain.stats.dto.TravelSpendCompareDTO;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -50,4 +47,6 @@ public class StatsController {
     public TravelSpendCompareDTO getTravelSpendCompare(@PathVariable Long groupId, @PathVariable Long travelId) {
         return statsService.getCompareTravelSpend(travelId);
     }
+
+
 }

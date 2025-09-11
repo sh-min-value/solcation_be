@@ -15,7 +15,8 @@ import org.solcation.solcation_be.util.timezone.ZonedTimeRange;
 import org.solcation.solcation_be.util.timezone.ZonedTimeUtil;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -71,22 +72,29 @@ public class StatsService {
 
         return transactionRepository.categorySpent(
                 range.start(),
-                range.end(),
-                TRANSACTIONTYPE.DEPOSIT
+                range.end()
         );
     }
 
     // 다른 그룹과 비교
-//    public TravelSpendCompareDTO getCompareTravelSpend(Long tpPk) {
-//        Long our = transactionRepository.getOurPerPersonPerDay(tpPk);
-//        Long others = transactionRepository.getOthersPerPersonPerDay(tpPk);
-//
-//        if (our == null) our = 0L;
-//        if (others == null) others = 0L;
-//
-//        Long diff = our - others;
-//
-//        return new TravelSpendCompareDTO(our, others, diff);
-//    }
+    public TravelSpendCompareDTO getCompareTravelSpend(Long tpPk) {
+        Travel tp = travelRepository.findById(tpPk).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_PLAN));
+        ZonedTimeRange range = ZonedTimeUtil.custom(tp.getTpStart(), tp.getTpEnd());
+        Instant start = range.start();
+        Instant endExclusive = range.end();
 
+        List<TRANSACTIONTYPE> types = List.of(TRANSACTIONTYPE.WITHDRAW, TRANSACTIONTYPE.CARD);
+
+        long ourTotal = transactionRepository.sumSpentTravel(tpPk, types, start, endExclusive);
+        long days = ChronoUnit.DAYS.between(tp.getTpStart(), tp.getTpEnd()) + 1;
+        long ourDenominator = Math.max(1, tp.getParticipant() * Math.max(1, days));
+        long ourPerPersonPerDay = ourTotal / ourDenominator;
+
+        long othersTotal = transactionRepository.sumOthersSpentBySameLocation(tpPk, types);
+        long othersPersonDays = transactionRepository.sumOthersPersonDays(tpPk);
+        long othersPerPersonPerDay = othersPersonDays > 0 ? (othersTotal / othersPersonDays) : 0;
+
+        long diff = ourPerPersonPerDay - othersPerPersonPerDay;
+        return new TravelSpendCompareDTO(ourPerPersonPerDay, othersPerPersonPerDay, diff);
+    }
 }
