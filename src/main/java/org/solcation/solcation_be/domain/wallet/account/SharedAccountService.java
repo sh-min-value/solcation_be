@@ -93,10 +93,8 @@ public class SharedAccountService {
             }
         });
 
-        int updated = groupRepository.updateSignatureUrlByGroupPk(groupId, filename);
-        if (updated == 0) {
-            throw new CustomException(ErrorCode.NOT_FOUND_GROUP);
-        }
+        group.updateSignatureUrl(filename);
+        groupRepository.save(group);
 
         SharedAccount account = SharedAccount.builder()
                 .group(group)

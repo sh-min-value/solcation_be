@@ -57,11 +57,4 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     User findGroupLeaderByGroupPk(@Param("groupPk") Long groupPk);
 
     Group findByGroupPk(Long groupPk);
-
-    @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("UPDATE Group g " +
-            "SET g.signatureUrl = :signatureUrl " +
-            "WHERE g.groupPk = :groupPk")
-    int updateSignatureUrlByGroupPk(@Param("groupPk") Long groupPk,
-                                    @Param("signatureUrl") String signatureUrl);
 }

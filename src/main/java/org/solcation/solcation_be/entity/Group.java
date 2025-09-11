@@ -47,4 +47,8 @@ public class Group extends BaseEntity {
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
     @Builder.Default
     private List<Travel> travels = new ArrayList<>();
+
+    public void updateSignatureUrl(String signatureUrl) {
+        this.signatureUrl = signatureUrl;
+    }
 }
