@@ -4,14 +4,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.common.CustomException;
 import org.solcation.solcation_be.common.ErrorCode;
-import org.solcation.solcation_be.domain.wallet.account.dto.DepositCycleDTO;
-import org.solcation.solcation_be.domain.wallet.account.dto.SharedAccountReqDTO;
-import org.solcation.solcation_be.domain.wallet.account.dto.SharedAccountResDTO;
+import org.solcation.solcation_be.domain.wallet.account.dto.*;
 import org.solcation.solcation_be.entity.SharedAccount;
+import org.solcation.solcation_be.entity.TermsAgreement;
+import org.solcation.solcation_be.entity.TermsCategory;
 import org.solcation.solcation_be.entity.enums.DEPOSITCYCLE;
 import org.solcation.solcation_be.entity.enums.DEPOSITDAY;
 import org.solcation.solcation_be.repository.GroupRepository;
 import org.solcation.solcation_be.repository.SharedAccountRepository;
+import org.solcation.solcation_be.repository.TermsAgreementRepository;
+import org.solcation.solcation_be.repository.TermsCategoryRepository;
 import org.solcation.solcation_be.util.s3.S3Utils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,13 +23,10 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.SecureRandom;
-import java.time.Clock;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-
-import static java.time.ZoneOffset.UTC;
 
 @Slf4j
 @Service
@@ -35,6 +34,8 @@ import static java.time.ZoneOffset.UTC;
 public class SharedAccountService {
     private final SharedAccountRepository sharedAccountRepository;
     private final GroupRepository groupRepository;
+    private final TermsCategoryRepository termsCategoryRepository;
+    private final TermsAgreementRepository termsAgreementRepository;
     private final S3Utils s3Utils;
 
     @Value("${cloud.s3.bucket.upload.signature}")
@@ -53,7 +54,7 @@ public class SharedAccountService {
                 .balance(res.getBalance())
                 .depositAlarm(res.getDepositAlarm())
                 .depositCycle(res.getDepositCycle() != null ? DEPOSITCYCLE.valueOf(res.getDepositCycle().name()) : null)
-                .depositDate(res.getDepositDate())
+                .depositDate(res.getDepositDate() != null ? res.getDepositDate() : null)
                 .depositDay(res.getDepositDay() != null ? DEPOSITDAY.valueOf(res.getDepositDay().name()) : null)
                 .depositAmount(res.getDepositAmount())
                 .accountNum(res.getAccountNum())
@@ -66,9 +67,13 @@ public class SharedAccountService {
     public Long createSharedAccount(Long groupId, SharedAccountReqDTO dto) {
         var group = groupRepository.findByGroupPk(groupId);
         if(sharedAccountRepository.findByGroup_GroupPk(groupId)!=null) throw new CustomException(ErrorCode.ACCOUNT_ALREADY_EXISTS);
-        MultipartFile signature = dto.getSignature();
+
+        var signature = dto.getSignature();
         //확장자 확인(png, jpeg, jpg)
         String originalFilename = signature.getOriginalFilename();
+
+        log.info("signature filename='{}', contentType='{}', size={}",
+                signature.getOriginalFilename(), signature.getContentType(), signature.getSize());
 
         if(!s3Utils.checkExtension(Objects.requireNonNull(originalFilename))){
             throw new CustomException(ErrorCode.UNSUPPORTED_MEDIA_TYPE);
@@ -88,20 +93,30 @@ public class SharedAccountService {
             }
         });
 
-        group.setSignatureUrl(filename);
+        group.updateSignatureUrl(filename);
+        groupRepository.save(group);
 
         SharedAccount account = SharedAccount.builder()
                 .group(group)
                 .accountNum(generateAccountNumber(groupId))
                 .balance(0)
-                .createdAt(Instant.now(Clock.systemUTC()))
+                .createdAt(Instant.now())
                 .depositAlarm(false)
                 .saPw(dto.getSaPw())
                 .build();
 
         sharedAccountRepository.save(account);
 
-        //TODO: 약관동의 DB 저장
+        List<TermsCategory> list = termsCategoryRepository.findAll();
+
+        for(TermsCategory tc : list) {
+            TermsAgreement terms = TermsAgreement.builder()
+                    .termsPk(tc)
+                    .isAgree(true)
+                    .group(group)
+                    .build();
+            termsAgreementRepository.save(terms);
+        }
 
         return account.getSaPk();
     }
@@ -110,10 +125,6 @@ public class SharedAccountService {
     public void updateDepositCycle(Long groupId, DepositCycleDTO dto) {
         SharedAccount res = sharedAccountRepository.findByGroup_GroupPk(groupId);
         if (res == null) throw new CustomException(ErrorCode.NOT_FOUND_ACCOUNT);
-
-
-        Integer cycleCode = (dto.getDepositCycle() != null) ? dto.getDepositCycle().getCode() : null;
-        Integer dayCode   = (dto.getDepositDay()    != null) ? dto.getDepositDay().getCode()    : null;
 
         sharedAccountRepository.updateDepositCycle(dto.getSaPk(),
                 dto.getDepositAlarm(),

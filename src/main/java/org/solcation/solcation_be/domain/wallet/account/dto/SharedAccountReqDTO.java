@@ -14,6 +14,7 @@ import org.solcation.solcation_be.entity.enums.DEPOSITDAY;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Schema(name = "모임통장 계좌 DTO")
 @Getter
@@ -33,5 +34,4 @@ public class SharedAccountReqDTO {
     @NotNull
     @Valid
     private MultipartFile signature;
-
 }

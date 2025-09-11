@@ -8,7 +8,6 @@ import org.solcation.solcation_be.domain.wallet.account.dto.SharedAccountReqDTO;
 import org.solcation.solcation_be.domain.wallet.account.dto.SharedAccountResDTO;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "모임통장 계좌 컨트롤러")
 @RequiredArgsConstructor
