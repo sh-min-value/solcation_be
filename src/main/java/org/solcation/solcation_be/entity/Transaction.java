@@ -6,7 +6,6 @@ import org.solcation.solcation_be.entity.converter.TransactionTypeConverter;
 import org.solcation.solcation_be.entity.enums.TRANSACTIONTYPE;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "shared_account_transaction_tb")
@@ -67,4 +66,12 @@ public class Transaction {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "gm_pk", referencedColumnName = "gm_pk")
     private GroupMember gmPk;
+
+    public void updateMemo(String memo) {
+        this.satMemo = memo;
+    }
+
+    public void updateCategory(TransactionCategory tc) {
+        this.tcPk = tc;
+    }
 }
