@@ -1,6 +1,7 @@
 package org.solcation.solcation_be.domain.wallet.transaction;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.common.CustomException;
 import org.solcation.solcation_be.common.ErrorCode;
 import org.solcation.solcation_be.domain.wallet.transaction.dto.TransactionDTO;
+import org.solcation.solcation_be.domain.wallet.transaction.dto.TransactionDetailDTO;
 import org.solcation.solcation_be.entity.*;
 import org.solcation.solcation_be.entity.enums.TRANSACTIONTYPE;
 import org.solcation.solcation_be.repository.*;
@@ -60,6 +62,7 @@ public class TransactionService {
         List<TransactionDTO> result = new ArrayList<>();
         list.forEach(i -> result.add(
                 TransactionDTO.builder()
+                        .satPk(i.getSatPk())
                         .satTime(i.getSatTime())
                         .briefs(i.getBriefs())
                         .tcName(i.getTcPk().getTcName())
@@ -103,6 +106,7 @@ public class TransactionService {
         List<TransactionDTO> result = new ArrayList<>();
         list.forEach(i -> result.add(
                 TransactionDTO.builder()
+                        .satPk(i.getSatPk())
                         .satTime(i.getSatTime())
                         .briefs(i.getBriefs())
                         .tcName(i.getTcPk().getTcName())
@@ -116,12 +120,39 @@ public class TransactionService {
     }
 
     /* 이용 내역 상세 렌더링 */
-    public void getTransactionDetail() {
+    public TransactionDetailDTO getTransactionDetail(Long satPk) {
+        QTransaction t = QTransaction.transaction;
+        QTransactionCategory tc = QTransactionCategory.transactionCategory;
+        QUser u = QUser.user;
 
+        return queryFactory.select(Projections.constructor(
+                TransactionDetailDTO.class,
+                t.satPk,
+                t.tcPk,
+                t.satTime,
+                t.briefs,
+                t.transactionType,
+                t.userPk.userName,
+                t.depositDestination,
+                t.withdrawDestination,
+                t.balance,
+                t.satAmount,
+                t.satMemo
+        ))
+                .from(t)
+                .leftJoin(t.tcPk, tc)
+                .leftJoin(t.userPk, u)
+                .where(t.satPk.eq(satPk))
+                .fetchOne();
     }
 
     /* 지출 카테고리 변경 */
     public void updateTransactionCategory() {
+
+    }
+
+    /* 메모 수정 */
+    public void updateMemo() {
 
     }
 }

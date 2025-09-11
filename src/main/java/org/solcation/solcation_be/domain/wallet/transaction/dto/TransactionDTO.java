@@ -16,6 +16,10 @@ import java.time.Instant;
 @AllArgsConstructor
 @Getter
 public class TransactionDTO {
+    //pk
+    @NotNull
+    private Long satPk;
+
     //일시
     @NotNull
     @KstDateTime
