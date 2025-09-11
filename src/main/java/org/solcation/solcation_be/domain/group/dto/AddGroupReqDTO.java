@@ -9,9 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Schema(name = "그룹 생성 요청 DTO")
 @Getter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-@Setter
 public class AddGroupReqDTO {
     //그룹 카테고리
     @NotNull

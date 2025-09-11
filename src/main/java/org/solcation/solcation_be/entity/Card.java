@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.solcation.solcation_be.util.security.AesGcmAttributeConverter;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 
 @Entity
 @Table(name = "shared_account_card_tb")
@@ -12,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Card {
+public class Card extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sac_pk")
@@ -27,10 +29,7 @@ public class Card {
     private SharedAccount saPk;
 
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "expiration_period", nullable = false)
-    private LocalDateTime expirationPeriod;
+    private Instant createdAt;
 
     @Convert(converter = AesGcmAttributeConverter.class)
     @Column(name = "sac_cvc", nullable = false)
@@ -44,9 +43,36 @@ public class Card {
     private Boolean cancellation;
 
     @Column(name = "cancellation_date", nullable = true)
-    private LocalDateTime cancellationDate;
+    private Instant cancellationDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "gm_pk", referencedColumnName = "gm_pk")
     private GroupMember gmPk;
+
+    @Column(name = "expiration_year")
+    private short expirationYear;
+
+    @Column(name = "expiration_month")
+    private byte expirationMonth;
+
+    /* insert/update 전 유효성 검사 */
+    @PrePersist
+    @PreUpdate
+    private void setExpiry() {
+        if(expirationMonth < 1 || expirationMonth > 12) throw new IllegalArgumentException("expirationMonth out of range");
+    }
+
+    public YearMonth getExpiration() {
+        return YearMonth.of(expirationYear, expirationMonth);
+    }
+
+    public void setExpiration(YearMonth expiration) {
+        this.expirationYear = (short) expiration.getYear();
+        this.expirationMonth = (byte) expiration.getMonthValue();
+    }
+
+    public void updateCancellation() {
+        this.cancellation = true;
+        this.cancellationDate = Instant.now();
+    }
 }

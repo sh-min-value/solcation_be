@@ -26,7 +26,9 @@ public enum ErrorCode {
 
     // 404 Not Found
     NOT_FOUND_END_POINT(40400, HttpStatus.NOT_FOUND, "존재하지 않는 API입니다."), //DEFAULT
-    NOT_FOUND_ACCOUNT(40401, HttpStatus.NOT_FOUND, "계좌가 존재하지 않습니다."),
+    NOT_EXIST(40004, HttpStatus.NOT_FOUND, "존재하지 않습니다."),
+    NOT_FOUND_ACCOUNT(40001, HttpStatus.NOT_FOUND, "계좌가 존재하지 않습니다."),
+    NOT_FOUND_CARD(40002, HttpStatus.NOT_FOUND, "카드가 존재하지 않습니다."),
     NOT_FOUND_PLAN(40403, HttpStatus.NOT_FOUND, "여행 계획이 없습니다."),
     NOT_FOUND_CATEGORY(40404, HttpStatus.NOT_FOUND, "존재하지 않는 카테고리입니다"),
     NOT_FOUND_GROUP(40405, HttpStatus.NOT_FOUND, "존재하지 않는 세부 계획입니다"),
@@ -39,6 +41,7 @@ public enum ErrorCode {
 
     // 409 Conflict
     CONFLICT(40900, HttpStatus.CONFLICT, "자원이 충돌하였습니다."), //DEFAULT
+    CARD_ALREADY_EXISTS(40901, HttpStatus.CONFLICT, "카드가 이미 존재합니다."),
     ACCOUNT_ALREADY_EXISTS(40902, HttpStatus.CONFLICT, "계좌가 이미 존재합니다."),
 
     // 410 Gone

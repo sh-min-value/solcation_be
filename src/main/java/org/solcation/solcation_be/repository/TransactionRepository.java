@@ -1,13 +1,14 @@
 package org.solcation.solcation_be.repository;
 
 import org.solcation.solcation_be.domain.stats.dto.CategorySpentDTO;
-import org.solcation.solcation_be.entity.Transaction;
+import org.solcation.solcation_be.entity.*;
 import org.solcation.solcation_be.entity.enums.TRANSACTIONTYPE;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -131,4 +132,15 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
         """, nativeQuery = true)
     Object[] compareTravelSpend(@Param("tpPk") Long tpPk);
 
+    //기간 동안의 총 거래액 추출
+    @Query("""
+    SELECT COALESCE(SUM(t.satAmount) , 0)
+    FROM Transaction t
+    WHERE t.saPk = :saPk AND t.transactionType = :transactionType AND t.userPk = :userPk AND t.sacPk = :sacPk AND t.satTime >= :from AND t.satTime < :to
+    """)
+    Long findTotalAmountForPeriod(@Param("saPk") SharedAccount saPk,
+                                                   @Param("transactionType") TRANSACTIONTYPE transactionType,
+                                                   @Param("userPk") User user,
+                                                   @Param("sacPk") Card sacPk,
+                                  @Param("from") Instant from, @Param("to") Instant to);
 }
