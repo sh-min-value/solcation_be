@@ -5,6 +5,7 @@ import org.solcation.solcation_be.domain.group.dto.GroupListDTO;
 import org.solcation.solcation_be.entity.Group;
 import org.solcation.solcation_be.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -56,4 +57,11 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     User findGroupLeaderByGroupPk(@Param("groupPk") Long groupPk);
 
     Group findByGroupPk(Long groupPk);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE Group g " +
+            "SET g.signatureUrl = :signatureUrl " +
+            "WHERE g.groupPk = :groupPk")
+    int updateSignatureUrlByGroupPk(@Param("groupPk") Long groupPk,
+                                    @Param("signatureUrl") String signatureUrl);
 }
