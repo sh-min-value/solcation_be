@@ -3,9 +3,7 @@ package org.solcation.solcation_be.domain.stats;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.solcation.solcation_be.domain.stats.dto.CategorySpentDTO;
-import org.solcation.solcation_be.domain.stats.dto.FinishTravelListDTO;
-import org.solcation.solcation_be.domain.stats.dto.TravelSpendCompareDTO;
+import org.solcation.solcation_be.domain.stats.dto.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -48,5 +46,16 @@ public class StatsController {
         return statsService.getCompareTravelSpend(travelId);
     }
 
+    @Operation(summary = "같은 여행지의 다른 여행들과 카테고리별 소비 비교")
+    @GetMapping("/{travelId}/category-compare")
+    public List<CategorySpentCompareDTO> getCategoryComparison(@PathVariable Long groupId, @PathVariable Long travelId) {
+        return statsService.getCategoryCompare(travelId);
+    }
+
+    @Operation(summary = "여행 계획 상 소비와 실제 소비 카테고리 별 비교")
+    @GetMapping("/{travelId}/plan-actual-compare")
+    public List<CategoryPlannedCompareDTO> getPlanActualComparison(@PathVariable Long groupId, @PathVariable Long travelId) {
+        return statsService.getPlanActualComparison(travelId);
+    }
 
 }

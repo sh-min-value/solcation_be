@@ -43,26 +43,26 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
 
     // 소비 카테고리 별 실제 소비량
     @Query("""
-    select new org.solcation.solcation_be.domain.stats.dto.CategorySpentDTO(
-        tc.tcPk,
-        tc.tcName,
-        tc.tcCode,
-        coalesce(sum(
-            case
-                when t.satTime >= :start
-                     and t.satTime < :endExclusive
-                     and t.tcPk is not null
-                     and (t.transactionType is null or t.transactionType <> org.solcation.solcation_be.entity.enums.TRANSACTIONTYPE.DEPOSIT)
-                then t.satAmount
-                else 0
-            end
-        ), 0L)
-    )
-    from TransactionCategory tc
-    left join Transaction t on t.tcPk = tc
-    group by tc.tcPk, tc.tcName, tc.tcCode
-    order by tc.tcPk
-    """)
+            select new org.solcation.solcation_be.domain.stats.dto.CategorySpentDTO(
+                tc.tcPk,
+                tc.tcName,
+                tc.tcCode,
+                coalesce(sum(
+                    case
+                        when t.satTime >= :start
+                             and t.satTime < :endExclusive
+                             and t.tcPk is not null
+                             and (t.transactionType is null or t.transactionType <> org.solcation.solcation_be.entity.enums.TRANSACTIONTYPE.DEPOSIT)
+                        then t.satAmount
+                        else 0
+                    end
+                ), 0L)
+            )
+            from TransactionCategory tc
+            left join Transaction t on t.tcPk = tc
+            group by tc.tcPk, tc.tcName, tc.tcCode
+            order by tc.tcPk
+            """)
     List<CategorySpentDTO> categorySpent(@Param("start") Instant start,
                                          @Param("endExclusive") Instant endExclusive);
 
@@ -95,6 +95,68 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
             WHERE tr.tp_pk = :tpPk
             """, nativeQuery = true)
     long sumOthersPersonDays(@Param("tpPk") Long tpPk);
+
+    // 다른 그룹의 카테고리별 합계 평균
+    @Query(value = """
+            SELECT 
+                tc.tc_pk AS tcPk,
+                tc.tc_name AS tcName,
+                tc.tc_code AS tcCode,
+                COALESCE(ROUND(AVG(ts.amount_sum)), 0) AS totalAmount
+            FROM transaction_category_tb tc
+            LEFT JOIN (
+                SELECT 
+                    t2.tc_pk AS tc_pk,
+                    tr2.tp_pk AS tp_pk,
+                    COALESCE(SUM(
+                        CASE 
+                            WHEN (t2.transaction_type IS NULL OR t2.transaction_type <> 'DEPOSIT')
+                            THEN t2.sat_amount
+                            ELSE 0
+                        END
+                    ), 0) AS amount_sum
+                FROM travel_plan_tb tr
+                JOIN travel_plan_tb tr2
+                     ON tr2.tp_location = tr.tp_location
+                    AND tr2.tp_pk <> tr.tp_pk
+                JOIN shared_account_tb s2
+                     ON s2.group_pk = tr2.group_pk
+                JOIN shared_account_transaction_tb t2
+                     ON t2.sa_pk = s2.sa_pk
+                WHERE tr.tp_pk = :tpPk
+                  AND t2.tc_pk IS NOT NULL
+                  AND t2.sat_time >= CONVERT_TZ(CONCAT(tr2.tp_start,' 00:00:00'),'Asia/Seoul','UTC')
+                  AND t2.sat_time <  CONVERT_TZ(DATE_ADD(CONCAT(tr2.tp_end,' 00:00:00'), INTERVAL 1 DAY),'Asia/Seoul','UTC')
+                GROUP BY t2.tc_pk, tr2.tp_pk
+            ) ts
+              ON ts.tc_pk = tc.tc_pk
+            GROUP BY tc.tc_pk, tc.tc_name, tc.tc_code
+            ORDER BY tc.tc_pk
+            """, nativeQuery = true)
+    List<Object[]> categoryOthersAvgPerTravel(@Param("tpPk") Long tpPk);
+
+    // 계획 상 카테고리별 소비 통게
+    @Query("""
+            select new org.solcation.solcation_be.domain.stats.dto.CategorySpentDTO(
+                tc.tcPk,
+                tc.tcName,
+                tc.tcCode,
+                coalesce(sum(
+                    case
+                        when p.travel.tpPk = :tpPk
+                             and p.tombstone = false
+                             and p.transactionCategory is not null
+                        then p.pdCost
+                        else 0
+                    end
+                ), 0L)
+            )
+            from TransactionCategory tc
+            left join PlanDetail p on p.transactionCategory = tc
+            group by tc.tcPk, tc.tcName, tc.tcCode
+            order by tc.tcPk
+            """)
+    List<CategorySpentDTO> plannedCategorySpentOfTravel(@Param("tpPk") Long tpPk);
 
     //기간 동안의 총 거래액 추출
     @Query("""
