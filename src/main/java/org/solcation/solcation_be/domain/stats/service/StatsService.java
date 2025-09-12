@@ -1,4 +1,4 @@
-package org.solcation.solcation_be.domain.stats;
+package org.solcation.solcation_be.domain.stats.service;
 
 import lombok.RequiredArgsConstructor;
 import org.solcation.solcation_be.common.CustomException;

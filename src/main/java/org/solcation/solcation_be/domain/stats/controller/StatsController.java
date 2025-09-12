@@ -1,9 +1,10 @@
-package org.solcation.solcation_be.domain.stats;
+package org.solcation.solcation_be.domain.stats.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.solcation.solcation_be.domain.stats.dto.*;
+import org.solcation.solcation_be.domain.stats.service.StatsService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
