@@ -1,15 +1,11 @@
-package org.solcation.solcation_be.domain.stats;
+package org.solcation.solcation_be.domain.stats.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.solcation.solcation_be.domain.stats.dto.CategorySpentDTO;
-import org.solcation.solcation_be.domain.stats.dto.FinishTravelListDTO;
-import org.solcation.solcation_be.domain.stats.dto.TravelSpendCompareDTO;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.solcation.solcation_be.domain.stats.dto.*;
+import org.solcation.solcation_be.domain.stats.service.StatsService;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -50,4 +46,17 @@ public class StatsController {
     public TravelSpendCompareDTO getTravelSpendCompare(@PathVariable Long groupId, @PathVariable Long travelId) {
         return statsService.getCompareTravelSpend(travelId);
     }
+
+    @Operation(summary = "같은 여행지의 다른 여행들과 카테고리별 소비 비교")
+    @GetMapping("/{travelId}/category-compare")
+    public List<CategorySpentCompareDTO> getCategoryComparison(@PathVariable Long groupId, @PathVariable Long travelId) {
+        return statsService.getCategoryCompare(travelId);
+    }
+
+    @Operation(summary = "여행 계획 상 소비와 실제 소비 카테고리 별 비교")
+    @GetMapping("/{travelId}/plan-actual-compare")
+    public List<CategoryPlannedCompareDTO> getPlanActualComparison(@PathVariable Long groupId, @PathVariable Long travelId) {
+        return statsService.getPlanActualComparison(travelId);
+    }
+
 }
