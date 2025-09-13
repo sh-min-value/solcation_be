@@ -110,7 +110,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
                     tr2.tp_pk AS tp_pk,
                     COALESCE(SUM(
                         CASE 
-                            WHEN (t2.transaction_type IS NULL OR t2.transaction_type <> 'DEPOSIT')
+                            WHEN (t2.transaction_type IS NULL OR t2.transaction_type <> 0)
                             THEN t2.sat_amount
                             ELSE 0
                         END
