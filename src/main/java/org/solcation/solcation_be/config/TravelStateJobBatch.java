@@ -17,6 +17,7 @@ import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.CannotAcquireLockException;
@@ -48,26 +49,32 @@ public class TravelStateJobBatch {
 
     /* Job */
     @Bean
-    public Job updateTravelStateJob() {
+    public Job updateTravelStateJob(Step updateTravelStateStep) {
         log.info("[Batch-start] TravelState Job Start");
         return new JobBuilder(JOB_NAME, jobRepository)
                 .incrementer(new CustomJobParameterIncrementer())
-                .start(updateTravelStateStep())
+                .start(updateTravelStateStep)
                 .build();
     }
 
     /* Step */
     @Bean
     @JobScope
-    public Step updateTravelStateStep() {
-        DefaultTransactionAttribute attr = new DefaultTransactionAttribute(TransactionDefinition.PROPAGATION_REQUIRED);
+    public Step updateTravelStateStep(
+            ItemReader<TravelDTO> travelStateItemReader,
+            ItemProcessor<TravelDTO, TravelDTO> travelStateItemProcessor,
+            JdbcBatchItemWriter<TravelDTO> travelStateItemWriter,
+            ExponentialBackOffPolicy travelStateExponentialBackoff
+    ) {
+        DefaultTransactionAttribute attr =
+                new DefaultTransactionAttribute(TransactionDefinition.PROPAGATION_REQUIRED);
         attr.setTimeout(30);
 
         return new StepBuilder(STEP_NAME, jobRepository)
                 .<TravelDTO, TravelDTO>chunk(1000, transactionManager)
-                .reader(itemReader(null))
-                .processor(itemProcessor(null))
-                .writer(itemWriter())
+                .reader(travelStateItemReader)
+                .processor(travelStateItemProcessor)
+                .writer(travelStateItemWriter)
 
                 .faultTolerant()
 
@@ -75,7 +82,7 @@ public class TravelStateJobBatch {
                 .retry(CannotAcquireLockException.class)
                 .retry(org.springframework.dao.QueryTimeoutException.class)
                 .retryLimit(3)
-                .backOffPolicy(exponentialBackoff())
+                .backOffPolicy(travelStateExponentialBackoff)
 
                 .skip(DataIntegrityViolationException.class)
                 .skipLimit(25)
@@ -90,8 +97,8 @@ public class TravelStateJobBatch {
     /* Reader */
     @Bean
     @StepScope
-    public ItemReader<TravelDTO> itemReader(
-            @org.springframework.beans.factory.annotation.Value("#{jobParameters['runDate']}") String runDate
+    public ItemReader<TravelDTO> travelStateItemReader(
+            @Value("#{jobParameters['runDate']}") String runDate
     ) {
         log.info("[Batch-start] TravelState Reader Start (runDate={})", runDate);
 
@@ -133,8 +140,8 @@ public class TravelStateJobBatch {
     /* Processor */
     @Bean
     @StepScope
-    public ItemProcessor<TravelDTO, TravelDTO> itemProcessor(
-            @org.springframework.beans.factory.annotation.Value("#{jobParameters['runDate']}") String runDate
+    public ItemProcessor<TravelDTO, TravelDTO> travelStateItemProcessor(
+            @Value("#{jobParameters['runDate']}") String runDate
     ) {
         log.info("[Batch-start] TravelState Processor Start (runDate={})", runDate);
 
@@ -165,7 +172,7 @@ public class TravelStateJobBatch {
     /* Writer */
     @Bean
     @StepScope
-    public JdbcBatchItemWriter<TravelDTO> itemWriter() {
+    public JdbcBatchItemWriter<TravelDTO> travelStateItemWriter() {
         log.info("[Batch-start] TravelState Writer Start");
         return new JdbcBatchItemWriterBuilder<TravelDTO>()
                 .dataSource(dataSource)
@@ -174,14 +181,15 @@ public class TravelStateJobBatch {
                        SET tp_state = :state
                      WHERE tp_pk   = :pk
                     """)
-                .itemSqlParameterSourceProvider(new org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider<>())
+                .itemSqlParameterSourceProvider(
+                        new org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider<>())
                 .assertUpdates(false)
                 .build();
     }
 
     /* Exponential Backoff (Retry 간 지연) */
-    @Bean
-    public ExponentialBackOffPolicy exponentialBackoff() {
+    @Bean(name = "travelStateExponentialBackoff")
+    public ExponentialBackOffPolicy travelStateExponentialBackoff() {
         var p = new ExponentialBackOffPolicy();
         p.setInitialInterval(50);
         p.setMultiplier(2.0);
