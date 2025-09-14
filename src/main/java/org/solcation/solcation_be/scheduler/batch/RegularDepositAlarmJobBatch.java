@@ -72,7 +72,7 @@ public class RegularDepositAlarmJobBatch {
                 .retry(QueryTimeoutException.class) //retry: 타임아웃
                 .retry(CannotGetJdbcConnectionException.class) //retry: 커넥션 오류
                 .retryLimit(3)
-                .backOffPolicy(exponentialBackoff())
+                .backOffPolicy(alarmExponentialBackoff())
 
                 /* Skip */
                 .skip(DataIntegrityViolationException.class) //skip: 제약 조건 위반
@@ -199,7 +199,7 @@ public class RegularDepositAlarmJobBatch {
 
     /* 재시도(Retry) 까지의 지연 시간(ms) 설정 */
     @Bean
-    public ExponentialBackOffPolicy exponentialBackoff() {
+    public ExponentialBackOffPolicy alarmExponentialBackoff() {
         var p = new ExponentialBackOffPolicy();
         p.setInitialInterval(50);
         p.setMultiplier(2.0);
