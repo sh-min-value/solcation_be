@@ -1,9 +1,8 @@
-package org.solcation.solcation_be.config;
+package org.solcation.solcation_be.scheduler.batch;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.entity.enums.TRAVELSTATE;
-import org.solcation.solcation_be.scheduler.CustomJobParameterIncrementer;
 import org.solcation.solcation_be.scheduler.dto.TravelDTO;
 import org.solcation.solcation_be.util.timezone.ZonedTimeUtil;
 import org.springframework.batch.core.Job;
@@ -19,7 +18,6 @@ import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.CannotAcquireLockException;
@@ -33,7 +31,6 @@ import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 
 import javax.sql.DataSource;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;

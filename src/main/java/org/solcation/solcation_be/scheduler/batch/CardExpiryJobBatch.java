@@ -1,9 +1,7 @@
-package org.solcation.solcation_be.config;
+package org.solcation.solcation_be.scheduler.batch;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.solcation.solcation_be.entity.Card;
-import org.solcation.solcation_be.scheduler.CustomJobParameterIncrementer;
 import org.solcation.solcation_be.scheduler.dto.CardExpiryDTO;
 import org.solcation.solcation_be.util.timezone.ZonedTimeUtil;
 import org.springframework.batch.core.Job;
@@ -15,7 +13,6 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
@@ -25,9 +22,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.*;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.retry.backoff.BackOffPolicy;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
