@@ -31,5 +31,5 @@ public interface SharedAccountRepository extends JpaRepository<SharedAccount, Lo
     void updateDepositCycle(Long saPk, Boolean depositAlarm, DEPOSITCYCLE depositCycle,
                            Integer depositDate, DEPOSITDAY depositDay, int depositAmount);
 
-
+    Optional<SharedAccount> findBySaPk(Long saPk);
 }

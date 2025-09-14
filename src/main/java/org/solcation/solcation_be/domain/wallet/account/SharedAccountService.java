@@ -4,16 +4,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.common.CustomException;
 import org.solcation.solcation_be.common.ErrorCode;
+import org.solcation.solcation_be.domain.notification.NotificationService;
 import org.solcation.solcation_be.domain.wallet.account.dto.*;
-import org.solcation.solcation_be.entity.SharedAccount;
-import org.solcation.solcation_be.entity.TermsAgreement;
-import org.solcation.solcation_be.entity.TermsCategory;
+import org.solcation.solcation_be.entity.*;
+import org.solcation.solcation_be.entity.enums.ALARMCODE;
 import org.solcation.solcation_be.entity.enums.DEPOSITCYCLE;
 import org.solcation.solcation_be.entity.enums.DEPOSITDAY;
-import org.solcation.solcation_be.repository.GroupRepository;
-import org.solcation.solcation_be.repository.SharedAccountRepository;
-import org.solcation.solcation_be.repository.TermsAgreementRepository;
-import org.solcation.solcation_be.repository.TermsCategoryRepository;
+import org.solcation.solcation_be.repository.*;
+import org.solcation.solcation_be.scheduler.dto.DepositAlarmDTO;
+import org.solcation.solcation_be.util.category.AlarmCategoryLookup;
 import org.solcation.solcation_be.util.s3.S3Utils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -36,6 +35,9 @@ public class SharedAccountService {
     private final GroupRepository groupRepository;
     private final TermsCategoryRepository termsCategoryRepository;
     private final TermsAgreementRepository termsAgreementRepository;
+    private final GroupMemberRepository groupMemberRepository;
+    private final NotificationService notificationService;
+    private final AlarmCategoryLookup alarmCategoryLookup;
     private final S3Utils s3Utils;
 
     @Value("${cloud.s3.bucket.upload.signature}")
@@ -132,6 +134,40 @@ public class SharedAccountService {
                 dto.getDepositDate(),
                 dto.getDepositDay(),
                 dto.getDepositAmount());
+    }
+
+    //정기 입금일 비활성화
+    @Transactional
+    public void disableDepositCycle(Long saPk) {
+        SharedAccount sa = sharedAccountRepository.findBySaPk(saPk).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ACCOUNT));
+        sa.disableAlarm();
+        sharedAccountRepository.save(sa);
+    }
+
+
+    //정기 입금일 알림 전송
+    @Transactional
+    public void sendRegularDepositAlarm(Long saPk) {
+        SharedAccount sa = sharedAccountRepository.findBySaPk(saPk).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ACCOUNT));
+
+        //그룹 멤버 조회
+        List<User> members = groupMemberRepository.findByGroup_GroupPkAndNotRejected(sa.getGroup().getGroupPk());
+        ALARMCODE acCode = ALARMCODE.DEPOSIT_REMINDER;
+        AlarmCategory ac = alarmCategoryLookup.get(acCode);
+
+        //알림 생성
+        for(User u : members) {
+            PushNotification pn = PushNotification.builder()
+                    .pnTitle(acCode.getTitle())
+                    .pnTime(Instant.now())
+                    .pnContent(acCode.getContent())
+                    .acPk(ac)
+                    .userPk(u)
+                    .groupPk(sa.getGroup())
+                    .isAccepted(false)
+                    .build();
+            notificationService.saveNotification(u.getUserPk(), pn);
+        }
     }
 
     private String generateAccountNumber(Long groupId) {
