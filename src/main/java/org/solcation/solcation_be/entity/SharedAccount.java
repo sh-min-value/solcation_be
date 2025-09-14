@@ -61,4 +61,12 @@ public class SharedAccount extends BaseEntity{
 
     @Column(name="created_at")
     private Instant createdAt;
+
+    public void disableAlarm() {
+        this.depositAlarm = false;
+        this.depositCycle = null;
+        this.depositDate = null;
+        this.depositDay = null;
+        this.depositAmount = 0;
+    }
 }

@@ -17,7 +17,7 @@ public class AuditorAwareImpl implements AuditorAware<Long> {
     public Optional<Long> getCurrentAuditor() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(auth == null || !auth.isAuthenticated()) {
-            return Optional.empty();
+            return Optional.of(-1L);
         }
 
         Object principal = auth.getPrincipal();
@@ -27,6 +27,6 @@ public class AuditorAwareImpl implements AuditorAware<Long> {
         }
 
 
-        return Optional.empty();
+        return Optional.of(-1L);
     }
 }

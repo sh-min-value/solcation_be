@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class SharedAccountController {
     private final SharedAccountService sharedAccountService;
 
-    @GetMapping("/")
+    @GetMapping("/info")
     public SharedAccountResDTO getSharedAccount(@PathVariable long groupId) {
         return sharedAccountService.getSharedAccountInfo(groupId);
     }

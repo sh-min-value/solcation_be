@@ -1,8 +1,7 @@
-package org.solcation.solcation_be.config;
+package org.solcation.solcation_be.scheduler.batch;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.solcation.solcation_be.scheduler.CustomJobParameterIncrementer;
 import org.solcation.solcation_be.scheduler.dto.CardExpiryDTO;
 import org.solcation.solcation_be.util.timezone.ZonedTimeUtil;
 import org.springframework.batch.core.Job;
@@ -21,10 +20,9 @@ import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuild
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.*;
+import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.retry.backoff.BackOffPolicy;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
@@ -42,27 +40,31 @@ public class CardExpiryJobBatch {
     private static final String JOB_NAME = "cardExpiryJob";
     private static final String STEP_NAME = "cardExpiryStep";
 
+    private final JobRepository jobRepository;
+    private final PlatformTransactionManager transactionManager;
+    private final DataSource dataSource;
+
     @Bean
-    public Job cardExpProcessing(JobRepository jobRepository, PlatformTransactionManager transactionManager, DataSource dataSource) {
+    public Job cardExpProcessing(Step cardExpiryStep) {
         log.info("[Batch-start] Batch Start");
         return new JobBuilder(JOB_NAME, jobRepository)
                 .incrementer(new CustomJobParameterIncrementer())
-                .start(cardExpiryStep(jobRepository, transactionManager, dataSource))
+                .start(cardExpiryStep)
                 .build();
     }
 
     @Bean
     @JobScope
-    public Step cardExpiryStep(JobRepository jobRepository, PlatformTransactionManager transactionManager, DataSource dataSource) {
+    public Step cardExpiryStep() {
         DefaultTransactionAttribute attr = new DefaultTransactionAttribute(TransactionDefinition.PROPAGATION_REQUIRED); //청크를 트랜잭션 단위로 취급
         attr.setTimeout(30); //30초 이내 트랜잭션 성공 요구
 
         return new StepBuilder(STEP_NAME, jobRepository)
                 .<Long, CardExpiryDTO>chunk(50, transactionManager) //sac_pk -> CardExpiryDTO
-                .reader(itemReader(dataSource))
+                .reader(itemReader())
                 .processor(itemProcessor())
 
-                .writer(itemWriter(dataSource))
+                .writer(itemWriter())
 
                 /* 내결함 */
                 .faultTolerant()
@@ -71,6 +73,8 @@ public class CardExpiryJobBatch {
                 .retry(PessimisticLockingFailureException.class) //retry: 교착 예외
                 .retry(CannotAcquireLockException.class) //retry: 락 획들 실패
                 .retry(QueryTimeoutException.class) //retry: 타임아웃
+                .retry(CannotGetJdbcConnectionException.class) //retry: 커넥션 오류
+                .retry(DataAccessException.class) //retry: 자원 실패(네트워크 오류, 서버 오류 등)
                 .retryLimit(3)
                 .backOffPolicy(exponentialBackoff())
 
@@ -90,7 +94,7 @@ public class CardExpiryJobBatch {
     /* reader */
     @Bean
     @StepScope
-    public ItemReader<Long> itemReader(DataSource dataSource) {
+    public ItemReader<Long> itemReader() {
         log.info("[Batch-start] ItemReader Start");
         //파라미터 설정: KST 기준 년/월
         Map<String, Object> params = new LinkedHashMap<>();
@@ -141,7 +145,7 @@ public class CardExpiryJobBatch {
     /* writer */
     @Bean
     @StepScope
-    public JdbcBatchItemWriter<CardExpiryDTO> itemWriter(DataSource dataSource) {
+    public JdbcBatchItemWriter<CardExpiryDTO> itemWriter() {
         log.info("[Batch-start] JdbcBatchItemWriter Start");
         return new JdbcBatchItemWriterBuilder<CardExpiryDTO>()
                 .dataSource(dataSource)

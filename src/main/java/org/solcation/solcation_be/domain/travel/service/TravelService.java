@@ -5,15 +5,15 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.solcation.solcation_be.common.CustomException;
 import org.solcation.solcation_be.common.ErrorCode;
+import org.solcation.solcation_be.domain.notification.NotificationService;
 import org.solcation.solcation_be.domain.travel.dto.PlanDetailDTO;
 import org.solcation.solcation_be.domain.travel.dto.TravelReqDTO;
 import org.solcation.solcation_be.domain.travel.dto.TravelResDTO;
 import org.solcation.solcation_be.entity.*;
+import org.solcation.solcation_be.entity.enums.ALARMCODE;
 import org.solcation.solcation_be.entity.enums.TRAVELSTATE;
-import org.solcation.solcation_be.repository.GroupRepository;
-import org.solcation.solcation_be.repository.PlanDetailRepository;
-import org.solcation.solcation_be.repository.TravelCategoryRepository;
-import org.solcation.solcation_be.repository.TravelRepository;
+import org.solcation.solcation_be.repository.*;
+import org.solcation.solcation_be.util.category.AlarmCategoryLookup;
 import org.solcation.solcation_be.util.s3.S3Utils;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +23,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -33,6 +34,9 @@ public class TravelService {
     private final TravelCategoryRepository travelCategoryRepository;
     private final GroupRepository groupRepository;
     private final PlanDetailRepository planDetailRepository;
+    private final GroupMemberRepository groupMemberRepository;
+    private final NotificationService notificationService;
+    private final AlarmCategoryLookup alarmCategoryLookup;
     private final S3Utils s3Utils;
 
     @Value("${cloud.s3.bucket.upload.profile.travel}")
@@ -94,7 +98,29 @@ public class TravelService {
                 .participant(dto.getParticipant())
                 .build();
 
-        return travelRepository.save(travel).getTpPk();
+        Long result = travelRepository.save(travel).getTpPk();
+
+        //그룹 멤버 조회
+        List<User> members = groupMemberRepository.findByGroup_GroupPkAndNotRejected(group.getGroupPk());
+        ALARMCODE acCode = ALARMCODE.TRAVEL_CREATED;
+        AlarmCategory ac = alarmCategoryLookup.get(acCode);
+
+        //그룹 멤버에게 모두 전송
+        for(User u :  members) {
+            PushNotification pn = PushNotification.builder()
+                    .pnTitle(acCode.getTitle())
+                    .pnTime(Instant.now())
+                    .pnContent(acCode.getContent())
+                    .acPk(ac)
+                    .userPk(u)
+                    .groupPk(group)
+                    .isAccepted(false)
+                    .build();
+            notificationService.saveNotification(u.getUserPk(), pn);
+        }
+
+
+        return result;
     }
 
     // 단일 여행 조회
