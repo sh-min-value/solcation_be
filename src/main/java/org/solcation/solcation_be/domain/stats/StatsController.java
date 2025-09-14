@@ -1,10 +1,9 @@
-package org.solcation.solcation_be.domain.stats.controller;
+package org.solcation.solcation_be.domain.stats;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.solcation.solcation_be.domain.stats.dto.*;
-import org.solcation.solcation_be.domain.stats.service.StatsService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -57,6 +56,12 @@ public class StatsController {
     @GetMapping("/{travelId}/plan-actual-compare")
     public List<CategoryPlannedCompareDTO> getPlanActualComparison(@PathVariable Long groupId, @PathVariable Long travelId) {
         return statsService.getPlanActualComparison(travelId);
+    }
+
+    @Operation(summary = "Gemini 인사이트 출력")
+    @GetMapping("/api/{travelId}/insight")
+    public String getTravelInsight(@PathVariable Long groupId, @PathVariable Long travelId) {
+        return statsService.generateTravelInsight(travelId);
     }
 
 }
