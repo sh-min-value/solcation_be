@@ -120,7 +120,28 @@ public class SharedAccountService {
             termsAgreementRepository.save(terms);
         }
 
-        return account.getSaPk();
+        Long result = account.getSaPk();
+
+        //그룹 멤버 조회
+        List<User> members = groupMemberRepository.findByGroup_GroupPkAndNotRejected(group.getGroupPk());
+        ALARMCODE acCode = ALARMCODE.ACCOUNT_CREATED;
+        AlarmCategory ac = alarmCategoryLookup.get(acCode);
+
+        //그룹 멤버에게 모두 전송
+        for(User u :  members) {
+            PushNotification pn = PushNotification.builder()
+                    .pnTitle(acCode.getTitle())
+                    .pnTime(Instant.now())
+                    .pnContent(acCode.getContent())
+                    .acPk(ac)
+                    .userPk(u)
+                    .groupPk(group)
+                    .isAccepted(false)
+                    .build();
+            notificationService.saveNotification(u.getUserPk(), pn);
+        }
+
+        return result;
     }
 
     @Transactional
