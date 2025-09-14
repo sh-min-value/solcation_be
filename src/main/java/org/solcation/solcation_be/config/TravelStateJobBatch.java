@@ -2,8 +2,10 @@ package org.solcation.solcation_be.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.solcation.solcation_be.entity.enums.TRAVELSTATE;
 import org.solcation.solcation_be.scheduler.CustomJobParameterIncrementer;
 import org.solcation.solcation_be.scheduler.dto.TravelDTO;
+import org.solcation.solcation_be.util.timezone.ZonedTimeUtil;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobScope;
@@ -31,6 +33,7 @@ import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 
 import javax.sql.DataSource;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -97,20 +100,20 @@ public class TravelStateJobBatch {
     /* Reader */
     @Bean
     @StepScope
-    public ItemReader<TravelDTO> travelStateItemReader(
-            @Value("#{jobParameters['runDate']}") String runDate
-    ) {
-        log.info("[Batch-start] TravelState Reader Start (runDate={})", runDate);
+    public ItemReader<TravelDTO> travelStateItemReader() {
+        //KST 기준 현재 시각
+        LocalDate base = ZonedTimeUtil.now();
+        Map<String, Object> params = new  LinkedHashMap<>();
+        params.put("base", base);
+        params.put("before", TRAVELSTATE.BEFORE.getCode());
+        params.put("ongoing", TRAVELSTATE.ONGOING.getCode());
+        params.put("finish", TRAVELSTATE.FINISH.getCode());
 
-        LocalDate base = (runDate != null && !runDate.isBlank())
-                ? LocalDate.parse(runDate)
-                : LocalDate.now();
-
-        Map<String, Object> params = Map.of("base", base);
+        log.info("[Batch-start] TravelState Reader Start (runDate={})", base);
 
         // 정렬 키
         Map<String, Order> sort = new LinkedHashMap<>();
-        sort.put("tp_pk", Order.ASCENDING);
+        sort.put("pk", Order.ASCENDING);
 
         return new JdbcPagingItemReaderBuilder<TravelDTO>()
                 .name("travelStateReader")
@@ -130,9 +133,9 @@ public class TravelStateJobBatch {
                 .fromClause("FROM travel_plan_tb")
                 .whereClause("""
                     WHERE
-                        (tp_end   < :base AND tp_state <> 2) /* FINISH 후보 */
-                     OR (tp_start <= :base AND tp_end >= :base AND tp_state <> 1) /* ONGOING 후보 */
-                     OR (tp_start  > :base AND tp_state <> 0) /* BEFORE 후보 */
+                        (tp_end   < :base AND tp_state <> :finish) /* FINISH 후보 */
+                     OR (tp_start <= :base AND tp_end >= :base AND tp_state <> :ongoing) /* ONGOING 후보 */
+                     OR (tp_start  > :base AND tp_state <> :before) /* BEFORE 후보 */
                     """)
                 .build();
     }
@@ -140,23 +143,23 @@ public class TravelStateJobBatch {
     /* Processor */
     @Bean
     @StepScope
-    public ItemProcessor<TravelDTO, TravelDTO> travelStateItemProcessor(
-            @Value("#{jobParameters['runDate']}") String runDate
-    ) {
-        log.info("[Batch-start] TravelState Processor Start (runDate={})", runDate);
+    public ItemProcessor<TravelDTO, TravelDTO> travelStateItemProcessor() {
+        //KST 기준 현재 시각
+        LocalDate base = ZonedTimeUtil.now();
+        log.info("[Batch-start] TravelState Processor Start (runDate={})", base);
 
-        LocalDate base = (runDate != null && !runDate.isBlank())
-                ? LocalDate.parse(runDate)
-                : LocalDate.now();
+        int finish = TRAVELSTATE.FINISH.getCode();
+        int ongoing = TRAVELSTATE.ONGOING.getCode();
+        int before = TRAVELSTATE.BEFORE.getCode();
 
         return item -> {
             int newState;
             if (item.getEndDate().isBefore(base)) {
-                newState = 2; // FINISH
+                newState = finish; // FINISH
             } else if (item.getStartDate().isAfter(base)) {
-                newState = 0; // BEFORE
+                newState = before; // BEFORE
             } else {
-                newState = 1; // ONGOING
+                newState = ongoing; // ONGOING
             }
 
             Integer cur = item.getState();
@@ -174,6 +177,7 @@ public class TravelStateJobBatch {
     @StepScope
     public JdbcBatchItemWriter<TravelDTO> travelStateItemWriter() {
         log.info("[Batch-start] TravelState Writer Start");
+
         return new JdbcBatchItemWriterBuilder<TravelDTO>()
                 .dataSource(dataSource)
                 .sql("""
