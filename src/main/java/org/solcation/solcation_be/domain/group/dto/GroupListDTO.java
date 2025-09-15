@@ -26,13 +26,13 @@ public class GroupListDTO {
     @NotNull
     private String profileImg;
 
-    //그룹 카테고리
+    //그룹 카테고리 이름
     @NotNull
-    private GroupCategory gcPk;
+    private String gcPk;
 
-    //개설자
+    //개설자 이름
     @NotNull
-    private User groupLeader;
+    private String groupLeader;
 
     //총 명수
     @NotNull

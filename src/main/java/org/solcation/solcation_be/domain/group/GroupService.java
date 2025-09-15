@@ -101,12 +101,14 @@ public class GroupService {
         List<Object[]> results = groupRepository.getGroupListWithSearch(userId, searchTerm);
 
         for(Object[] obj: results) {
+            GroupCategory gc = (GroupCategory) obj[3];
+            User leader = (User) obj[4];
             GroupListDTO dto = GroupListDTO.builder()
                     .groupPk((Long) obj[0])
                     .groupName((String) obj[1])
                     .profileImg((String) obj[2])
-                    .gcPk((GroupCategory) obj[3])
-                    .groupLeader((User) obj[4])
+                    .gcPk(gc.getGcName())
+                    .groupLeader(leader.getUserName())
                     .totalMembers((int) obj[5])
                     .scheduled((Long) obj[6])
                     .build();
