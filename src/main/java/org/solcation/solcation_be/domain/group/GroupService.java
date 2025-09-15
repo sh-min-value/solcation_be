@@ -1,5 +1,6 @@
 package org.solcation.solcation_be.domain.group;
 
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.common.CustomException;
@@ -8,15 +9,18 @@ import org.solcation.solcation_be.domain.group.dto.*;
 import org.solcation.solcation_be.domain.notification.NotificationService;
 import org.solcation.solcation_be.entity.*;
 import org.solcation.solcation_be.entity.enums.ALARMCODE;
+import org.solcation.solcation_be.entity.enums.TRAVELSTATE;
 import org.solcation.solcation_be.repository.*;
 import org.solcation.solcation_be.util.category.AlarmCategoryLookup;
 import org.solcation.solcation_be.util.category.GroupCategoryLookup;
 import org.solcation.solcation_be.util.s3.S3Utils;
+import org.solcation.solcation_be.util.timezone.ZonedTimeUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -95,30 +99,14 @@ public class GroupService {
     }
 
     /* 그룹 목록 */
+    @Transactional(readOnly = true)
     public List<GroupListDTO> getList(String userId, String searchTerm) {
-        List<GroupListDTO> result = new ArrayList<>();
-
-        List<Object[]> results = groupRepository.getGroupListWithSearch(userId, searchTerm);
-
-        for(Object[] obj: results) {
-            GroupCategory gc = (GroupCategory) obj[3];
-            User leader = (User) obj[4];
-            GroupListDTO dto = GroupListDTO.builder()
-                    .groupPk((Long) obj[0])
-                    .groupName((String) obj[1])
-                    .profileImg((String) obj[2])
-                    .gcPk(gc.getGcName())
-                    .groupLeader(leader.getUserName())
-                    .totalMembers((int) obj[5])
-                    .scheduled((Long) obj[6])
-                    .build();
-            result.add(dto);
-        }
-
-        return result;
+        List<GroupListDTO> results = groupRepository.getGroupListWithSearch(userId, searchTerm, TRAVELSTATE.BEFORE);
+        return results;
     }
 
     /* 그룹 메인 - 그룹 정보 렌더링 */
+    @Transactional(readOnly = true)
     public GroupInfoDTO getGroupInfo(Long groupPk) {
         //그룹 정보 조회
         Object[] result = (Object[])groupRepository.getGroupInfoByGroupPk(groupPk);
@@ -145,6 +133,7 @@ public class GroupService {
     }
 
     /* 그룹 메인 - 참여자 목록 */
+    @Transactional(readOnly = true)
     public GroupMembersDTO getGroupMembers(Long groupPk) {
         //그룹 개설자 조회
         User groupLeader = groupRepository.findGroupLeaderByGroupPk(groupPk);
@@ -231,5 +220,20 @@ public class GroupService {
         //대기 중인 그룹 멤버 추가
         GroupMember groupMember = GroupMember.invitee(group, invitee);
         groupMemberRepository.save(groupMember);
+    }
+
+    /* 초대자 정보 조회 */
+    public GroupMemberDTO getInvitee(String tel) {
+        User user = userRepository.findByTel(tel).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        return GroupMemberDTO.builder()
+                .userPk(user.getUserPk())
+                .userId(user.getUserId())
+                .tel(user.getTel())
+                .userName(user.getUserName())
+                .dateOfBirth(user.getDateOfBirth())
+                .gender(user.getGender())
+                .email(user.getEmail())
+                .build();
     }
 }

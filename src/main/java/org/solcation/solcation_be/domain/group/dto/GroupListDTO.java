@@ -36,7 +36,7 @@ public class GroupListDTO {
 
     //총 명수
     @NotNull
-    private int totalMembers;
+    private Integer totalMembers;
 
     //예정된 여정 개수
     private Long scheduled;
