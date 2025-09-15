@@ -31,7 +31,14 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     FROM Group g
     JOIN g.gcPk gc
     JOIN g.groupLeader leader
-    WHERE g.groupLeader.userId = :userId
+    WHERE
+        exists (
+          select 1
+          from GroupMember gm
+          where gm.group = g
+            and gm.user.userId = :userId
+            and gm.isAccepted = true
+        )
           AND (
                :searchTerm IS NULL
                OR :searchTerm = ''

@@ -148,18 +148,14 @@ public class GroupService {
     /* 그룹 메인 - 초대 전송 */
     public void inviteMembers(Long groupId, String tel) {
         //전화번호로 회원 조회
-        User invitee = (User) userRepository.findByTel(tel).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        UserDTO invitee = userRepository.findByTelWithGroupCheck(tel, groupId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        //그룹 조회
-        Group group = groupRepository.findByGroupPk(groupId);
+        if(invitee.getIsMember()) {
+            throw new CustomException(ErrorCode.ALREADY_GROUP_MEMBER);
+        }
 
-        //멤버 - isAccepted(true) | 거절 - isAccepted(false) | 대기 - isAccepted(null): 멤버/대기중인 회원 리스트에 존재 시 에러
-        List<User> groupMemebers = groupMemberRepository.findByGroup_GroupPkAndNotRejected(group.getGroupPk());
-
-        boolean exists = groupMemebers.stream().anyMatch(gm -> Objects.equals(invitee.getUserPk(), gm.getUserPk()));
-
-        if(exists) {
-            throw new CustomException(ErrorCode.BAD_REQUEST);
+        if(invitee.getIsPending()) {
+            throw new CustomException(ErrorCode.ALREADY_INVITED);
         }
 
         //초대 전송(알림 전송, 알림 저장)
@@ -170,30 +166,21 @@ public class GroupService {
                 .pnTime(Instant.now())
                 .pnContent(ALARMCODE.GROUP_INVITE.getContent())
                 .acPk(ac)
-                .userPk(invitee)
-                .groupPk(group)
+                .userPk(userRepository.getReferenceById(invitee.getUserPk()))
+                .groupPk(groupRepository.getReferenceById(groupId))
                 .isAccepted(false)
                 .build();
 
         notificationService.saveNotification(invitee.getUserPk(), pn);
 
         //대기 중인 그룹 멤버 추가
-        GroupMember groupMember = GroupMember.invitee(group, invitee);
+        GroupMember groupMember = GroupMember.invitee(groupRepository.getReferenceById(groupId), userRepository.getReferenceById(invitee.getUserPk()));
         groupMemberRepository.save(groupMember);
     }
 
     /* 초대자 정보 조회 */
-    public GroupMemberDTO getInvitee(String tel) {
-        User user = userRepository.findByTel(tel).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-        return GroupMemberDTO.builder()
-                .userPk(user.getUserPk())
-                .userId(user.getUserId())
-                .tel(user.getTel())
-                .userName(user.getUserName())
-                .dateOfBirth(user.getDateOfBirth())
-                .gender(user.getGender())
-                .email(user.getEmail())
-                .build();
+    public UserDTO getInvitee(Long groupId, String tel) {
+        UserDTO user = userRepository.findByTelWithGroupCheck(tel, groupId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        return user;
     }
 }

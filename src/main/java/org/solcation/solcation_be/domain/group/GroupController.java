@@ -59,7 +59,7 @@ public class GroupController {
 
     @Operation(summary = "초대자 정보 조회")
     @GetMapping("/{groupId:\\d+}/get-invitee")
-    public GroupMemberDTO getInvitee(@PathVariable("groupId") Long groupId, @PathParam("tel") String tel) {
-        return groupService.getInvitee(tel);
+    public UserDTO getInvitee(@PathVariable("groupId") Long groupId, @PathParam("tel") String tel) {
+        return groupService.getInvitee(groupId, tel);
     }
 }
