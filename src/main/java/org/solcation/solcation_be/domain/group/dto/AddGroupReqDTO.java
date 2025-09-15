@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.solcation.solcation_be.entity.enums.GROUPCODE;
 import org.springframework.web.multipart.MultipartFile;
 
 @Schema(name = "그룹 생성 요청 DTO")
@@ -13,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class AddGroupReqDTO {
     //그룹 카테고리
     @NotNull
-    private Long gcPk;
+    private GROUPCODE gcPk;
 
     //그룹 이름
     @NotNull
