@@ -39,14 +39,14 @@ public class SharedAccountResDTO {
     private DEPOSITCYCLE depositCycle;
 
     @Schema(description = "입금 예정일", example = "2025-10-01")
-    private int depositDate;
+    private Integer depositDate;
 
     @Schema(description = "입금 요일/일자", example = "MON")
     @Convert(converter = DepositDayConverter.class)
     private DEPOSITDAY depositDay;
 
     @Schema(description = "입금 금액")
-    private int depositAmount;
+    private Integer depositAmount;
 
     @Schema(description = "계좌번호")
     @NotBlank
