@@ -23,25 +23,4 @@ public class GroupTests {
     @Autowired
     private GroupMemberRepository groupMemberRepository;
 
-    @Test
-    public void getLeaderInfo() {
-        User groupLeader = groupRepository.findGroupLeaderByGroupPk(10L);
-        System.out.println(groupLeader.getUserName());
-    }
-
-    @Test
-    public void getGroupMembers() {
-        List<User> groupMembers = groupMemberRepository.findByGroup_GroupPkAndRoleAndIsAcceptedOrderByUser_UserPkAsc(10L, false, true);
-        for(User gm : groupMembers){
-            System.out.println(gm.getUserId());
-        }
-    }
-
-    @Test
-    public void getWaitingMembers() {
-        List<User> groupMembers = groupMemberRepository.findByGroup_GroupPkAndRoleAndIsAcceptedOrderByUser_UserPkAsc(10L, false, false);
-        for(User gm : groupMembers){
-            System.out.println(gm.getUserId());
-        }
-    }
 }

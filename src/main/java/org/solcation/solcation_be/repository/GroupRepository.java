@@ -2,6 +2,7 @@ package org.solcation.solcation_be.repository;
 
 import org.solcation.solcation_be.domain.group.dto.GroupInfoDTO;
 import org.solcation.solcation_be.domain.group.dto.GroupListDTO;
+import org.solcation.solcation_be.domain.group.dto.GroupMemberDTO;
 import org.solcation.solcation_be.entity.Group;
 import org.solcation.solcation_be.entity.User;
 import org.solcation.solcation_be.entity.enums.TRAVELSTATE;
@@ -59,9 +60,6 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     GROUP BY g.groupPk, g.groupName, g.groupImage, g.gcPk, g.groupLeader, g.totalMembers  
     """)
     GroupInfoDTO getGroupInfoByGroupPk(@Param("groupPk") long groupPk, @Param("beforeState") TRAVELSTATE beforeState, @Param("finishState") TRAVELSTATE finishState);
-
-    @Query("SELECT g.groupLeader FROM Group g WHERE g.groupPk = :groupPk")
-    User findGroupLeaderByGroupPk(@Param("groupPk") Long groupPk);
 
     Group findByGroupPk(Long groupPk);
 }

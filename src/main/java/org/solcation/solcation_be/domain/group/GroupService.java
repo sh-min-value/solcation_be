@@ -116,53 +116,32 @@ public class GroupService {
     /* 그룹 메인 - 참여자 목록 */
     @Transactional(readOnly = true)
     public GroupMembersDTO getGroupMembers(Long groupPk) {
-        //그룹 개설자 조회
-        User groupLeader = groupRepository.findGroupLeaderByGroupPk(groupPk);
-        GroupMemberDTO leader = GroupMemberDTO.builder()
-                .userPk(groupLeader.getUserPk())
-                .userId(groupLeader.getUserId())
-                .tel(groupLeader.getTel())
-                .userName(groupLeader.getUserName())
-                .dateOfBirth(groupLeader.getDateOfBirth())
-                .gender(groupLeader.getGender())
-                .email(groupLeader.getEmail())
-                .build();
-        //그룹 멤버 조회
-        List<User> groupMembers = groupMemberRepository
-                .findByGroup_GroupPkAndRoleAndIsAcceptedOrderByUser_UserPkAsc(groupPk, false, true);
+        //그룹 멤버 전체 조회
+        List<GroupMemberFlatDTO> all = groupMemberRepository.findActiveAndWaitingMembers(groupPk);
 
-        List<GroupMemberDTO> dtos = groupMembers.stream()
-                .map(u -> new GroupMemberDTO(
-                        u.getUserPk(),
-                        u.getUserId(),
-                        u.getTel(),
-                        u.getUserName(),
-                        u.getDateOfBirth(),
-                        u.getGender(),
-                        u.getEmail()
-                ))
-                .toList();
+        GroupMemberDTO leader = null;
+        List<GroupMemberDTO> members = new ArrayList<>();
+        List<GroupMemberDTO> waiting = new ArrayList<>();
 
-        //그룹 대기자 조회
-        List<User> waitingMembers = groupMemberRepository
-                .findByGroup_GroupPkAndPending(groupPk);
+        for (GroupMemberFlatDTO f : all) {
+            GroupMemberDTO dto = new GroupMemberDTO(
+                    f.getUserPk(), f.getUserId(), f.getTel(), f.getUserName(),
+                    f.getDateOfBirth(), f.getGender(), f.getEmail()
+            );
 
-        List<GroupMemberDTO> dtos2 = waitingMembers.stream()
-                .map(u -> new GroupMemberDTO(
-                        u.getUserPk(),
-                        u.getUserId(),
-                        u.getTel(),
-                        u.getUserName(),
-                        u.getDateOfBirth(),
-                        u.getGender(),
-                        u.getEmail()
-                ))
-                .toList();
+            if(Boolean.TRUE.equals(f.getRole())) {
+                leader = dto;
+            } else if (Boolean.TRUE.equals(f.getIsAccepted())) {
+                members.add(dto);
+            } else if (f.getIsAccepted() == null) {
+                waiting.add(dto);
+            }
+        }
 
         return GroupMembersDTO.builder()
                 .groupLeader(leader)
-                .members(dtos)
-                .waitingList(dtos2)
+                .members(members)
+                .waitingList(waiting)
                 .build();
     }
 
