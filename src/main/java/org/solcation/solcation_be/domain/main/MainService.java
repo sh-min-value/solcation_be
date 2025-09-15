@@ -93,6 +93,7 @@ public class MainService {
                         .acCode(n.getAcPk().getAcCode())
                         .groupName(n.getGroupPk().getGroupName())
                         .groupLeader(n.getGroupPk().getGroupLeader().getUserName())
+                        .pnTitle(n.getPnTitle())
                         .build())
                 .toList();
     }
