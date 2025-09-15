@@ -41,21 +41,24 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     List<GroupListDTO> getGroupListWithSearch(@Param("userId") String userId, @Param("searchTerm") String searchTerm, @Param("state") TRAVELSTATE state);
 
     @Query("""
-    SELECT
+    select new org.solcation.solcation_be.domain.group.dto.GroupInfoDTO(
       g.groupPk,
       g.groupName,
       g.groupImage,
-      g.gcPk,
-      g.groupLeader,
+      gc.gcName,
+      leader.userName,
       g.totalMembers,
-      COALESCE(SUM(CASE WHEN t.tpStart < CURRENT_DATE THEN 1 ELSE 0 END), 0),
-      COALESCE(SUM(CASE WHEN t.tpStart > CURRENT_DATE THEN 1 ELSE 0 END), 0)
+      (select count(t2) from Travel t2 where t2.group = g and t2.tpState = :beforeState),
+      (select count(t2) from Travel t2 where t2.group = g and t2.tpState = :finishState),
+      (select count(gm) from GroupMember gm where gm.group = g and gm.isAccepted is null)
+    )
     FROM Group g
-    LEFT JOIN g.travels t
+    JOIN g.gcPk gc
+    JOIN g.groupLeader leader
     WHERE g.groupPk = :groupPk
     GROUP BY g.groupPk, g.groupName, g.groupImage, g.gcPk, g.groupLeader, g.totalMembers  
     """)
-    Object getGroupInfoByGroupPk(@Param("groupPk") long groupPk);
+    GroupInfoDTO getGroupInfoByGroupPk(@Param("groupPk") long groupPk, @Param("beforeState") TRAVELSTATE beforeState, @Param("finishState") TRAVELSTATE finishState);
 
     @Query("SELECT g.groupLeader FROM Group g WHERE g.groupPk = :groupPk")
     User findGroupLeaderByGroupPk(@Param("groupPk") Long groupPk);

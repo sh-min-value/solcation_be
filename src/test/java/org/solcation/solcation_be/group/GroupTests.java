@@ -24,15 +24,6 @@ public class GroupTests {
     private GroupMemberRepository groupMemberRepository;
 
     @Test
-    public void getGroupInfo() {
-        Object result = groupRepository.getGroupInfoByGroupPk(10);
-        log.info("getGroupInfo result:{}", result);
-        for (Object obj : (Object[])result) {
-            System.out.println(obj.toString());
-        }
-    }
-
-    @Test
     public void getLeaderInfo() {
         User groupLeader = groupRepository.findGroupLeaderByGroupPk(10L);
         System.out.println(groupLeader.getUserName());

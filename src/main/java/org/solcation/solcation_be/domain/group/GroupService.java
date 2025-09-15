@@ -109,27 +109,8 @@ public class GroupService {
     @Transactional(readOnly = true)
     public GroupInfoDTO getGroupInfo(Long groupPk) {
         //그룹 정보 조회
-        Object[] result = (Object[])groupRepository.getGroupInfoByGroupPk(groupPk);
-
-        //대기 중인 초대 수
-        Long cnt = pushNotificationRepository.countPendingInvitationByGroupPk(groupPk);
-
-        GroupCategory gc = (GroupCategory) result[3];
-        User leader = (User) result[4];
-
-        GroupInfoDTO dto = GroupInfoDTO.builder()
-                .groupPk((Long) result[0])
-                .groupName((String) result[1])
-                .profileImg((String) result[2])
-                .gcPk(gc.getGcName())
-                .groupLeader(leader.getUserName())
-                .totalMembers((int) result[5])
-                .finished((Long) result[6])
-                .scheduled((Long) result[7])
-                .pending(cnt)
-                .build();
-
-        return dto;
+        GroupInfoDTO result = groupRepository.getGroupInfoByGroupPk(groupPk, TRAVELSTATE.BEFORE, TRAVELSTATE.FINISH);
+        return result;
     }
 
     /* 그룹 메인 - 참여자 목록 */

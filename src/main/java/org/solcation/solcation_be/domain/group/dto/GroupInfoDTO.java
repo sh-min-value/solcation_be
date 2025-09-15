@@ -34,7 +34,7 @@ public class GroupInfoDTO {
 
     //총 멤버 수
     @NotNull
-    private int totalMembers;
+    private Integer totalMembers;
 
     //완료된 여정
     @NotNull
