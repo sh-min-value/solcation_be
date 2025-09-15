@@ -126,12 +126,15 @@ public class GroupService {
         //대기 중인 초대 수
         Long cnt = pushNotificationRepository.countPendingInvitationByGroupPk(groupPk);
 
+        GroupCategory gc = (GroupCategory) result[3];
+        User leader = (User) result[4];
+
         GroupInfoDTO dto = GroupInfoDTO.builder()
                 .groupPk((Long) result[0])
                 .groupName((String) result[1])
                 .profileImg((String) result[2])
-                .gcPk((GroupCategory) result[3])
-                .groupLeader((User) result[4])
+                .gcPk(gc.getGcName())
+                .groupLeader(leader.getUserName())
                 .totalMembers((int) result[5])
                 .finished((Long) result[6])
                 .scheduled((Long) result[7])
