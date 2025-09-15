@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.common.CustomException;
 import org.solcation.solcation_be.common.ErrorCode;
-import org.solcation.solcation_be.domain.group.dto.AddGroupReqDTO;
-import org.solcation.solcation_be.domain.group.dto.GroupInfoDTO;
-import org.solcation.solcation_be.domain.group.dto.GroupListDTO;
-import org.solcation.solcation_be.domain.group.dto.GroupMembersDTO;
+import org.solcation.solcation_be.domain.group.dto.*;
 import org.solcation.solcation_be.domain.notification.NotificationService;
 import org.solcation.solcation_be.entity.*;
 import org.solcation.solcation_be.entity.enums.ALARMCODE;
@@ -146,20 +143,51 @@ public class GroupService {
     public GroupMembersDTO getGroupMembers(Long groupPk) {
         //그룹 개설자 조회
         User groupLeader = groupRepository.findGroupLeaderByGroupPk(groupPk);
-
+        GroupMemberDTO leader = GroupMemberDTO.builder()
+                .userPk(groupLeader.getUserPk())
+                .userId(groupLeader.getUserId())
+                .tel(groupLeader.getTel())
+                .userName(groupLeader.getUserName())
+                .dateOfBirth(groupLeader.getDateOfBirth())
+                .gender(groupLeader.getGender())
+                .email(groupLeader.getEmail())
+                .build();
         //그룹 멤버 조회
         List<User> groupMembers = groupMemberRepository
                 .findByGroup_GroupPkAndRoleAndIsAcceptedOrderByUser_UserPkAsc(groupPk, false, true);
+
+        List<GroupMemberDTO> dtos = groupMembers.stream()
+                .map(u -> new GroupMemberDTO(
+                        u.getUserPk(),
+                        u.getUserId(),
+                        u.getTel(),
+                        u.getUserName(),
+                        u.getDateOfBirth(),
+                        u.getGender(),
+                        u.getEmail()
+                ))
+                .toList();
 
         //그룹 대기자 조회
         List<User> waitingMembers = groupMemberRepository
                 .findByGroup_GroupPkAndPending(groupPk);
 
+        List<GroupMemberDTO> dtos2 = waitingMembers.stream()
+                .map(u -> new GroupMemberDTO(
+                        u.getUserPk(),
+                        u.getUserId(),
+                        u.getTel(),
+                        u.getUserName(),
+                        u.getDateOfBirth(),
+                        u.getGender(),
+                        u.getEmail()
+                ))
+                .toList();
 
         return GroupMembersDTO.builder()
-                .groupLeader(groupLeader)
-                .members(groupMembers)
-                .waitingList(waitingMembers)
+                .groupLeader(leader)
+                .members(dtos)
+                .waitingList(dtos2)
                 .build();
     }
 
