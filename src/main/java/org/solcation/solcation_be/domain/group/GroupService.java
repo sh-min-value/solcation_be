@@ -153,7 +153,7 @@ public class GroupService {
 
         //그룹 대기자 조회
         List<User> waitingMembers = groupMemberRepository
-                .findByGroup_GroupPkAndRoleAndIsAcceptedOrderByUser_UserPkAsc(groupPk, false, false);
+                .findByGroup_GroupPkAndPending(groupPk);
 
 
         return GroupMembersDTO.builder()

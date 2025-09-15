@@ -31,6 +31,14 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
     @Query("""
     SELECT g.user
     FROM GroupMember g
+    WHERE g.group.groupPk = :groupPk AND g.isAccepted is null
+    ORDER BY g.user.userPk ASC
+    """)
+    List<User> findByGroup_GroupPkAndPending(@Param("groupPk") Long groupPk);
+
+    @Query("""
+    SELECT g.user
+    FROM GroupMember g
     WHERE g.group.groupPk = :groupPk AND (g.isAccepted = true OR g.isAccepted is null)
     ORDER BY g.user.userPk ASC
     """)
