@@ -66,7 +66,7 @@ public class MainService {
                         .tpEnd(t.getTpEnd())
                         .tpTitle(t.getTpTitle())
                         .groupName(t.getGroup().getGroupName())
-                        .gcIcon(t.getGroup().getGcPk().getGcIcon())
+                        .gcCode(t.getGroup().getGcPk().getGcCode())
                         .build())
                 .toList();
     }

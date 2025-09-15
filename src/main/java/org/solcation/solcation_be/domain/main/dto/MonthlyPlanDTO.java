@@ -10,7 +10,7 @@ import java.time.LocalDate;
 public class MonthlyPlanDTO {
     private LocalDate tpStart;
     private LocalDate tpEnd;
-    private String gcIcon;
+    private String gcCode;
     private String tpTitle;
     private String groupName;
 }
