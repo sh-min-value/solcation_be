@@ -2,6 +2,7 @@ package org.solcation.solcation_be.domain.travel.dto;
 
 import lombok.*;
 import org.solcation.solcation_be.entity.PlanDetail;
+import org.solcation.solcation_be.entity.TransactionCategory;
 import org.solcation.solcation_be.entity.Travel;
 
 @Getter
@@ -22,7 +23,7 @@ public class PlanDetailDTO {
     private String pdPlace;
     private String pdAddress;
     private int pdCost;
-
+    private Long category;
     // 정렬/CRDT 메타
     // BigDecimal → 문자열로 노출(직렬화/정밀도 안전)
     private String position;
@@ -44,27 +45,12 @@ public class PlanDetailDTO {
                 .pdPlace(e.getPdPlace())
                 .pdAddress(e.getPdAddress())
                 .pdCost(e.getPdCost())
+                .category(e.getTransactionCategory().getTcPk())
                 .position(e.getPosition() != null ? e.getPosition().toPlainString() : null)
                 .crdtId(e.getCrdtId())
                 .clientId(e.getClientId())
                 .opTs(e.getOpTs())
                 .tombstone(e.isTombstone())
-                .build();
-    }
-
-    public PlanDetail dtoToEntity(Travel travel) {
-        return PlanDetail.builder()
-                .pdPk(pdPk)
-                .travel(travel)
-                .pdDay(pdDay)
-                .pdPlace(pdPlace)
-                .pdAddress(pdAddress)
-                .pdCost(pdCost)
-                .position(position != null ? new java.math.BigDecimal(position) : null)
-                .crdtId(crdtId)
-                .clientId(clientId)
-                .opTs(opTs)
-                .tombstone(tombstone)
                 .build();
     }
 }
