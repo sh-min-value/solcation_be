@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.solcation.solcation_be.domain.auth.dto.LoginReqDTO;
 import org.solcation.solcation_be.domain.auth.dto.LoginResDTO;
+import org.solcation.solcation_be.domain.auth.dto.SignupReqDTO;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "인증/인가 컨트롤러")
@@ -19,5 +20,11 @@ public class AuthController {
     @PostMapping("/login")
     public LoginResDTO login(@Valid @RequestBody LoginReqDTO reqDTO) {
         return authService.login(reqDTO);
+    }
+
+    @Operation(summary = "회원가입", description = "회원가입")
+    @PostMapping("/sign-up")
+    public void signup(@Valid @RequestBody SignupReqDTO reqDTO) {
+        authService.signUp(reqDTO);
     }
 }
