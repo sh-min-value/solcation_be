@@ -44,6 +44,13 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
     """)
     List<User> findByGroup_GroupPkAndNotRejected(@Param("groupPk") Long groupPk);
 
+    @Query("""
+    SELECT COALESCE(COUNT(g), 0)
+    FROM GroupMember g
+    WHERE g.group.groupPk = :groupPk AND (g.isAccepted = true OR g.isAccepted is null)
+    """)
+    Long findTotalNumByGroup_GroupPkAndNotRejected(@Param("groupPk") Long groupPk);
+
     GroupMember findByUserAndGroup(@Param("user") User user, @Param("group") Group group);
 
     Optional<GroupMember> findByGroup_GroupPkAndUser_UserPkAndIsAcceptedIsNull(@Param("groupPk") Long groupPk, @Param("userPk") Long userPk);
