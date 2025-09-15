@@ -133,7 +133,7 @@ public class GroupService {
                 leader = dto;
             } else if (Boolean.TRUE.equals(f.getIsAccepted())) {
                 members.add(dto);
-            } else if (f.getIsAccepted() == null) {
+            } else {
                 waiting.add(dto);
             }
         }

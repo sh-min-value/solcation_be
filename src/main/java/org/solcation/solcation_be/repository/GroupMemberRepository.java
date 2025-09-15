@@ -55,7 +55,7 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
         g.role
     )
     FROM GroupMember g
-    WHERE g.group.groupPk = :groupPk AND g.isAccepted != false
+    WHERE g.group.groupPk = :groupPk AND (g.isAccepted is null OR g.isAccepted = true)
     ORDER BY g.user.userPk ASC
     """)
     List<GroupMemberFlatDTO> findActiveAndWaitingMembers(@Param("groupPk") Long groupPk);
