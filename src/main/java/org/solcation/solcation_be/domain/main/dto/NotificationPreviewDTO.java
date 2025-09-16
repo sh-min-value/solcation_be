@@ -8,4 +8,5 @@ public class NotificationPreviewDTO {
     private String acCode;
     private String groupName;
     private String groupLeader;
+    private String pnTitle;
 }
