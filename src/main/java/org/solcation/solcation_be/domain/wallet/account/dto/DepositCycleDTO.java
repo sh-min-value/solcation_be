@@ -32,6 +32,6 @@ public class DepositCycleDTO {
     private DEPOSITDAY depositDay;
 
     @Schema(description = "입금 금액")
-    private int depositAmount;
+    private Integer depositAmount;
 
 }

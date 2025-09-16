@@ -40,4 +40,6 @@ public interface PlanDetailRepository extends JpaRepository<PlanDetail, Long> {
     Optional<PlanDetail> findByCrdtIdAndTravel_TpPkAndPdDayAndTombstoneFalse(
             String crdtId, Long travelId, int pdDay
     );
-}
+
+    @Query("SELECT DISTINCT p.pdDay FROM PlanDetail p WHERE p.travel.tpPk = :travelId AND p.tombstone = false ORDER BY p.pdDay ASC")
+    List<Integer> findTravelDays(long travelId);}

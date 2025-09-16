@@ -66,7 +66,7 @@ public class SharedAccountService {
     }
 
     @Transactional
-    public Long createSharedAccount(Long groupId, SharedAccountReqDTO dto) {
+    public void createSharedAccount(Long groupId, SharedAccountReqDTO dto) {
         var group = groupRepository.findByGroupPk(groupId);
         if(sharedAccountRepository.findByGroup_GroupPk(groupId)!=null) throw new CustomException(ErrorCode.ACCOUNT_ALREADY_EXISTS);
 
@@ -140,8 +140,6 @@ public class SharedAccountService {
                     .build();
             notificationService.saveNotification(u.getUserPk(), pn);
         }
-
-        return result;
     }
 
     @Transactional

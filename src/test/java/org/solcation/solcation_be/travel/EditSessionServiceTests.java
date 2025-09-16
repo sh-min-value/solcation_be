@@ -96,10 +96,10 @@ class EditSessionServiceTests {
         when(pdRepo.findAliveByTravelAndDayByPdDayAscPositionAsc(travelId, day))
                 .thenReturn(List.of(e));
 
-        JoinPayload payload = service.join(travelId, day, userId);
+        JoinPayload payload = service.join(travelId, userId);
 
         // presence set 확인
-        assertTrue(redisson.getSet(RedisKeys.members(travelId, day)).contains(userId));
+        assertTrue(redisson.getSet(RedisKeys.members(travelId)).contains(userId));
 
         String snapJson = (String) redisson.getBucket(RedisKeys.snapshot(travelId, day), StringCodec.INSTANCE).get();
         assertNotNull(snapJson);
@@ -127,7 +127,7 @@ class EditSessionServiceTests {
         redisson.getBucket(RedisKeys.snapshot(travelId, day)).set(preSnap);
 
         // 실행
-        JoinPayload payload = service.join(travelId, day, userId);
+        JoinPayload payload = service.join(travelId, userId);
 
         // DB는 호출되지 않아야 함
         verify(pdRepo, never()).findAliveByTravelAndDayByPdDayAscPositionAsc(anyLong(), anyInt());
@@ -139,11 +139,11 @@ class EditSessionServiceTests {
     @Test
     void leave_shouldRemoveMemberAndBroadcast() {
         long travelId = 102L; int day = 1; String userId = "ux";
-        redisson.getSet(RedisKeys.members(travelId, day)).add(userId);
+        redisson.getSet(RedisKeys.members(travelId)).add(userId);
 
-        service.leave(travelId, day, userId);
+        service.leave(travelId, userId);
 
-        assertFalse(redisson.getSet(RedisKeys.members(travelId, day)).contains(userId));
+        assertFalse(redisson.getSet(RedisKeys.members(travelId)).contains(userId));
 
         ArgumentCaptor<Object> payloadCap = ArgumentCaptor.forClass(Object.class);
         verify(messaging, atLeastOnce()).convertAndSend(eq("/topic/travel/" + travelId), payloadCap.capture());

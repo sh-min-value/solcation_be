@@ -22,10 +22,9 @@ public class SharedAccountController {
     }
 
     @PostMapping(value="/new", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public SharedAccountResDTO createSharedAccount(@PathVariable long groupId,
+    public void createSharedAccount(@PathVariable long groupId,
                                                    @Valid @ModelAttribute SharedAccountReqDTO dto) {
-        Long saPk = sharedAccountService.createSharedAccount(groupId, dto);
-        return sharedAccountService.getSharedAccountInfo(groupId);
+        sharedAccountService.createSharedAccount(groupId, dto);
     }
 
     @PostMapping("/cycle")

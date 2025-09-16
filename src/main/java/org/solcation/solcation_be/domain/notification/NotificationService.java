@@ -6,11 +6,13 @@ import org.solcation.solcation_be.common.CustomException;
 import org.solcation.solcation_be.common.ErrorCode;
 import org.solcation.solcation_be.domain.notification.dto.PushNotificationDTO;
 import org.solcation.solcation_be.domain.notification.dto.UpdateGroupInviteReqDTO;
+import org.solcation.solcation_be.entity.Group;
 import org.solcation.solcation_be.entity.GroupMember;
 import org.solcation.solcation_be.entity.enums.ALARMCODE;
 import org.solcation.solcation_be.entity.AlarmCategory;
 import org.solcation.solcation_be.entity.PushNotification;
 import org.solcation.solcation_be.repository.GroupMemberRepository;
+import org.solcation.solcation_be.repository.GroupRepository;
 import org.solcation.solcation_be.repository.PushNotificationRepository;
 import org.solcation.solcation_be.util.category.AlarmCategoryLookup;
 import org.solcation.solcation_be.util.redis.RedisPublisher;
@@ -42,6 +44,7 @@ public class NotificationService {
     private final PushNotificationRepository notificationRepository;
     private final PushNotificationRepository pushNotificationRepository;
     private final GroupMemberRepository groupMemberRepository;
+    private final GroupRepository groupRepository;
     private final AlarmCategoryLookup alarmCategoryLookup;
 
     /* sse 연결 (emitter 생성) */
@@ -146,5 +149,13 @@ public class NotificationService {
         GroupMember gm = groupMemberRepository.findByGroup_GroupPkAndUser_UserPkAndIsAcceptedIsNull(dto.getGroupPk(), userPk).orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST));
         gm.updateIsAccepted(dto.getDecision());
         groupMemberRepository.save(gm);
+
+        //그룹 멤버 수 가져오기
+        Long totalNum = groupMemberRepository.findTotalNumByGroup_GroupPkAndNotRejected(dto.getGroupPk());
+
+        //그룹 멤버 수 업데이트
+        Group g = groupRepository.findByGroupPk(dto.getGroupPk());
+        g.updateTotalMember(totalNum.intValue());
+        groupRepository.save(g);
     }
 }

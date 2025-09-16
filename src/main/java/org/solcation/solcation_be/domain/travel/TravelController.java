@@ -38,9 +38,9 @@ public class TravelController {
 
     @Operation(summary = "그룹 여행 생성")
     @PostMapping(value = "/new", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Long createTravel(@PathVariable Long groupId, @Valid @ModelAttribute TravelReqDTO dto) {
+    public void createTravel(@PathVariable Long groupId, @Valid @ModelAttribute TravelReqDTO dto) {
         dto.setGroupPk(groupId);
-        return travelService.create(dto);
+        travelService.create(dto);
     }
 
     @Operation(summary = "단일 여행 조회")

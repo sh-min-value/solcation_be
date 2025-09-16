@@ -7,10 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.common.CustomException;
 import org.solcation.solcation_be.common.ErrorCode;
-import org.solcation.solcation_be.domain.group.dto.AddGroupReqDTO;
-import org.solcation.solcation_be.domain.group.dto.GroupInfoDTO;
-import org.solcation.solcation_be.domain.group.dto.GroupListDTO;
-import org.solcation.solcation_be.domain.group.dto.GroupMembersDTO;
+import org.solcation.solcation_be.domain.group.dto.*;
 import org.solcation.solcation_be.entity.User;
 import org.solcation.solcation_be.repository.UserRepository;
 import org.solcation.solcation_be.security.JwtPrincipal;
@@ -58,5 +55,11 @@ public class GroupController {
     @PostMapping("/{groupId:\\d+}/invite")
     public void inviteMembers(@PathVariable("groupId") Long groupId, @PathParam("tel") String tel) {
         groupService.inviteMembers(groupId, tel);
+    }
+
+    @Operation(summary = "초대자 정보 조회")
+    @GetMapping("/{groupId:\\d+}/get-invitee")
+    public UserDTO getInvitee(@PathVariable("groupId") Long groupId, @PathParam("tel") String tel) {
+        return groupService.getInvitee(groupId, tel);
     }
 }
