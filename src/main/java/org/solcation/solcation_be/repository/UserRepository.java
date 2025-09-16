@@ -1,5 +1,6 @@
 package org.solcation.solcation_be.repository;
 
+import org.solcation.solcation_be.domain.auth.dto.UserAuthDTO;
 import org.solcation.solcation_be.domain.group.dto.UserDTO;
 import org.solcation.solcation_be.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,6 +12,21 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+    @Query("""
+    select new org.solcation.solcation_be.domain.auth.dto.UserAuthDTO (
+        u.userPk,
+        u.userId,
+        u.userPw,
+        u.tel,
+        u.userName,
+        u.role,
+        u.email
+        )
+    FROM User u
+    WHERE u.userId = :userId
+    """)
+    Optional<UserAuthDTO> findByUserIdToDTO(String userId);
+
     Optional<User> findByUserId(String id);
 
     @Query("""
