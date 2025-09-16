@@ -18,13 +18,13 @@ import java.util.List;
 public class GroupMembersDTO {
     //개설자
     @NotNull
-    private User groupLeader;
+    private GroupMemberDTO groupLeader;
 
     //참여자 리스트
     @NotNull
-    private List<User> members;
+    private List<GroupMemberDTO> members;
 
     //대기자 리스트
     @NotNull
-    private List<User> waitingList;
+    private List<GroupMemberDTO> waitingList;
 }

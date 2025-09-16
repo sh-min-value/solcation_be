@@ -1,25 +1,26 @@
 package org.solcation.solcation_be.domain.group;
 
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.common.CustomException;
 import org.solcation.solcation_be.common.ErrorCode;
-import org.solcation.solcation_be.domain.group.dto.AddGroupReqDTO;
-import org.solcation.solcation_be.domain.group.dto.GroupInfoDTO;
-import org.solcation.solcation_be.domain.group.dto.GroupListDTO;
-import org.solcation.solcation_be.domain.group.dto.GroupMembersDTO;
+import org.solcation.solcation_be.domain.group.dto.*;
 import org.solcation.solcation_be.domain.notification.NotificationService;
 import org.solcation.solcation_be.entity.*;
 import org.solcation.solcation_be.entity.enums.ALARMCODE;
+import org.solcation.solcation_be.entity.enums.TRAVELSTATE;
 import org.solcation.solcation_be.repository.*;
 import org.solcation.solcation_be.util.category.AlarmCategoryLookup;
 import org.solcation.solcation_be.util.category.GroupCategoryLookup;
 import org.solcation.solcation_be.util.s3.S3Utils;
+import org.solcation.solcation_be.util.timezone.ZonedTimeUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -98,86 +99,63 @@ public class GroupService {
     }
 
     /* 그룹 목록 */
+    @Transactional(readOnly = true)
     public List<GroupListDTO> getList(String userId, String searchTerm) {
-        List<GroupListDTO> result = new ArrayList<>();
-
-        List<Object[]> results = groupRepository.getGroupListWithSearch(userId, searchTerm);
-
-        for(Object[] obj: results) {
-            GroupListDTO dto = GroupListDTO.builder()
-                    .groupPk((Long) obj[0])
-                    .groupName((String) obj[1])
-                    .profileImg((String) obj[2])
-                    .gcPk((GroupCategory) obj[3])
-                    .groupLeader((User) obj[4])
-                    .totalMembers((int) obj[5])
-                    .scheduled((Long) obj[6])
-                    .build();
-            result.add(dto);
-        }
-
-        return result;
+        List<GroupListDTO> results = groupRepository.getGroupListWithSearch(userId, searchTerm, TRAVELSTATE.BEFORE);
+        return results;
     }
 
     /* 그룹 메인 - 그룹 정보 렌더링 */
+    @Transactional(readOnly = true)
     public GroupInfoDTO getGroupInfo(Long groupPk) {
         //그룹 정보 조회
-        Object[] result = (Object[])groupRepository.getGroupInfoByGroupPk(groupPk);
-
-        //대기 중인 초대 수
-        Long cnt = pushNotificationRepository.countPendingInvitationByGroupPk(groupPk);
-
-        GroupInfoDTO dto = GroupInfoDTO.builder()
-                .groupPk((Long) result[0])
-                .groupName((String) result[1])
-                .profileImg((String) result[2])
-                .gcPk((GroupCategory) result[3])
-                .groupLeader((User) result[4])
-                .totalMembers((int) result[5])
-                .finished((Long) result[6])
-                .scheduled((Long) result[7])
-                .pending(cnt)
-                .build();
-
-        return dto;
+        GroupInfoDTO result = groupRepository.getGroupInfoByGroupPk(groupPk, TRAVELSTATE.BEFORE, TRAVELSTATE.FINISH);
+        return result;
     }
 
     /* 그룹 메인 - 참여자 목록 */
+    @Transactional(readOnly = true)
     public GroupMembersDTO getGroupMembers(Long groupPk) {
-        //그룹 개설자 조회
-        User groupLeader = groupRepository.findGroupLeaderByGroupPk(groupPk);
+        //그룹 멤버 전체 조회
+        List<GroupMemberFlatDTO> all = groupMemberRepository.findActiveAndWaitingMembers(groupPk);
 
-        //그룹 멤버 조회
-        List<User> groupMembers = groupMemberRepository
-                .findByGroup_GroupPkAndRoleAndIsAcceptedOrderByUser_UserPkAsc(groupPk, false, true);
+        GroupMemberDTO leader = null;
+        List<GroupMemberDTO> members = new ArrayList<>();
+        List<GroupMemberDTO> waiting = new ArrayList<>();
 
-        //그룹 대기자 조회
-        List<User> waitingMembers = groupMemberRepository
-                .findByGroup_GroupPkAndRoleAndIsAcceptedOrderByUser_UserPkAsc(groupPk, false, false);
+        for (GroupMemberFlatDTO f : all) {
+            GroupMemberDTO dto = new GroupMemberDTO(
+                    f.getUserPk(), f.getUserId(), f.getTel(), f.getUserName(),
+                    f.getDateOfBirth(), f.getGender(), f.getEmail()
+            );
 
+            if(Boolean.TRUE.equals(f.getRole())) {
+                leader = dto;
+            } else if (Boolean.TRUE.equals(f.getIsAccepted())) {
+                members.add(dto);
+            } else {
+                waiting.add(dto);
+            }
+        }
 
         return GroupMembersDTO.builder()
-                .groupLeader(groupLeader)
-                .members(groupMembers)
-                .waitingList(waitingMembers)
+                .groupLeader(leader)
+                .members(members)
+                .waitingList(waiting)
                 .build();
     }
 
     /* 그룹 메인 - 초대 전송 */
     public void inviteMembers(Long groupId, String tel) {
         //전화번호로 회원 조회
-        User invitee = (User) userRepository.findByTel(tel).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        UserDTO invitee = userRepository.findByTelWithGroupCheck(tel, groupId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        //그룹 조회
-        Group group = groupRepository.findByGroupPk(groupId);
+        if(invitee.getIsMember()) {
+            throw new CustomException(ErrorCode.ALREADY_GROUP_MEMBER);
+        }
 
-        //멤버 - isAccepted(true) | 거절 - isAccepted(false) | 대기 - isAccepted(null): 멤버/대기중인 회원 리스트에 존재 시 에러
-        List<User> groupMemebers = groupMemberRepository.findByGroup_GroupPkAndNotRejected(group.getGroupPk());
-
-        boolean exists = groupMemebers.stream().anyMatch(gm -> Objects.equals(invitee.getUserPk(), gm.getUserPk()));
-
-        if(exists) {
-            throw new CustomException(ErrorCode.BAD_REQUEST);
+        if(invitee.getIsPending()) {
+            throw new CustomException(ErrorCode.ALREADY_INVITED);
         }
 
         //초대 전송(알림 전송, 알림 저장)
@@ -188,15 +166,21 @@ public class GroupService {
                 .pnTime(Instant.now())
                 .pnContent(ALARMCODE.GROUP_INVITE.getContent())
                 .acPk(ac)
-                .userPk(invitee)
-                .groupPk(group)
+                .userPk(userRepository.getReferenceById(invitee.getUserPk()))
+                .groupPk(groupRepository.getReferenceById(groupId))
                 .isAccepted(false)
                 .build();
 
         notificationService.saveNotification(invitee.getUserPk(), pn);
 
         //대기 중인 그룹 멤버 추가
-        GroupMember groupMember = GroupMember.invitee(group, invitee);
+        GroupMember groupMember = GroupMember.invitee(groupRepository.getReferenceById(groupId), userRepository.getReferenceById(invitee.getUserPk()));
         groupMemberRepository.save(groupMember);
+    }
+
+    /* 초대자 정보 조회 */
+    public UserDTO getInvitee(Long groupId, String tel) {
+        UserDTO user = userRepository.findByTelWithGroupCheck(tel, groupId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        return user;
     }
 }
