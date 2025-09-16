@@ -13,4 +13,5 @@ public class MonthlyPlanDTO {
     private String gcCode;
     private String tpTitle;
     private String groupName;
+    private Long groupPk;
 }
