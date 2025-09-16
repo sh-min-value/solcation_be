@@ -66,7 +66,7 @@ public class MainService {
                         .tpEnd(t.getTpEnd())
                         .tpTitle(t.getTpTitle())
                         .groupName(t.getGroup().getGroupName())
-                        .gcIcon(t.getGroup().getGcPk().getGcIcon())
+                        .gcCode(t.getGroup().getGcPk().getGcCode())
                         .build())
                 .toList();
     }
@@ -93,6 +93,7 @@ public class MainService {
                         .acCode(n.getAcPk().getAcCode())
                         .groupName(n.getGroupPk().getGroupName())
                         .groupLeader(n.getGroupPk().getGroupLeader().getUserName())
+                        .pnTitle(n.getPnTitle())
                         .build())
                 .toList();
     }

@@ -1,35 +1,52 @@
 package org.solcation.solcation_be.domain.travel;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-
+import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.domain.travel.service.EditSessionService;
 import org.solcation.solcation_be.domain.travel.service.SnapshotCommitService;
 import org.solcation.solcation_be.domain.travel.ws.JoinPayload;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.stereotype.Controller;
 
-@RestController
+import java.util.Map;
+
+@Controller
 @RequiredArgsConstructor
-@RequestMapping("/group/{groupId:\\d+}/travel/{travelId:\\d+}")
+@Slf4j
 public class PlanDetailController {
 
     private final EditSessionService editSessionService;
     private final SnapshotCommitService snapshotCommitService;
 
-    @PostMapping("/edit/join")
-    public JoinPayload join(@PathVariable long groupId, @PathVariable long travelId,
-                            @RequestParam int day, @RequestParam String userId) {
-        return editSessionService.join(travelId, day, userId);
+    // 여행 편집 입장
+    @MessageMapping("/group/{groupId}/travel/{travelId}/edit/join")
+    public JoinPayload join(@DestinationVariable long travelId,
+                              @Payload Map<String, Object> payload,
+                              SimpMessageHeaderAccessor header) {
+        String userId = (String) payload.get("userId");
+        log.info("WS JOIN travelId={}, userId={}", travelId, userId);
+        return editSessionService.join(travelId, userId);
     }
 
-    @PostMapping("/edit/leave")
-    public void leave(@PathVariable long groupId, @PathVariable long travelId,
-                      @RequestParam int day, @RequestParam String userId) {
-        editSessionService.leave(travelId, day, userId);
+    // 여행 편집 퇴장
+    @MessageMapping("/group/{groupId}/travel/{travelId}/edit/leave")
+    public void leave(@DestinationVariable long travelId,
+                        @Payload Map<String, Object> payload) {
+        String userId = (String) payload.get("userId");
+        log.info("WS LEAVE travelId={}, userId={}", travelId, userId);
+        editSessionService.leave(travelId, userId);
     }
 
-    @PostMapping("/edit/save")
-    public void save(@PathVariable long groupId, @PathVariable long travelId,
-                     @RequestParam int day, @RequestParam String clientId) {
-        snapshotCommitService.save(travelId, day, clientId);
+    // 여행 편집 저장
+    @MessageMapping("/group/{groupId}/travel/{travelId}/edit/save")
+    public void save(@DestinationVariable long travelId,
+                       @Payload Map<String, Object> payload) {
+        String clientId = (String) payload.get("clientId");
+        log.info("WS SAVE travelId={}, clientId={}", travelId, clientId);
+        editSessionService.leave(travelId, clientId);
+        snapshotCommitService.saveDirty(travelId, clientId);
     }
 }
