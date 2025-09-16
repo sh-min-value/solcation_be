@@ -21,7 +21,7 @@ public class TravelResDTO {
     private LocalDate endDate;
     private String thumbnail;
     private String state;
-    private Long categoryId;
+    private String categoryCode;
     private String categoryName;
     private int participant;
 }

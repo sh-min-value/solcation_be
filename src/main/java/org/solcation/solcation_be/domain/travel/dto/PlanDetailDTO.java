@@ -23,7 +23,7 @@ public class PlanDetailDTO {
     private String pdPlace;
     private String pdAddress;
     private int pdCost;
-    private Long category;
+    private String tcCode;
     // 정렬/CRDT 메타
     // BigDecimal → 문자열로 노출(직렬화/정밀도 안전)
     private String position;
@@ -45,7 +45,7 @@ public class PlanDetailDTO {
                 .pdPlace(e.getPdPlace())
                 .pdAddress(e.getPdAddress())
                 .pdCost(e.getPdCost())
-                .category(e.getTransactionCategory().getTcPk())
+                .tcCode(e.getTransactionCategory().getTcCode())
                 .position(e.getPosition() != null ? e.getPosition().toPlainString() : null)
                 .crdtId(e.getCrdtId())
                 .clientId(e.getClientId())

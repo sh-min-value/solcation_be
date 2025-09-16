@@ -7,7 +7,7 @@ public record InsertReq(
         String pdPlace,
         String pdAddress,
         int pdCost,
-        Long tcPk,
+        String tcCode,
         String clientId,
         Long opTs
 ) {}
