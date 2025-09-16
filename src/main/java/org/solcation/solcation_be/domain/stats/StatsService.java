@@ -43,7 +43,8 @@ public class StatsService {
                         .tpStart(t.getTpStart())
                         .tpEnd(t.getTpEnd())
                         .tpImage(t.getTpImage())
-                        .tpcIcon(t.getTravelCategory().getTpcIcon())
+                        .tpcCode(t.getTravelCategory().getTpcCode())
+                        .tpcName(t.getTravelCategory().getTpcName())
                         .build())
                 .toList();
     }

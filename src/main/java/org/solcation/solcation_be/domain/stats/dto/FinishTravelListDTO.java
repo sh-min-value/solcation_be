@@ -13,5 +13,6 @@ public class FinishTravelListDTO {
     private LocalDate tpStart;
     private LocalDate tpEnd;
     private String tpImage;
-    private String tpcIcon;
+    private String tpcCode;
+    private String tpcName;
 }
