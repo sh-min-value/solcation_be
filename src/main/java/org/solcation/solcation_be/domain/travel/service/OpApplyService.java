@@ -2,25 +2,22 @@ package org.solcation.solcation_be.domain.travel.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-
 import org.redisson.api.*;
 import org.redisson.api.stream.StreamAddArgs;
 import org.redisson.api.stream.StreamTrimArgs;
 import org.redisson.client.codec.StringCodec;
-
 import org.solcation.solcation_be.common.CustomException;
 import org.solcation.solcation_be.common.ErrorCode;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Service;
-
 import org.solcation.solcation_be.domain.travel.dto.PlanDetailDTO;
-import org.solcation.solcation_be.util.redis.RedisKeys;
+import org.solcation.solcation_be.domain.travel.dto.Snapshot;
 import org.solcation.solcation_be.domain.travel.util.Positioning;
 import org.solcation.solcation_be.domain.travel.ws.OpMessage;
+import org.solcation.solcation_be.util.redis.RedisKeys;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Service;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -31,11 +28,8 @@ public class OpApplyService {
     private final SimpMessagingTemplate messaging;
 
     public void handleOp(long travelId, OpMessage op) {
-        // 멱등
         RBucket<String> seen = redisson.getBucket(RedisKeys.op(op.opId()));
-        if (!seen.trySet("1", 24, TimeUnit.HOURS)) {
-            return; // 이미 처리한 op
-        }
+        if (!seen.trySet("1", 24, TimeUnit.HOURS)) return;
 
         switch (op.type()) {
             case "insert", "move", "update", "delete" -> applySingleDay(travelId, op, op.day());
@@ -48,43 +42,29 @@ public class OpApplyService {
         }
     }
 
-    // insert/move/update/delete : 한 날짜 스냅샷만 수정
     private void applySingleDay(long travelId, OpMessage op, int day) {
         RLock lock = redisson.getLock(RedisKeys.editLock(travelId, day));
         try {
             if (!lock.tryLock(1, 5, TimeUnit.SECONDS)) throw new CustomException(ErrorCode.LOCKED);
 
-            // 스냅샷 로드
-            RBucket<String> snapBucket =
-                    redisson.getBucket(RedisKeys.snapshot(travelId, day), StringCodec.INSTANCE);
-            String snapJson = snapBucket.get();
-            Snapshot snap = readSnap(snapJson);
+            RBucket<String> snapBucket = redisson.getBucket(RedisKeys.snapshot(travelId, day), StringCodec.INSTANCE);
+            Snapshot snap = readSnap(snapBucket.get());
             if (snap == null) snap = new Snapshot(new ArrayList<>(), "0-0");
 
-            // 메모리 수정
             List<PlanDetailDTO> items = new ArrayList<>(snap.items());
             applyInMemory(items, op);
 
-            // 스냅샷 저장
             snapBucket.set(writeJson(new Snapshot(items, snap.lastStreamId())));
 
-            // 스트림 기록 + lastStreamId 갱신 + trim
-            RStream<String, String> stream =
-                    redisson.getStream(RedisKeys.stream(travelId, day), StringCodec.INSTANCE);
-
-            StreamMessageId sid =
-                    stream.add(StreamAddArgs.entries(toFields(op, day)));
-
+            RStream<String, String> stream = redisson.getStream(RedisKeys.stream(travelId, day), StringCodec.INSTANCE);
+            StreamMessageId sid = stream.add(StreamAddArgs.entries(toFields(op, day)));
             stream.trim((StreamTrimArgs) StreamTrimArgs.maxLen(2000));
 
-            // 마지막 스트림 ID로 스냅샷 갱신
             snapBucket.set(writeJson(new Snapshot(items, sid.toString())));
 
-            // dirty day 표시
             RSet<String> dirty = redisson.getSet(RedisKeys.dirtyDays(travelId), StringCodec.INSTANCE);
             dirty.add(String.valueOf(day));
 
-            // 브로드캐스트
             messaging.convertAndSend("/topic/travel/" + travelId, Map.of(
                     "type","applied","streamId", sid.toString(), "day", day, "op", op
             ));
@@ -96,7 +76,6 @@ public class OpApplyService {
         }
     }
 
-    // moveDay : 두 날짜 스냅샷을 모두 수정 (락 순서 보장)
     private void applyMoveDay(long travelId, OpMessage op, int oldDay, int newDay) {
         int d1 = Math.min(oldDay, newDay);
         int d2 = Math.max(oldDay, newDay);
@@ -108,25 +87,21 @@ public class OpApplyService {
             if (!l1.tryLock(1, 5, TimeUnit.SECONDS)) throw new CustomException(ErrorCode.LOCKED);
             if (!l2.tryLock(1, 5, TimeUnit.SECONDS)) throw new CustomException(ErrorCode.LOCKED);
 
-            // 스냅샷 로드
             var srcBucket = redisson.getBucket(RedisKeys.snapshot(travelId, oldDay), StringCodec.INSTANCE);
             var dstBucket = redisson.getBucket(RedisKeys.snapshot(travelId, newDay), StringCodec.INSTANCE);
             Snapshot src = readSnap((String) srcBucket.get()); if (src == null) src = new Snapshot(new ArrayList<>(), "0-0");
             Snapshot dst = readSnap((String) dstBucket.get()); if (dst == null) dst = new Snapshot(new ArrayList<>(), "0-0");
 
-            var itemsSrc = new ArrayList<>(src.items());
-            var itemsDst = new ArrayList<>(dst.items());
+            List<PlanDetailDTO> itemsSrc = new ArrayList<>(src.items());
+            List<PlanDetailDTO> itemsDst = new ArrayList<>(dst.items());
 
-            // payload에서 대상 항목/위치 힌트
-            String id   = (String) op.payload().get("crdtId");
+            String id = (String) op.payload().get("crdtId");
             String prev = Positioning.normalize((String) op.payload().get("prevCrdtId"));
             String next = Positioning.normalize((String) op.payload().get("nextCrdtId"));
 
-            // 소스에서 제거
             PlanDetailDTO t = find(itemsSrc, id);
             itemsSrc.remove(t);
 
-            // 타겟에서 position 계산 후 필드 갱신
             BigDecimal pos = Positioning.computePos(itemsDst, newDay, prev, next);
             t.setPdDay(newDay);
             t.setPosition(pos.toPlainString());
@@ -134,32 +109,24 @@ public class OpApplyService {
             t.setOpTs(op.opTs());
             itemsDst.add(t);
 
-            // 소스/타겟 스냅샷 저장
             srcBucket.set(writeJson(new Snapshot(itemsSrc, src.lastStreamId())));
             dstBucket.set(writeJson(new Snapshot(itemsDst, dst.lastStreamId())));
 
-            // 스트림 기록(양쪽) + lastStreamId 갱신 + trim
-            RStream<String, String> srcStream =
-                    redisson.getStream(RedisKeys.stream(travelId, oldDay), StringCodec.INSTANCE);
-            RStream<String, String> dstStream =
-                    redisson.getStream(RedisKeys.stream(travelId, newDay), StringCodec.INSTANCE);
+            RStream<String, String> srcStream = redisson.getStream(RedisKeys.stream(travelId, oldDay), StringCodec.INSTANCE);
+            RStream<String, String> dstStream = redisson.getStream(RedisKeys.stream(travelId, newDay), StringCodec.INSTANCE);
 
-            StreamMessageId sidOut =
-                    srcStream.add(StreamAddArgs.entries(toMoveOutFields(op, oldDay)));
+            StreamMessageId sidOut = srcStream.add(StreamAddArgs.entries(toMoveOutFields(op, oldDay)));
             srcStream.trim((StreamTrimArgs) StreamTrimArgs.maxLen(2000));
             srcBucket.set(writeJson(new Snapshot(itemsSrc, sidOut.toString())));
 
-            StreamMessageId sidIn =
-                    dstStream.add(StreamAddArgs.entries(toMoveInFields(op, newDay, t)));
+            StreamMessageId sidIn = dstStream.add(StreamAddArgs.entries(toMoveInFields(op, newDay, t)));
             dstStream.trim((StreamTrimArgs) StreamTrimArgs.maxLen(2000));
             dstBucket.set(writeJson(new Snapshot(itemsDst, sidIn.toString())));
 
-            // dirty days 표시
-            var set = redisson.getSet(RedisKeys.dirtyDays(travelId), StringCodec.INSTANCE);
-            set.add(String.valueOf(oldDay));
-            set.add(String.valueOf(newDay));
+            RSet<String> dirty = redisson.getSet(RedisKeys.dirtyDays(travelId), StringCodec.INSTANCE);
+            dirty.add(String.valueOf(oldDay));
+            dirty.add(String.valueOf(newDay));
 
-            // 브로드캐스트
             messaging.convertAndSend("/topic/travel/"+travelId, Map.of(
                     "type","applied","moveDay", Map.of("from", oldDay, "to", newDay), "op", op
             ));
@@ -172,7 +139,6 @@ public class OpApplyService {
         }
     }
 
-    // Inmemory 적용
     private void applyInMemory(List<PlanDetailDTO> list, OpMessage op) {
         Map<String,Object> p = op.payload();
         switch (op.type()) {
@@ -181,7 +147,7 @@ public class OpApplyService {
                 String next = Positioning.normalize((String)p.get("nextCrdtId"));
                 int day = (int) p.getOrDefault("pdDay", op.day());
                 BigDecimal pos = Positioning.computePos(list, day, prev, next);
-                String crdtId = java.util.UUID.randomUUID() + ":" + op.clientId();
+                String crdtId = UUID.randomUUID() + ":" + op.clientId();
 
                 PlanDetailDTO dto = PlanDetailDTO.builder()
                         .pdPk(null)
@@ -210,9 +176,9 @@ public class OpApplyService {
             case "update" -> {
                 String id = (String)p.get("crdtId");
                 var t = find(list, id);
-                if (p.get("pdPlace")   != null) t.setPdPlace((String)p.get("pdPlace"));
+                if (p.get("pdPlace") != null) t.setPdPlace((String)p.get("pdPlace"));
                 if (p.get("pdAddress") != null) t.setPdAddress((String)p.get("pdAddress"));
-                if (p.get("pdCost")    != null) t.setPdCost(((Number)p.get("pdCost")).intValue());
+                if (p.get("pdCost") != null) t.setPdCost(((Number)p.get("pdCost")).intValue());
                 t.setClientId(op.clientId());
                 t.setOpTs(op.opTs());
             }
@@ -272,8 +238,6 @@ public class OpApplyService {
                 .findFirst().orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST));
     }
 
-    /* 내부 VO + JSON */
-    private record Snapshot(java.util.List<PlanDetailDTO> items, String lastStreamId) {}
-    private Snapshot readSnap(String s){ try { return s==null?null:om.readValue(s, Snapshot.class);} catch(Exception e){throw new RuntimeException(e);} }
-    private String writeJson(Object o){ try { return om.writeValueAsString(o);} catch(Exception e){throw new RuntimeException(e);} }
+    private Snapshot readSnap(String s){ try { return s == null ? null : om.readValue(s, Snapshot.class); } catch(Exception e){ throw new RuntimeException(e); } }
+    private String writeJson(Object o){ try { return om.writeValueAsString(o); } catch(Exception e){ throw new RuntimeException(e); } }
 }
