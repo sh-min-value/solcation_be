@@ -15,4 +15,5 @@ public class FinishTravelListDTO {
     private String tpImage;
     private String tpcCode;
     private String tpcName;
+    private Long tpPk;
 }
