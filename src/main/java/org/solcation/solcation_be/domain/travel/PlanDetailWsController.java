@@ -30,7 +30,7 @@ public class PlanDetailWsController{
                             SimpMessageHeaderAccessor header) {
         String userId = (String) payload.get("userId");
         log.info("WS JOIN travelId={}, userId={}", travelId, userId);
-        return editSessionService.join(travelId, userId);
+        return editSessionService.join(travelId, userId, header.getSessionId());
     }
 
     // 여행 편집 퇴장
