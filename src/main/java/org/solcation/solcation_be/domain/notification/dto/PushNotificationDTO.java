@@ -31,6 +31,9 @@ public class PushNotificationDTO {
     private String acDest;
 
     @NotNull
+    private Long groupPk;
+
+    @NotNull
     private String groupName;
 
     @NotNull

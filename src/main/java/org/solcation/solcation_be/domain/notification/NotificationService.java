@@ -89,6 +89,7 @@ public class NotificationService {
                 .pnTime(i.getPnTime())
                 .acDest(i.getAcPk().getAcDest())
                 .content(i.getPnContent())
+                .groupPk(i.getGroupPk().getGroupPk())
                 .groupName(i.getGroupPk().getGroupName())
                 .groupImage(i.getGroupPk().getGroupImage())
                 .isAccepted(i.getIsAccepted())
