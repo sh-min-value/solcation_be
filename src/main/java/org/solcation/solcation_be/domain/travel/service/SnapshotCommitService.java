@@ -11,9 +11,13 @@ import org.solcation.solcation_be.common.ErrorCode;
 import org.solcation.solcation_be.domain.travel.dto.PlanDetailDTO;
 import org.solcation.solcation_be.domain.travel.dto.Snapshot;
 import org.solcation.solcation_be.entity.PlanDetail;
+import org.solcation.solcation_be.entity.TransactionCategory;
 import org.solcation.solcation_be.entity.Travel;
+import org.solcation.solcation_be.entity.enums.TRANSACTIONCODE;
 import org.solcation.solcation_be.repository.PlanDetailRepository;
+import org.solcation.solcation_be.repository.TransactionCategoryRepository;
 import org.solcation.solcation_be.repository.TravelRepository;
+import org.solcation.solcation_be.util.category.TransactionCategoryLookup;
 import org.solcation.solcation_be.util.redis.RedisKeys;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -35,6 +39,7 @@ public class SnapshotCommitService {
     private final PlanDetailRepository planRepo;
     private final TravelRepository travelRepo;
     private final SimpMessagingTemplate messaging;
+    private final TransactionCategoryLookup transactionCategoryLookup;
 
     @Transactional
     public void save(long travelId, int day, String clientId) {
@@ -67,6 +72,7 @@ public class SnapshotCommitService {
                 e.setPdAddress(dto.getPdAddress());
                 e.setPdCost(dto.getPdCost());
                 e.setPosition(new BigDecimal(dto.getPosition()).setScale(SCALE, RoundingMode.UNNECESSARY));
+                e.setTransactionCategory(transactionCategoryLookup.get(TRANSACTIONCODE.valueOf(dto.getTcCode())));
                 e.setCrdtId(dto.getCrdtId());
                 e.setClientId(dto.getClientId());
                 e.setOpTs(dto.getOpTs());

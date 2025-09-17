@@ -154,6 +154,7 @@ public class OpApplyService {
                         .pdDay(day)
                         .pdPlace((String)p.get("pdPlace"))
                         .pdAddress((String)p.get("pdAddress"))
+                        .tcCode((String)p.get("tcCode"))
                         .pdCost(((Number)p.getOrDefault("pdCost", 0)).intValue())
                         .position(pos.toPlainString())
                         .crdtId(crdtId)
@@ -176,9 +177,8 @@ public class OpApplyService {
             case "update" -> {
                 String id = (String)p.get("crdtId");
                 var t = find(list, id);
-                if (p.get("pdPlace") != null) t.setPdPlace((String)p.get("pdPlace"));
-                if (p.get("pdAddress") != null) t.setPdAddress((String)p.get("pdAddress"));
                 if (p.get("pdCost") != null) t.setPdCost(((Number)p.get("pdCost")).intValue());
+                if(p.get("tcCode") != null) t.setTcCode((String)p.get("tcCode"));
                 t.setClientId(op.clientId());
                 t.setOpTs(op.opTs());
             }
@@ -205,6 +205,7 @@ public class OpApplyService {
                 "clientId", op.clientId(),
                 "opTs", String.valueOf(op.opTs()),
                 "day", String.valueOf(day),
+                "tcCode", op.tcCode(),
                 "payload", writeJson(op.payload())
         );
     }
@@ -215,6 +216,7 @@ public class OpApplyService {
                 "clientId", op.clientId(),
                 "opTs", String.valueOf(op.opTs()),
                 "day", String.valueOf(oldDay),
+                "tcCode", String.valueOf(op.tcCode()),
                 "payload", writeJson(Map.of("crdtId", op.payload().get("crdtId")))
         );
     }
@@ -225,6 +227,7 @@ public class OpApplyService {
                 "clientId", op.clientId(),
                 "opTs", String.valueOf(op.opTs()),
                 "day", String.valueOf(newDay),
+                "tcCode", dto.getTcCode(),
                 "payload", writeJson(Map.of(
                         "crdtId", dto.getCrdtId(),
                         "pdDay", dto.getPdDay(),
