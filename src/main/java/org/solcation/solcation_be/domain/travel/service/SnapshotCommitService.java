@@ -1,6 +1,7 @@
 package org.solcation.solcation_be.domain.travel.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RLock;
 import org.redisson.api.RSet;
