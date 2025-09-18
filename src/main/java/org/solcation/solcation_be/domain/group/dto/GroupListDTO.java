@@ -26,7 +26,7 @@ public class GroupListDTO {
     @NotNull
     private String profileImg;
 
-    //그룹 카테고리 이름
+    //그룹 카테고리 코드
     @NotNull
     private String gcPk;
 

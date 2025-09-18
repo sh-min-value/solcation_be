@@ -23,7 +23,7 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
         g.groupPk,
         g.groupName,
         g.groupImage,
-        gc.gcName,
+        gc.gcCode,
         leader.userName,
         g.totalMembers,
         (select count(t2) from Travel t2 where t2.group = g and t2.tpState = :state)
@@ -53,7 +53,7 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
       g.groupPk,
       g.groupName,
       g.groupImage,
-      gc.gcName,
+      gc.gcCode,
       leader.userName,
       g.totalMembers,
       (select count(t2) from Travel t2 where t2.group = g and t2.tpState = :beforeState),
