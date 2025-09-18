@@ -88,7 +88,7 @@ public class MainService {
 
     // 메인 페이지 알림 렌더링
     public List<NotificationPreviewDTO> getNotificationPreview(Long userPk) {
-        var top2 = pushNotificationRepository.findTop2ByUserPk_UserPkOrderByPnTimeDesc(userPk);
+        var top2 = pushNotificationRepository.findTop2ByUserPk_UserPkAndIsAcceptedFalseOrderByPnTimeDesc(userPk);
         return top2.stream()
                 .map(n -> NotificationPreviewDTO.builder()
                         .acCode(n.getAcPk().getAcCode())

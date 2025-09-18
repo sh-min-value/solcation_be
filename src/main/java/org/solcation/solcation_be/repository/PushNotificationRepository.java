@@ -18,7 +18,8 @@ import java.util.Optional;
 
 @Repository
 public interface PushNotificationRepository extends JpaRepository<PushNotification, Long>{
-    List<PushNotification> findTop2ByUserPk_UserPkOrderByPnTimeDesc(Long userPk);
+    // 메인페이지 알림 미리보기
+    List<PushNotification> findTop2ByUserPk_UserPkAndIsAcceptedFalseOrderByPnTimeDesc(Long userPk);
 
     @Query(value = """
     SELECT COUNT(*)
