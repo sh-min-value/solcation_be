@@ -25,9 +25,11 @@ public class SecurityConfig {
 
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, GroupAuth groupAuth) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, GroupAuth groupAuth, TravelAuth travelAuth) throws Exception {
         var pp = PathPatternRequestMatcher.withDefaults();
         RequestMatcher groupMatcher = pp.matcher("/group/{groupId:\\d+}/**");
+        RequestMatcher groupAndTravelMatcher = pp.matcher("/group/{groupId:\\d+}/travel/{tpPk:\\d+}");
+
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> {})
@@ -40,9 +42,10 @@ public class SecurityConfig {
                         // 인증 발급/회원가입/소셜 콜백 등 공개
                         .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/auth/**").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/notification/conn").permitAll() //todo: 없애기
+                        //그룹 멤버 & 여행 인증
+                        .requestMatchers(groupAndTravelMatcher).access(new GroupAuthorizationManager(groupAuth, travelAuth))
                         //그룹 멤버 인증
-                        .requestMatchers(groupMatcher).access(new GroupAuthorizationManager(groupAuth))
+                        .requestMatchers(groupMatcher).access(new GroupAuthorizationManager(groupAuth, travelAuth))
                         // WebSocket 핸드셰이크 허용
                         .requestMatchers("/ws").permitAll()
                         .requestMatchers("/ws/**").permitAll()
@@ -54,8 +57,9 @@ public class SecurityConfig {
                         .authenticationEntryPoint(handlers.authenticationEntryPoint())
                         .accessDeniedHandler(handlers.accessDeniedHandler())
                 )
-
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+
+
 
         return http.build();
     }

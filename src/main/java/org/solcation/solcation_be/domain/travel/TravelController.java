@@ -44,9 +44,9 @@ public class TravelController {
     }
 
     @Operation(summary = "단일 여행 조회")
-    @GetMapping("/{travelId}")
-    public TravelResDTO getTravel(@PathVariable Long groupId, @PathVariable Long travelId) {
-        return travelService.getTravelById(travelId);
+    @GetMapping("/{tpPk:\\d+}")
+    public TravelResDTO getTravel(@PathVariable Long groupId, @PathVariable Long tpPk) {
+        return travelService.getTravelById(tpPk);
     }
 
     //세부계획
