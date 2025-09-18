@@ -50,7 +50,7 @@ public class TravelReqDTO {
     @Schema(description = "카테고리 PK", example = "3")
     @NotNull(message = "테마를 선택해주세요")
     @Positive(message = "유효한 카테고리를 선택해주세요")
-    private Long categoryPk;
+    private String categoryCode;
 
     @Schema(description = "대표 사진 파일", type = "string", format = "binary")
     @NotNull(message = "이미지를 선택해주세요")

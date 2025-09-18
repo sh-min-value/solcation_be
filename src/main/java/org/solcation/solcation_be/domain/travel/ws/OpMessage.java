@@ -8,6 +8,7 @@ public record OpMessage(
         String clientId,
         long opTs,
         int day,
+        String tcCode,
         Map<String,Object> payload
 ) {
     @SuppressWarnings("unchecked")
@@ -18,6 +19,7 @@ public record OpMessage(
                 String.valueOf(m.get("clientId")),
                 ((Number)m.get("opTs")).longValue(),
                 ((Number)m.get("day")).intValue(),
+                String.valueOf(m.get("tcCode")),
                 (Map<String,Object>) m.getOrDefault("payload", Map.of())
         );
     }
