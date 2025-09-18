@@ -213,7 +213,7 @@ public class StatsService {
                 .block();
     }
 
-    public String generateTravelInsight(Long tpPk) {
+    public InsightDTO generateTravelInsight(Long tpPk) {
         long actual = getTravelTotalSpent(tpPk);
         long planned = getTravelPlannedTotal(tpPk);
         List<CategorySpentDTO> actualCats = getCategorySpentByTravel(tpPk);
@@ -261,7 +261,7 @@ public class StatsService {
                 }
         );
 
-        return geminiWebClient.post()
+        String text = geminiWebClient.post()
                 .uri("/gemini-2.5-flash:generateContent")
                 .bodyValue(body)
                 .retrieve()
@@ -269,6 +269,8 @@ public class StatsService {
                 .map(this::extractTextOrFallback)
                 .onErrorResume(e -> Mono.just("요청 실패: " + e.getMessage()))
                 .block();
+
+        return new InsightDTO(text, tpPk);
     }
 
     private String extractTextOrFallback(Map res) {

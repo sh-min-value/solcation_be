@@ -61,9 +61,8 @@ public class StatsController {
 
     @Operation(summary = "Gemini 인사이트 출력")
     @GetMapping("/api/{travelId}/insight")
-    public ResponseEntity<InsightDTO> getTravelInsight(@PathVariable Long groupId, @PathVariable Long travelId) {
-        String msg = statsService.generateTravelInsight(travelId);
-        return ResponseEntity.ok(new InsightDTO(msg, travelId));
+    public InsightDTO getTravelInsight(@PathVariable Long groupId, @PathVariable Long travelId) {
+        return statsService.generateTravelInsight(travelId);
     }
 
 }
