@@ -36,7 +36,7 @@ public interface PushNotificationRepository extends JpaRepository<PushNotificati
     @Query("""
     select new org.solcation.solcation_be.domain.notification.dto.PushNotificationDTO(
       p.pnPk, p.pnTitle, p.pnTime, p.pnContent,
-      ac.acDest, g.groupName, g.groupImage,
+      ac.acDest, g.groupPk, g.groupName, g.groupImage,
       p.isAccepted, p.readAt
     )
     from PushNotification p
