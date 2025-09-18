@@ -35,23 +35,29 @@ public class RedisExpirationListener extends KeyExpirationEventMessageListener {
         String expiredKey = message.toString();
         log.info("Redis key expired - key: {}", expiredKey);
 
-        Long pnPk = Long.valueOf(expiredKey.split(":")[1]);
-        PushNotification pn = pushNotificationRepository.findByPnPk(pnPk);
-
         if(expiredKey.startsWith("pn:")) {
-            //group_member_tb에서 is_accepted false로 업데이트
-            User user = pushNotificationRepository.findByPnPk(pnPk).getUserPk();
-            Group group = pn.getGroupPk();
-            GroupMember gm = groupMemberRepository.findByUserAndGroup(user, group);
+            try {
+                Long pnPk = Long.valueOf(expiredKey.split(":")[1]);
+                PushNotification pn = pushNotificationRepository.findByPnPk(pnPk);
 
-            gm.updateIsAccepted(false);
+                //group_member_tb에서 is_accepted false로 업데이트
+                User user = pushNotificationRepository.findByPnPk(pnPk).getUserPk();
+                Group group = pn.getGroupPk();
+                GroupMember gm = groupMemberRepository.findByUserAndGroup(user, group);
 
-            groupMemberRepository.save(gm);
+                gm.updateIsAccepted(false);
+
+                groupMemberRepository.save(gm);
+
+                //push_notification_tb is_accepted true로 업데이트
+                pn.updateIsAccepted(true, Instant.now());
+                pushNotificationRepository.save(pn);
+
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                log.warn("만료된 Redis 키 [{}] 를 파싱할 수 없음", expiredKey, e);
+            }
+        } else {
+            log.debug("처리하지 않는 키 만료 이벤트: {}", expiredKey);
         }
-
-        //push_notification_tb is_accepted true로 업데이트
-
-        pn.updateIsAccepted(true, Instant.now());
-        pushNotificationRepository.save(pn);
     }
 }

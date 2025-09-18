@@ -58,7 +58,7 @@ public class TravelService {
     public Long create(TravelReqDTO dto) {
         Group group = groupRepository.findById(dto.getGroupPk())
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_GROUP));
-        TravelCategory category = travelCategoryRepository.findById(dto.getCategoryPk())
+        TravelCategory category = travelCategoryRepository.findByTpcCode(dto.getCategoryCode())
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CATEGORY));
 
         String location = dto.getCountry() + " " + dto.getCity();
@@ -146,7 +146,7 @@ public class TravelService {
                 .endDate(t.getTpEnd())
                 .thumbnail(t.getTpImage())
                 .state(t.getTpState().getLabel())
-                .categoryId(t.getTravelCategory().getTpcPk())
+                .categoryCode(t.getTravelCategory().getTpcCode())
                 .categoryName(t.getTravelCategory().getTpcName())
                 .participant(t.getParticipant())
                 .build();

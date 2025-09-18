@@ -51,7 +51,7 @@ public class PlanDetail extends BaseEntity {
     @JoinColumn(name = "tp_pk", nullable = false)
     private Travel travel;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "tc_pk", nullable = false)
     private TransactionCategory transactionCategory;
 }

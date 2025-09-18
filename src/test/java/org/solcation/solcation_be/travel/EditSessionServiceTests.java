@@ -96,7 +96,7 @@ class EditSessionServiceTests {
         when(pdRepo.findAliveByTravelAndDayByPdDayAscPositionAsc(travelId, day))
                 .thenReturn(List.of(e));
 
-        JoinPayload payload = service.join(travelId, userId);
+        JoinPayload payload = service.join(travelId, userId, "0");
 
         // presence set 확인
         assertTrue(redisson.getSet(RedisKeys.members(travelId)).contains(userId));
@@ -127,7 +127,7 @@ class EditSessionServiceTests {
         redisson.getBucket(RedisKeys.snapshot(travelId, day)).set(preSnap);
 
         // 실행
-        JoinPayload payload = service.join(travelId, userId);
+        JoinPayload payload = service.join(travelId, userId,"0");
 
         // DB는 호출되지 않아야 함
         verify(pdRepo, never()).findAliveByTravelAndDayByPdDayAscPositionAsc(anyLong(), anyInt());
