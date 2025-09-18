@@ -26,4 +26,7 @@ public interface TravelRepository extends JpaRepository<Travel, Long> {
 
     // 우리 그룹과 같은 여행지, 우리 그룹을 제외한 다른 그룹들의 여행
     List<Travel> findByTpLocationAndGroup_GroupPkNotAndTpState(String tpLocation, Long excludeGroupPk, TRAVELSTATE state);
+
+    //해당 그룹 여행인지 확인
+    boolean existsByGroup_GroupPkAndTpPk(Long groupPk, Long tpPk);
 }
