@@ -44,19 +44,20 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
     //그룹 멤버 전체 조회(초대 거절 제외)
     @Query("""
     select new org.solcation.solcation_be.domain.group.dto.GroupMemberFlatDTO(
-        g.user.userPk,
-        g.user.userId,
-        g.user.tel,
-        g.user.userName,
-        g.user.dateOfBirth,
-        g.user.gender,
-        g.user.email,
+        u.userPk,
+        u.userId,
+        u.tel,
+        u.userName,
+        u.dateOfBirth,
+        u.gender,
+        u.email,
         g.isAccepted,
         g.role
     )
     FROM GroupMember g
+    JOIN g.user u
     WHERE g.group.groupPk = :groupPk AND (g.isAccepted is null OR g.isAccepted = true)
-    ORDER BY g.user.userPk ASC
+    ORDER BY u.userPk ASC
     """)
     List<GroupMemberFlatDTO> findActiveAndWaitingMembers(@Param("groupPk") Long groupPk);
 
