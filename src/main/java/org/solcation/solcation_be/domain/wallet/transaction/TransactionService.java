@@ -67,6 +67,7 @@ public class TransactionService {
                         .satTime(i.getSatTime())
                         .briefs(i.getBriefs())
                         .tcName(i.getTcPk().getTcName())
+                        .tcCode(i.getTcPk().getTcCode())
                         .tType(i.getTransactionType().name())
                         .satAmount(i.getSatAmount())
                         .balance(i.getBalance())

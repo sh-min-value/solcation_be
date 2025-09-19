@@ -33,6 +33,9 @@ public class TransactionDTO {
     @NotNull
     private String tcName;
 
+    @NotNull
+    private String tcCode;
+
     //거래 유형
     @NotNull
     private String tType;
