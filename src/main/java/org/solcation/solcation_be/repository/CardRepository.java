@@ -23,4 +23,8 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     //카드 번호 모두 조회
     @Query("SELECT c.sacNum FROM Card c")
     List<String> findAllSacNums();
+
+    //해당 그룹에서 해당 유저가 개설한 카드가 있는지 확인
+    boolean existsBySacPkAndSaPk_Group_GroupPkAndGmPk_User_UserPkAndCancellationFalse(@Param("sacPk") Long sacPk, @Param("groupPk") Long groupPk, @Param("userPk") Long userPk);
+
 }
