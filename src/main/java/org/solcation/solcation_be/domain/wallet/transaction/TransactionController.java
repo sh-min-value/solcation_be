@@ -24,7 +24,7 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("group/{groupId:\\d+}/transaction")
+@RequestMapping("group/{groupId:\\d+}/account/transaction")
 public class TransactionController {
     private final TransactionService transactionService;
 
@@ -41,14 +41,14 @@ public class TransactionController {
     }
 
     @Operation(summary = "이용 내역 상세 렌더링")
-    @GetMapping("/detail")
-    public TransactionDetailDTO getTransactionDetail(@PathVariable("groupId") Long groupId, @PathParam("satPk") Long satPk) {
+    @GetMapping("/{satPk:\\d+}/detail")
+    public TransactionDetailDTO getTransactionDetail(@PathVariable("groupId") Long groupId,  @PathVariable("satPk") Long satPk) {
         return transactionService.getTransactionDetail(satPk);
     }
 
     @Operation(summary = "거래 상세 메모 수정")
-    @PostMapping("/update-memo")
-    public void updateMemo(@PathVariable("groupId") Long groupId, @Valid @RequestBody UpdateMemoReqDTO dto) {
+    @PostMapping("/{satPk:\\d+}/update-memo")
+    public void updateMemo(@PathVariable("groupId") Long groupId,  @PathVariable("satPk") Long satPk, @Valid @RequestBody UpdateMemoReqDTO dto) {
         transactionService.updateMemo(dto);
     }
 
@@ -59,14 +59,14 @@ public class TransactionController {
     }
 
     @Operation(summary = "지출 카테고리 변경")
-    @PostMapping("/update-category")
-    public void updateTransactionCategory(@PathVariable("groupId") Long groupId, @RequestBody UpdateCategoryReqDTO dto) {
+    @PostMapping("/{satPk:\\d+}/update-category")
+    public void updateTransactionCategory(@PathVariable("groupId") Long groupId,  @PathVariable("satPk") Long satPk, @RequestBody UpdateCategoryReqDTO dto) {
         transactionService.updateTransactionCategory(dto);
     }
 
     @Operation(summary = "지출 카테고리 & 메모 변경")
-    @PostMapping("/update-transaction")
-    public void updateTransactionDetail(@PathVariable("groupId") Long groupId, @RequestBody UpdateTransactionDTO dto) {
+    @PostMapping("/{satPk:\\d+}/update-transaction")
+    public void updateTransactionDetail(@PathVariable("groupId") Long groupId,  @PathVariable("satPk") Long satPk, @RequestBody UpdateTransactionDTO dto) {
         transactionService.updateTransactionDetail(dto);
     }
 }

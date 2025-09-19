@@ -172,4 +172,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
 
     //pk로 조회
     Transaction findBySatPk(@Param("satPk") Long satPk);
+
+    //pk + group으로 조회
+    boolean existsBySatPkAndGmPk_Group_GroupPk(@Param("satPk") Long satPk, @Param("groupPk") Long groupPk);
 }
