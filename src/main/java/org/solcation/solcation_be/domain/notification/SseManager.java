@@ -91,6 +91,7 @@ public class SseManager {
                     deadEmitters.add(emitter);
                 }
             }
+            log.info("SSE: success");
             deadEmitters.forEach(i -> cleanUpEmitter(userPk, i));
         } else {
             log.warn("No emitter found for user: {}", userPk);

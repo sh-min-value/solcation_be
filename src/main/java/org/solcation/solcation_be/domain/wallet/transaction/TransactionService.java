@@ -121,6 +121,7 @@ public class TransactionService {
     }
 
     /* 이용 내역 상세 렌더링 */
+    @Transactional(readOnly = true)
     public TransactionDetailDTO getTransactionDetail(Long satPk) {
         QTransaction t = QTransaction.transaction;
         QTransactionCategory tc = QTransactionCategory.transactionCategory;
@@ -148,6 +149,7 @@ public class TransactionService {
     }
 
     /* 카테고리 목록 렌더링 */
+    @Transactional(readOnly = true)
     public List<TransactionCategoryDTO> getTransactionCategories() {
         List<TransactionCategory> list = transactionCategoryLookup.getList();
         List<TransactionCategoryDTO> result = new ArrayList<>();
@@ -161,6 +163,7 @@ public class TransactionService {
     }
 
     /* 지출 카테고리 변경 */
+    @Transactional
     public void updateTransactionCategory(UpdateCategoryReqDTO dto) {
         Transaction t  = transactionRepository.findBySatPk(dto.getSatPk());
         TransactionCategory tc = transactionCategoryLookup.get(dto.getTcPk());
@@ -170,9 +173,22 @@ public class TransactionService {
     }
 
     /* 메모 수정 */
+    @Transactional
     public void updateMemo(UpdateMemoReqDTO dto) {
         Transaction t = transactionRepository.findBySatPk(dto.getSatPk());
         t.updateMemo(dto.getMemo());
+        transactionRepository.save(t);
+    }
+
+    /* 메모 & 지출 카테고리 변경 */
+    @Transactional
+    public void updateTransactionDetail(UpdateTransactionDTO dto) {
+        Transaction t  = transactionRepository.findBySatPk(dto.getSatPk());
+        TransactionCategory tc = transactionCategoryLookup.get(dto.getTcPk());
+
+        t.updateMemo(dto.getMemo());
+        t.updateCategory(tc);
+
         transactionRepository.save(t);
     }
 }

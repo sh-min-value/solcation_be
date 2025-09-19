@@ -64,4 +64,9 @@ public class TransactionController {
         transactionService.updateTransactionCategory(dto);
     }
 
+    @Operation(summary = "지출 카테고리 & 메모 변경")
+    @PostMapping("/update-transaction")
+    public void updateTransactionDetail(@PathVariable("groupId") Long groupId, @RequestBody UpdateTransactionDTO dto) {
+        transactionService.updateTransactionDetail(dto);
+    }
 }
