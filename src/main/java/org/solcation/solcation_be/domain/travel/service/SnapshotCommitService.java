@@ -3,6 +3,7 @@ package org.solcation.solcation_be.domain.travel.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
@@ -109,6 +110,10 @@ public class SnapshotCommitService {
             } catch (NumberFormatException e) {
                 System.out.println("Invalid dirty day value in Redis: " + dayStr);
             }
+        }
+        if(days.isEmpty()) {
+            messaging.convertAndSend("/topic/travel/" + travelId, Map.of("type", "saved"));
+            return;
         }
         days.sort(Integer::compareTo);
 

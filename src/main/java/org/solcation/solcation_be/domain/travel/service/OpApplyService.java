@@ -150,7 +150,6 @@ public class OpApplyService {
                 String crdtId = UUID.randomUUID() + ":" + op.clientId();
 
                 PlanDetailDTO dto = PlanDetailDTO.builder()
-                        .pdPk(null)
                         .pdDay(day)
                         .pdPlace((String)p.get("pdPlace"))
                         .pdAddress((String)p.get("pdAddress"))

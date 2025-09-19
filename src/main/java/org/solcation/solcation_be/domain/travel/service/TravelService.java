@@ -58,7 +58,7 @@ public class TravelService {
     public Long create(TravelReqDTO dto) {
         Group group = groupRepository.findById(dto.getGroupPk())
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_GROUP));
-        TravelCategory category = travelCategoryRepository.findByTpcCode(dto.getCategoryCode())
+        TravelCategory category = travelCategoryRepository.findByTpcCode(String.valueOf(dto.getCategoryCode()))
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CATEGORY));
 
         String location = dto.getCountry() + " " + dto.getCity();
