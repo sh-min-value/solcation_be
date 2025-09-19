@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.solcation.solcation_be.domain.stats.dto.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -60,7 +61,7 @@ public class StatsController {
 
     @Operation(summary = "Gemini 인사이트 출력")
     @GetMapping("/api/{travelId}/insight")
-    public String getTravelInsight(@PathVariable Long groupId, @PathVariable Long travelId) {
+    public InsightDTO getTravelInsight(@PathVariable Long groupId, @PathVariable Long travelId) {
         return statsService.generateTravelInsight(travelId);
     }
 
