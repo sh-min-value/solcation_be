@@ -25,10 +25,12 @@ public class SecurityConfig {
 
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, GroupAuth groupAuth, TravelAuth travelAuth) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, PageAuth pageAuth) throws Exception {
         var pp = PathPatternRequestMatcher.withDefaults();
         RequestMatcher groupMatcher = pp.matcher("/group/{groupId:\\d+}/**");
-        RequestMatcher groupAndTravelMatcher = pp.matcher("/group/{groupId:\\d+}/travel/{tpPk:\\d+}");
+        RequestMatcher TravelMatcher = pp.matcher("/group/{groupId:\\d+}/travel/{tpPk:\\d+}/**");
+        RequestMatcher TransactionMatcher = pp.matcher("/group/{groupId:\\d+}/account/transaction/{satPk:\\d+}/**");
+        RequestMatcher CardMatcher = pp.matcher("/group/{groupId:\\d+}/account/card/{sacPk:\\d+}/**");
 
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -42,10 +44,14 @@ public class SecurityConfig {
                         // 인증 발급/회원가입/소셜 콜백 등 공개
                         .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/auth/**").permitAll()
-                        //그룹 멤버 & 여행 인증
-                        .requestMatchers(groupAndTravelMatcher).access(new GroupAuthorizationManager(groupAuth, travelAuth))
+                        //여행 인증
+                        .requestMatchers(TravelMatcher).access(new GroupAuthorizationManager(pageAuth))
+                        //트랜잭션 인증
+                        .requestMatchers(TransactionMatcher).access(new GroupAuthorizationManager(pageAuth))
+                        //카드 인증
+                        .requestMatchers(CardMatcher).access(new GroupAuthorizationManager(pageAuth))
                         //그룹 멤버 인증
-                        .requestMatchers(groupMatcher).access(new GroupAuthorizationManager(groupAuth, travelAuth))
+                        .requestMatchers(groupMatcher).access(new GroupAuthorizationManager(pageAuth))
                         // WebSocket 핸드셰이크 허용
                         .requestMatchers("/ws").permitAll()
                         .requestMatchers("/ws/**").permitAll()

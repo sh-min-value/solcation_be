@@ -24,49 +24,49 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("group/{groupId:\\d+}/transaction")
+@RequestMapping("group/{groupId:\\d+}/account/transaction/{satPk:\\d+}")
 public class TransactionController {
     private final TransactionService transactionService;
 
     @Operation(summary = "전체 거래 내역 렌더링(필터링 포함 - 거래 유형으로 필터링)")
     @GetMapping("/all")
-    public List<TransactionDTO> getTransactionsAll(@PathVariable("groupId") Long groupId, @AuthenticationPrincipal JwtPrincipal principal, @PathParam("tType") @Nullable TRANSACTIONTYPE tType) {
+    public List<TransactionDTO> getTransactionsAll(@PathVariable("groupId") Long groupId, @PathVariable("satPk") Long satPk, @AuthenticationPrincipal JwtPrincipal principal, @PathParam("tType") @Nullable TRANSACTIONTYPE tType) {
         return transactionService.getTransactionsAll(groupId, principal, tType);
     }
 
     @Operation(summary = "카드 거래 내역 렌더링(필터링 포함 - 월별로 필터링)")
     @GetMapping("/card")
-    public List<TransactionDTO> getTransactionsCard(@PathVariable("groupId") Long groupId, @AuthenticationPrincipal JwtPrincipal principal, @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth) {
+    public List<TransactionDTO> getTransactionsCard(@PathVariable("groupId") Long groupId, @PathVariable("satPk") Long satPk, @AuthenticationPrincipal JwtPrincipal principal, @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth) {
         return transactionService.getTransactionsCard(groupId, principal, yearMonth);
     }
 
     @Operation(summary = "이용 내역 상세 렌더링")
     @GetMapping("/detail")
-    public TransactionDetailDTO getTransactionDetail(@PathVariable("groupId") Long groupId, @PathParam("satPk") Long satPk) {
+    public TransactionDetailDTO getTransactionDetail(@PathVariable("groupId") Long groupId,  @PathVariable("satPk") Long satPk) {
         return transactionService.getTransactionDetail(satPk);
     }
 
     @Operation(summary = "거래 상세 메모 수정")
     @PostMapping("/update-memo")
-    public void updateMemo(@PathVariable("groupId") Long groupId, @Valid @RequestBody UpdateMemoReqDTO dto) {
+    public void updateMemo(@PathVariable("groupId") Long groupId,  @PathVariable("satPk") Long satPk, @Valid @RequestBody UpdateMemoReqDTO dto) {
         transactionService.updateMemo(dto);
     }
 
     @Operation(summary = "거래 카테고리 목록 렌더링")
     @GetMapping("/categories")
-    public List<TransactionCategoryDTO> getTransactionCategories(@PathVariable("groupId") Long groupId) {
+    public List<TransactionCategoryDTO> getTransactionCategories(@PathVariable("groupId") Long groupId,  @PathVariable("satPk") Long satPk) {
         return transactionService.getTransactionCategories();
     }
 
     @Operation(summary = "지출 카테고리 변경")
     @PostMapping("/update-category")
-    public void updateTransactionCategory(@PathVariable("groupId") Long groupId, @RequestBody UpdateCategoryReqDTO dto) {
+    public void updateTransactionCategory(@PathVariable("groupId") Long groupId,  @PathVariable("satPk") Long satPk, @RequestBody UpdateCategoryReqDTO dto) {
         transactionService.updateTransactionCategory(dto);
     }
 
     @Operation(summary = "지출 카테고리 & 메모 변경")
     @PostMapping("/update-transaction")
-    public void updateTransactionDetail(@PathVariable("groupId") Long groupId, @RequestBody UpdateTransactionDTO dto) {
+    public void updateTransactionDetail(@PathVariable("groupId") Long groupId,  @PathVariable("satPk") Long satPk, @RequestBody UpdateTransactionDTO dto) {
         transactionService.updateTransactionDetail(dto);
     }
 }
