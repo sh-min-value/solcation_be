@@ -100,14 +100,27 @@ public class OpApplyService {
             String next = Positioning.normalize((String) op.payload().get("nextCrdtId"));
 
             PlanDetailDTO t = find(itemsSrc, id);
-            itemsSrc.remove(t);
-
-            BigDecimal pos = Positioning.computePos(itemsDst, newDay, prev, next);
-            t.setPdDay(newDay);
-            t.setPosition(pos.toPlainString());
+            t.setTombstone(true);
             t.setClientId(op.clientId());
             t.setOpTs(op.opTs());
-            itemsDst.add(t);
+
+            String newCrdtId = UUID.randomUUID() + ":" + op.clientId();
+            BigDecimal pos = Positioning.computePos(itemsDst, newDay, prev, next);
+
+            PlanDetailDTO newItem = PlanDetailDTO.builder()
+                    .pdDay(newDay)
+                    .pdPlace(t.getPdPlace())
+                    .pdAddress(t.getPdAddress())
+                    .tcCode(t.getTcCode())
+                    .pdCost(t.getPdCost())
+                    .position(pos.toPlainString())
+                    .crdtId(newCrdtId)
+                    .clientId(op.clientId())
+                    .opTs(op.opTs())
+                    .tombstone(false)
+                    .build();
+
+            itemsDst.add(newItem);
 
             srcBucket.set(writeJson(new Snapshot(itemsSrc, src.lastStreamId())));
             dstBucket.set(writeJson(new Snapshot(itemsDst, dst.lastStreamId())));
@@ -119,7 +132,7 @@ public class OpApplyService {
             srcStream.trim((StreamTrimArgs) StreamTrimArgs.maxLen(2000));
             srcBucket.set(writeJson(new Snapshot(itemsSrc, sidOut.toString())));
 
-            StreamMessageId sidIn = dstStream.add(StreamAddArgs.entries(toMoveInFields(op, newDay, t)));
+            StreamMessageId sidIn = dstStream.add(StreamAddArgs.entries(toMoveInFields(op, newDay, newItem)));
             dstStream.trim((StreamTrimArgs) StreamTrimArgs.maxLen(2000));
             dstBucket.set(writeJson(new Snapshot(itemsDst, sidIn.toString())));
 
@@ -128,7 +141,8 @@ public class OpApplyService {
             dirty.add(String.valueOf(newDay));
 
             messaging.convertAndSend("/topic/travel/"+travelId, Map.of(
-                    "type","applied","moveDay", Map.of("from", oldDay, "to", newDay), "op", op
+                    "type","applied","moveDay", Map.of("from", oldDay, "to", newDay),
+                    "op", op, "newCrdtId", newCrdtId  // 클라이언트에 새 CRDT ID 전달
             ));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

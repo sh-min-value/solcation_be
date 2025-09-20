@@ -30,4 +30,8 @@ public interface PlanDetailRepository extends JpaRepository<PlanDetail, Long> {
             @Param("travelId") Long travelId, @Param("day") Integer day);
 
     @Query("SELECT DISTINCT p.pdDay FROM PlanDetail p WHERE p.travel.tpPk = :travelId AND p.tombstone = false ORDER BY p.pdDay ASC")
-    List<Integer> findTravelDays(long travelId);}
+    List<Integer> findTravelDays(long travelId);
+
+    Optional<PlanDetail> findByCrdtId(String crdtId);
+
+}
