@@ -34,8 +34,8 @@ public class SharedAccountController {
         sharedAccountService.updateDepositCycle(groupId, dto);
     }
 
-
-
-
-
+    @PostMapping("/reset-cycle/{saPk}")
+    public void disableDepositCycle(@PathVariable long groupId, @PathVariable long saPk) {
+        sharedAccountService.disableDepositCycle(saPk);
+    }
 }

@@ -32,6 +32,10 @@ public class GroupInfoDTO {
     @NotNull
     private String groupLeader;
 
+    //개설자 pk
+    @NotNull
+    private Long leaderPk;
+
     //총 멤버 수
     @NotNull
     private Integer totalMembers;
