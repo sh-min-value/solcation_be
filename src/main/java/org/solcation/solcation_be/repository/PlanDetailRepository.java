@@ -29,17 +29,9 @@ public interface PlanDetailRepository extends JpaRepository<PlanDetail, Long> {
     List<PlanDetail> findAliveByTravelAndDayByPdDayAscPositionAsc(
             @Param("travelId") Long travelId, @Param("day") Integer day);
 
+    @Query("SELECT DISTINCT p.pdDay FROM PlanDetail p WHERE p.travel.tpPk = :travelId AND p.tombstone = false ORDER BY p.pdDay ASC")
+    List<Integer> findTravelDays(long travelId);
+
     Optional<PlanDetail> findByCrdtId(String crdtId);
 
-    // 같은 여행/같은 day에서 tail(맨 뒤) 하나만
-    Optional<PlanDetail> findTopByTravel_TpPkAndPdDayAndTombstoneFalseOrderByPositionDesc(
-            Long travelId, int pdDay
-    );
-
-    // 같은 여행/같은 day에서 crdtId로 찾기 (prev/next 안전 조회)
-    Optional<PlanDetail> findByCrdtIdAndTravel_TpPkAndPdDayAndTombstoneFalse(
-            String crdtId, Long travelId, int pdDay
-    );
-
-    @Query("SELECT DISTINCT p.pdDay FROM PlanDetail p WHERE p.travel.tpPk = :travelId AND p.tombstone = false ORDER BY p.pdDay ASC")
-    List<Integer> findTravelDays(long travelId);}
+}

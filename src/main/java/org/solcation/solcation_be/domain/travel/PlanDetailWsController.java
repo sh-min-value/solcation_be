@@ -48,8 +48,8 @@ public class PlanDetailWsController{
                      @Payload Map<String, Object> payload) {
         String clientId = (String) payload.get("clientId");
         log.info("WS SAVE travelId={}, clientId={}", travelId, clientId);
-        editSessionService.leave(travelId, clientId);
         snapshotCommitService.saveDirty(travelId, clientId);
+        editSessionService.leave(travelId, clientId);
     }
 
     @MessageMapping("/group/{groupId}/travel/{travelId}/edit/op")

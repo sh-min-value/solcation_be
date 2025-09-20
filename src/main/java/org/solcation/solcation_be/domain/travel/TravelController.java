@@ -22,7 +22,6 @@ import java.util.List;
 public class TravelController {
 
     private final TravelService travelService;
-    private final SnapshotCommitService snapshotCommitService;
 
     @Operation(summary = "그룹 여행 조회", description = "status가 없으면 전체, 있으면 상태별 필터")
     @GetMapping("/list")
