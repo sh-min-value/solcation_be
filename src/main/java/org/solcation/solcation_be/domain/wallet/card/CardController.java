@@ -23,7 +23,7 @@ public class CardController {
 
     @Operation(summary = "카드 개설")
     @PostMapping("/open")
-    public void OpenCard(@PathVariable("groupId") Long groupId, @PathVariable("sacPk") Long sacPk, @Valid @RequestBody OpenCardReqDTO dto, @AuthenticationPrincipal JwtPrincipal principal) {
+    public void OpenCard(@PathVariable("groupId") Long groupId, @Valid @RequestBody OpenCardReqDTO dto, @AuthenticationPrincipal JwtPrincipal principal) {
         cardService.openCard(groupId, principal, dto);
     }
 
