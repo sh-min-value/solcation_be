@@ -34,6 +34,7 @@ public class TransactionService {
     private final CardRepository cardRepository;
     private final JPAQueryFactory queryFactory;
     private final TransactionCategoryLookup  transactionCategoryLookup;
+    private final TransactionCategoryRepository transactionCategoryRepository;
 
 
     /* 전체 거래 내역 렌더링(필터링 포함 - 거래 유형으로 필터링) */
@@ -147,19 +148,6 @@ public class TransactionService {
                 .fetchOne();
     }
 
-    /* 카테고리 목록 렌더링 */
-    @Transactional(readOnly = true)
-    public List<TransactionCategoryDTO> getTransactionCategories() {
-        List<TransactionCategory> list = transactionCategoryLookup.getList();
-        List<TransactionCategoryDTO> result = new ArrayList<>();
-        list.forEach(i -> result.add(TransactionCategoryDTO.builder()
-                .tcPk(i.getTcPk())
-                .tcName(i.getTcName())
-                .tcIcon(i.getTcIcon())
-                .tcCode(i.getTcCode())
-                .build()));
-        return result;
-    }
 
     /* 지출 카테고리 변경 */
     @Transactional
@@ -190,4 +178,5 @@ public class TransactionService {
 
         transactionRepository.save(t);
     }
+
 }

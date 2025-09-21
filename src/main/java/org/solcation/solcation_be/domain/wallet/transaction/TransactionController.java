@@ -52,11 +52,6 @@ public class TransactionController {
         transactionService.updateMemo(dto);
     }
 
-    @Operation(summary = "거래 카테고리 목록 렌더링")
-    @GetMapping("/categories")
-    public List<TransactionCategoryDTO> getTransactionCategories(@PathVariable("groupId") Long groupId) {
-        return transactionService.getTransactionCategories();
-    }
 
     @Operation(summary = "지출 카테고리 변경")
     @PostMapping("/{satPk:\\d+}/update-category")
