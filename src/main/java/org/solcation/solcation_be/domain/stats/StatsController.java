@@ -65,4 +65,9 @@ public class StatsController {
         return statsService.generateTravelInsight(travelId);
     }
 
+    @GetMapping("/plan_total")
+    public ResponseEntity<GroupTravelStatsDTO> getGroupStats(@PathVariable Long groupId) {
+        return ResponseEntity.ok(statsService.getGroupStats(groupId));
+    }
+
 }

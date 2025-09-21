@@ -173,4 +173,76 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
 
     //pk + group으로 조회
     boolean existsBySatPkAndGmPk_Group_GroupPk(@Param("satPk") Long satPk, @Param("groupPk") Long groupPk);
+
+    // 그룹의 총 여행 횟수
+    @Query("""
+            select count(tr)
+            from Travel tr
+            where tr.group.groupPk = :groupPk
+                        and tr.tpState = org.solcation.solcation_be.entity.enums.TRAVELSTATE.FINISH
+            """)
+    long countTripsByGroup(@Param("groupPk") Long groupPk);
+
+    // 그룹의 총 여행 일수 합계
+    @Query("""
+    select coalesce(
+        sum( cast(function('datediff', tr.tpEnd, tr.tpStart) as long) + 1L ),
+        0L
+    )
+    from Travel tr
+    where tr.group.groupPk = :groupPk
+      and tr.tpState = org.solcation.solcation_be.entity.enums.TRAVELSTATE.FINISH
+    """)
+    long sumTripDaysByGroup(@Param("groupPk") Long groupPk);
+
+    // 그룹의 여행 기간 동안 실제 지출 합계
+    @Query("""
+            select coalesce(sum(
+                case
+                    when t.transactionType in (
+                         org.solcation.solcation_be.entity.enums.TRANSACTIONTYPE.WITHDRAW,
+                         org.solcation.solcation_be.entity.enums.TRANSACTIONTYPE.CARD
+                    )
+                    and exists (
+                        select 1 from Travel tr
+                        where tr.group.groupPk = :groupPk
+                          and function('date', function('convert_tz', t.satTime, '+00:00', '+09:00'))
+                              between tr.tpStart and tr.tpEnd
+                    )
+                    then t.satAmount
+                    else 0
+                end
+            ), 0)
+            from Transaction t
+            where t.saPk.group.groupPk = :groupPk
+            """)
+    long sumSpentOnTravelDays(@Param("groupPk") Long groupPk);
+
+    // 그룹의 여행 기간 동안 카테고리별 합계
+    @Query("""
+            select tc.tcPk,
+                   tc.tcName,
+                   tc.tcCode,
+                   coalesce(sum(
+                       case
+                           when t.transactionType in (
+                                org.solcation.solcation_be.entity.enums.TRANSACTIONTYPE.WITHDRAW,
+                                org.solcation.solcation_be.entity.enums.TRANSACTIONTYPE.CARD
+                           )
+                           and exists (
+                               select 1 from Travel tr
+                               where tr.group.groupPk = :groupPk
+                                 and function('date', function('convert_tz', t.satTime, '+00:00', '+09:00'))
+                                     between tr.tpStart and tr.tpEnd
+                           )
+                           then t.satAmount
+                           else 0
+                       end
+                   ), 0)
+            from TransactionCategory tc
+            left join Transaction t on t.tcPk = tc
+            group by tc.tcPk, tc.tcName, tc.tcCode
+            order by tc.tcPk
+            """)
+    List<Object[]> categoryAmountsOnTravelDays(@Param("groupPk") Long groupPk);
 }
