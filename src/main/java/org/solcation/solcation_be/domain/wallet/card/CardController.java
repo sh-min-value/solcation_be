@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.domain.wallet.card.dto.CardInfoDTO;
 import org.solcation.solcation_be.domain.wallet.card.dto.OpenCardReqDTO;
+import org.solcation.solcation_be.domain.wallet.card.dto.UserAddressDTO;
 import org.solcation.solcation_be.security.JwtPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("group/{groupId:\\d+}/card")
+@RequestMapping("/group/{groupId:\\d+}/account/card/")
 public class CardController {
     private final CardService cardService;
 
@@ -26,17 +27,24 @@ public class CardController {
         cardService.openCard(groupId, principal, dto);
     }
 
+    @Operation(summary = "유저 주소 조회")
+    @GetMapping("/address")
+    public UserAddressDTO getUserAddress(@PathVariable("groupId") Long groupId, @AuthenticationPrincipal JwtPrincipal principal){
+        UserAddressDTO dto = cardService.getUserAddress(principal);
+        return dto;
+    }
+
     /* 카드 정보 렌더링 */
     @Operation(summary = "카드 정보 렌더링")
-    @GetMapping("/info")
-    public CardInfoDTO getCardInfo(@PathVariable("groupId") Long groupId, @AuthenticationPrincipal JwtPrincipal principal) {
-        return cardService.getCardInfo(groupId, principal);
+    @GetMapping("/{sacPk:\\d+}/info")
+    public CardInfoDTO getCardInfo(@PathVariable("groupId") Long groupId, @PathVariable("sacPk") Long sacPk, @AuthenticationPrincipal JwtPrincipal principal) {
+        return cardService.getCardInfo(groupId, principal, sacPk);
     }
 
     /* 카드 해지 */
     @Operation(summary = "카드 해지")
-    @PostMapping("/cancel")
-    public void cancelCard(@PathVariable("groupId") Long groupId, @AuthenticationPrincipal JwtPrincipal principal) {
-        cardService.cancelCard(groupId, principal);
+    @PostMapping("/{sacPk:\\d+}/cancel")
+    public void cancelCard(@PathVariable("groupId") Long groupId, @PathVariable("sacPk") Long sacPk, @AuthenticationPrincipal JwtPrincipal principal) {
+        cardService.cancelCard(groupId, principal, sacPk);
     }
 }
