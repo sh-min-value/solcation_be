@@ -1,5 +1,6 @@
 package org.solcation.solcation_be.repository;
 
+import org.solcation.solcation_be.domain.main.dto.NotificationPreviewDTO;
 import org.solcation.solcation_be.domain.notification.dto.PushNotificationDTO;
 import org.solcation.solcation_be.entity.AlarmCategory;
 import org.solcation.solcation_be.entity.PushNotification;
@@ -19,7 +20,22 @@ import java.util.Optional;
 @Repository
 public interface PushNotificationRepository extends JpaRepository<PushNotification, Long>{
     // 메인페이지 알림 미리보기
-    List<PushNotification> findTop2ByUserPk_UserPkAndIsAcceptedFalseOrderByPnTimeDesc(Long userPk);
+    @Query("""
+        select new org.solcation.solcation_be.domain.main.dto.NotificationPreviewDTO(
+          ac.acCode,
+          g.groupName,
+          gl.userName,
+          p.pnTitle
+        )
+        from PushNotification p
+        join p.acPk ac
+        join p.groupPk g
+        join g.groupLeader gl
+        where p.userPk.userPk = :userPk
+          and p.isAccepted = false
+        order by p.pnTime desc
+        """)
+    List<NotificationPreviewDTO> findPreviewByUser(@Param("userPk") Long userPk, Pageable pageable);
 
     @Query(value = """
     SELECT COUNT(*)
