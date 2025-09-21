@@ -16,27 +16,27 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("group/{groupId:\\d+}/card")
+@RequestMapping("/group/{groupId:\\d+}/account/card/{sacPk:\\d+}/")
 public class CardController {
     private final CardService cardService;
 
     @Operation(summary = "카드 개설")
     @PostMapping("/open")
-    public void OpenCard(@PathVariable("groupId") Long groupId, @Valid @RequestBody OpenCardReqDTO dto, @AuthenticationPrincipal JwtPrincipal principal) {
+    public void OpenCard(@PathVariable("groupId") Long groupId, @PathVariable("sacPk") Long sacPk, @Valid @RequestBody OpenCardReqDTO dto, @AuthenticationPrincipal JwtPrincipal principal) {
         cardService.openCard(groupId, principal, dto);
     }
 
     /* 카드 정보 렌더링 */
     @Operation(summary = "카드 정보 렌더링")
     @GetMapping("/info")
-    public CardInfoDTO getCardInfo(@PathVariable("groupId") Long groupId, @AuthenticationPrincipal JwtPrincipal principal) {
-        return cardService.getCardInfo(groupId, principal);
+    public CardInfoDTO getCardInfo(@PathVariable("groupId") Long groupId, @PathVariable("sacPk") Long sacPk, @AuthenticationPrincipal JwtPrincipal principal) {
+        return cardService.getCardInfo(groupId, principal, sacPk);
     }
 
     /* 카드 해지 */
     @Operation(summary = "카드 해지")
     @PostMapping("/cancel")
-    public void cancelCard(@PathVariable("groupId") Long groupId, @AuthenticationPrincipal JwtPrincipal principal) {
-        cardService.cancelCard(groupId, principal);
+    public void cancelCard(@PathVariable("groupId") Long groupId, @PathVariable("sacPk") Long sacPk, @AuthenticationPrincipal JwtPrincipal principal) {
+        cardService.cancelCard(groupId, principal, sacPk);
     }
 }

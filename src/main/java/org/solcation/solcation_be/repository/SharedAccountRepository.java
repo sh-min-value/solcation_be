@@ -36,4 +36,6 @@ public interface SharedAccountRepository extends JpaRepository<SharedAccount, Lo
                            Integer depositDate, DEPOSITDAY depositDay, int depositAmount);
 
     Optional<SharedAccount> findBySaPk(Long saPk);
+
+    Long group(Group group);
 }

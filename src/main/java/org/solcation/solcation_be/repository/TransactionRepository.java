@@ -162,11 +162,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
     @Query("""
             SELECT COALESCE(SUM(t.satAmount) , 0)
             FROM Transaction t
-            WHERE t.saPk = :saPk AND t.transactionType = :transactionType AND t.userPk = :userPk AND t.sacPk = :sacPk AND t.satTime >= :from AND t.satTime < :to
+            WHERE t.transactionType = :transactionType AND t.sacPk = :sacPk AND t.satTime >= :from AND t.satTime < :to
             """)
-    Long findTotalAmountForPeriod(@Param("saPk") SharedAccount saPk,
-                                  @Param("transactionType") TRANSACTIONTYPE transactionType,
-                                  @Param("userPk") User user,
+    Long findTotalAmountForPeriod(@Param("transactionType") TRANSACTIONTYPE transactionType,
                                   @Param("sacPk") Card sacPk,
                                   @Param("from") Instant from, @Param("to") Instant to);
 
