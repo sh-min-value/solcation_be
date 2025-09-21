@@ -53,9 +53,9 @@ public class SharedAccountResDTO {
     @Size(max = 20)
     private String accountNum;
 
-    @Schema(description = "계좌 비밀번호 (6자리)")
-    @NotBlank
-    @Size(min = 6, max = 6)
-    private String saPw;
+    @NotNull
+    private boolean isOpened;
+
+    private Long sacPk;
 
 }

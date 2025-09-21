@@ -65,6 +65,7 @@ public class AuthService {
                 .tokenType("Bearer")
                 .accessToken(newAccess)
                 .expiresIn(jwtTokenProvider.getAccessValidityMs())
+                .userPk(user.getUserPk())
                 .userId(user.getUserId())
                 .userName(user.getUserName())
                 .email(user.getEmail())
