@@ -34,6 +34,7 @@ public class TransactionService {
     private final CardRepository cardRepository;
     private final JPAQueryFactory queryFactory;
     private final TransactionCategoryLookup  transactionCategoryLookup;
+    private final TransactionCategoryRepository transactionCategoryRepository;
 
 
     /* 전체 거래 내역 렌더링(필터링 포함 - 거래 유형으로 필터링) */
@@ -84,13 +85,10 @@ public class TransactionService {
         QTransaction t = QTransaction.transaction;
 
         //유저 조회, 해당 그룹의 sa 조회, 해당 유저 카드 조회
-        Group group = groupRepository.findByGroupPk(groupPk);
-        User user = userRepository.findByUserId(principal.userId()).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        SharedAccount sa = sharedAccountRepository.findByGroup(group).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ACCOUNT));
-        Card card = cardRepository.findBySaPk_GroupAndGmPk_UserAndCancellationFalse(group, user).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CARD));
+        Card card = cardRepository.findBySaPk_GroupAndGmPk_UserAndCancellationFalse(groupRepository.getReferenceById(groupPk), userRepository.getReferenceById(principal.userPk())).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CARD));
 
-        //sa_pk가 일치, sac_pk가 일치
-        builder.and(t.saPk.eq(sa)).and(t.sacPk.eq(card));
+        //sac_pk가 일치
+        builder.and(t.sacPk.eq(card));
 
         //카드 거래만
         builder.and(t.transactionType.eq(TRANSACTIONTYPE.CARD));
@@ -111,6 +109,7 @@ public class TransactionService {
                         .satPk(i.getSatPk())
                         .satTime(i.getSatTime())
                         .briefs(i.getBriefs())
+                        .tcCode(i.getTcPk().getTcCode())
                         .tcName(i.getTcPk().getTcName())
                         .tType(i.getTransactionType().name())
                         .satAmount(i.getSatAmount())
@@ -149,19 +148,6 @@ public class TransactionService {
                 .fetchOne();
     }
 
-    /* 카테고리 목록 렌더링 */
-    @Transactional(readOnly = true)
-    public List<TransactionCategoryDTO> getTransactionCategories() {
-        List<TransactionCategory> list = transactionCategoryLookup.getList();
-        List<TransactionCategoryDTO> result = new ArrayList<>();
-        list.forEach(i -> result.add(TransactionCategoryDTO.builder()
-                .tcPk(i.getTcPk())
-                .tcName(i.getTcName())
-                .tcIcon(i.getTcIcon())
-                .tcCode(i.getTcCode())
-                .build()));
-        return result;
-    }
 
     /* 지출 카테고리 변경 */
     @Transactional
@@ -192,4 +178,5 @@ public class TransactionService {
 
         transactionRepository.save(t);
     }
+
 }

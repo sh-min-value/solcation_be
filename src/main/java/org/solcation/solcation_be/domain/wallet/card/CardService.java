@@ -90,18 +90,14 @@ public class CardService {
 
     /* 카드 정보 렌더링 */
     @Transactional
-    public CardInfoDTO getCardInfo(Long groupPk, JwtPrincipal principal) {
-        Group group = groupRepository.findByGroupPk(groupPk);
-        User user = userRepository.findByUserId(principal.userId()).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        SharedAccount sa = sharedAccountRepository.findByGroup(group).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ACCOUNT));
-        //카드 번호 조회
-        Card card = cardRepository.findBySaPk_GroupAndGmPk_UserAndCancellationFalse(group, user).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CARD));
+    public CardInfoDTO getCardInfo(Long groupPk, JwtPrincipal principal, Long sacPk) {
+        Card card = cardRepository.findBySacPkAndSaPk_GroupAndGmPk_UserAndCancellationFalse(sacPk, groupRepository.getReferenceById(groupPk), userRepository.getReferenceById(principal.userPk())).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CARD));
 
         //이번 달 카드 이용 총 금액 조회 (sa_pk, transaction_type, user_pk, tc_pk, sac_pk, gm_pk, 이번달) -> sat_amount
         YearMonth nowYm = YearMonth.from(ZonedTimeUtil.now());
         ZonedTimeRange r = ZonedTimeUtil.month(nowYm);
         log.info("From: {} / to: {}", r.start(), r.end());
-        Long total = transactionRepository.findTotalAmountForPeriod(sa, TRANSACTIONTYPE.CARD, user, card, r.start(), r.end());
+        Long total = transactionRepository.findTotalAmountForPeriod(TRANSACTIONTYPE.CARD, card, r.start(), r.end());
 
         CardInfoDTO result = CardInfoDTO.builder()
                 .cardNum(card.getSacNum())
@@ -114,11 +110,9 @@ public class CardService {
 
     /* 카드 해지 */
     @Transactional
-    public void cancelCard(Long groupPk, JwtPrincipal principal) {
+    public void cancelCard(Long groupPk, JwtPrincipal principal, Long sacPk) {
         //groupPk, userPk로 카드 조회
-        Group group = groupRepository.findByGroupPk(groupPk);
-        User user = userRepository.findByUserId(principal.userId()).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        Card card = cardRepository.findBySaPk_GroupAndGmPk_UserAndCancellationFalse(group, user).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CARD));
+        Card card = cardRepository.findBySacPkAndSaPk_GroupAndGmPk_UserAndCancellationFalse(sacPk, groupRepository.getReferenceById(groupPk), userRepository.getReferenceById(principal.userPk())).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CARD));
 
         //cancellation(1), cancellation_date(now) 수정
         card.updateCancellation();
