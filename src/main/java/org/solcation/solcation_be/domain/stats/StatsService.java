@@ -17,9 +17,8 @@ import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -290,5 +289,77 @@ public class StatsService {
     private static String esc(String s) {
         if (s == null) return "";
         return s.replace("\\", "\\\\").replace("\"", "\\\"");
+    }
+
+    public GroupTravelStatsDTO getGroupStats(Long groupPk) {
+        CompletableFuture<Long> totalTripsF = CompletableFuture.supplyAsync(() ->
+                transactionRepository.countTripsByGroup(groupPk)
+        );
+        CompletableFuture<Long> totalTripDaysF = CompletableFuture.supplyAsync(() ->
+                transactionRepository.sumTripDaysByGroup(groupPk)
+        );
+        CompletableFuture<Long> totalSpentF = CompletableFuture.supplyAsync(() ->
+                transactionRepository.sumSpentOnTravelDays(groupPk)
+        );
+        CompletableFuture<List<Object[]>> categoryAmountsRawF = CompletableFuture.supplyAsync(() ->
+                transactionRepository.categoryAmountsOnTravelDays(groupPk)
+        );
+
+        long totalTrips = totalTripsF.join();
+        long totalTripDays = totalTripDaysF.join();
+        long totalSpent = totalSpentF.join();
+        List<Object[]> rows = categoryAmountsRawF.join();
+
+        List<GroupTravelStatsDTO.CategoryShare> shares = rows.stream()
+                .map(r -> new GroupTravelStatsDTO.CategoryShare(
+                        (Long) r[0],
+                        Objects.toString(r[1], null),
+                        Objects.toString(r[2], null),
+                        r[3] == null ? 0L : (Long) r[3],
+                        0.0
+                ))
+                .toList();
+
+        long spentDenominator = Math.max(1L, totalSpent);
+        List<GroupTravelStatsDTO.CategoryShare> sharesWithRatio = shares.stream()
+                .map(s -> new GroupTravelStatsDTO.CategoryShare(
+                        s.getTcPk(),
+                        s.getName(),
+                        s.getCode(),
+                        s.getAmount(),
+                        spentDenominator == 0 ? 0.0 : (double) s.getAmount() / spentDenominator
+                ))
+                .toList();
+
+        List<GroupTravelStatsDTO.CategoryAmount> top3 = sharesWithRatio.stream()
+                .map(s -> new GroupTravelStatsDTO.CategoryAmount(
+                        s.getTcPk(),
+                        s.getName(),
+                        s.getCode(),
+                        s.getAmount()
+                ))
+                .sorted(Comparator.comparingLong(GroupTravelStatsDTO.CategoryAmount::getAmount).reversed())
+                .limit(3)
+                .toList();
+
+        GroupTravelStatsDTO.CategoryAmount least = sharesWithRatio.stream()
+                .map(s -> new GroupTravelStatsDTO.CategoryAmount(
+                        s.getTcPk(),
+                        s.getName(),
+                        s.getCode(),
+                        s.getAmount()
+                ))
+                .sorted(Comparator.comparingLong(GroupTravelStatsDTO.CategoryAmount::getAmount))
+                .findFirst()
+                .orElse(new GroupTravelStatsDTO.CategoryAmount(null, null, null, 0L));
+
+        return new GroupTravelStatsDTO(
+                totalTrips,
+                totalTripDays,
+                totalSpent,
+                sharesWithRatio,
+                top3,
+                least
+        );
     }
 }
