@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.domain.wallet.card.dto.CardInfoDTO;
 import org.solcation.solcation_be.domain.wallet.card.dto.OpenCardReqDTO;
+import org.solcation.solcation_be.domain.wallet.card.dto.UserAddressDTO;
 import org.solcation.solcation_be.security.JwtPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,13 @@ public class CardController {
     @PostMapping("/open")
     public void OpenCard(@PathVariable("groupId") Long groupId, @PathVariable("sacPk") Long sacPk, @Valid @RequestBody OpenCardReqDTO dto, @AuthenticationPrincipal JwtPrincipal principal) {
         cardService.openCard(groupId, principal, dto);
+    }
+
+    @Operation(summary = "유저 주소 조회")
+    @GetMapping("/address")
+    public UserAddressDTO getUserAddress(@PathVariable("groupId") Long groupId, @AuthenticationPrincipal JwtPrincipal principal){
+        UserAddressDTO dto = cardService.getUserAddress(principal);
+        return dto;
     }
 
     /* 카드 정보 렌더링 */

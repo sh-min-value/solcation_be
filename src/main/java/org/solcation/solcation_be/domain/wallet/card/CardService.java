@@ -7,6 +7,7 @@ import org.solcation.solcation_be.common.ErrorCode;
 import org.solcation.solcation_be.domain.wallet.card.dto.CardInfoDTO;
 import org.solcation.solcation_be.domain.wallet.card.dto.CardTransactionDTO;
 import org.solcation.solcation_be.domain.wallet.card.dto.OpenCardReqDTO;
+import org.solcation.solcation_be.domain.wallet.card.dto.UserAddressDTO;
 import org.solcation.solcation_be.entity.*;
 import org.solcation.solcation_be.entity.enums.TRANSACTIONCODE;
 import org.solcation.solcation_be.entity.enums.TRANSACTIONTYPE;
@@ -38,6 +39,13 @@ public class CardService {
     private final SharedAccountRepository sharedAccountRepository;
     private final TransactionRepository transactionRepository;
     private final TransactionCategoryLookup transactionCategoryLookup;
+
+    /* 유저 주소 조회*/
+    public UserAddressDTO getUserAddress(JwtPrincipal principal){
+        User user =  userRepository.findByUserId(principal.userId())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        return new UserAddressDTO(user.getStreetAddr(), user.getAddrDetail(), user.getPostalCode());
+    }
 
     /* 카드 개설 */
     @Transactional
