@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/group/{groupId:\\d+}/account/card/{sacPk:\\d+}/")
+@RequestMapping("/group/{groupId:\\d+}/account/card/")
 public class CardController {
     private final CardService cardService;
 
@@ -36,14 +36,14 @@ public class CardController {
 
     /* 카드 정보 렌더링 */
     @Operation(summary = "카드 정보 렌더링")
-    @GetMapping("/info")
+    @GetMapping("/{sacPk:\\d+}/info")
     public CardInfoDTO getCardInfo(@PathVariable("groupId") Long groupId, @PathVariable("sacPk") Long sacPk, @AuthenticationPrincipal JwtPrincipal principal) {
         return cardService.getCardInfo(groupId, principal, sacPk);
     }
 
     /* 카드 해지 */
     @Operation(summary = "카드 해지")
-    @PostMapping("/cancel")
+    @PostMapping("/{sacPk:\\d+}/cancel")
     public void cancelCard(@PathVariable("groupId") Long groupId, @PathVariable("sacPk") Long sacPk, @AuthenticationPrincipal JwtPrincipal principal) {
         cardService.cancelCard(groupId, principal, sacPk);
     }
