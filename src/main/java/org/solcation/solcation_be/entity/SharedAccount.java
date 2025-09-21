@@ -7,6 +7,7 @@ import java.time.Instant;
 
 import lombok.*;
 
+import org.solcation.solcation_be.domain.wallet.account.dto.DepositCycleDTO;
 import org.solcation.solcation_be.entity.converter.DepositCycleConverter;
 import org.solcation.solcation_be.entity.converter.DepositDayConverter;
 import org.solcation.solcation_be.entity.enums.DEPOSITCYCLE;
@@ -68,5 +69,13 @@ public class SharedAccount extends BaseEntity{
         this.depositDate = null;
         this.depositDay = null;
         this.depositAmount = 0;
+    }
+
+    public void updateDepositCycle(DepositCycleDTO dto) {
+        this.depositAlarm = dto.getDepositAlarm();
+        this.depositCycle = dto.getDepositCycle();
+        this.depositDate = dto.getDepositDate();
+        this. depositDay = dto.getDepositDay();
+        this.depositAmount = dto.getDepositAmount();
     }
 }

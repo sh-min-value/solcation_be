@@ -21,6 +21,9 @@ public class LoginResDTO {
     //유효기간
     private long expiresIn;
 
+    //사용자 pk
+    private Long userPk;
+
     //사용자 id
     private String userId;
 

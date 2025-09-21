@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.solcation.solcation_be.domain.wallet.account.dto.DepositCycleDTO;
 import org.solcation.solcation_be.domain.wallet.account.dto.SharedAccountReqDTO;
 import org.solcation.solcation_be.domain.wallet.account.dto.SharedAccountResDTO;
+import org.solcation.solcation_be.security.JwtPrincipal;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "모임통장 계좌 컨트롤러")
@@ -17,8 +19,8 @@ public class SharedAccountController {
     private final SharedAccountService sharedAccountService;
 
     @GetMapping("/info")
-    public SharedAccountResDTO getSharedAccount(@PathVariable long groupId) {
-        return sharedAccountService.getSharedAccountInfo(groupId);
+    public SharedAccountResDTO getSharedAccount(@PathVariable long groupId, @AuthenticationPrincipal JwtPrincipal jwtPrincipal) {
+        return sharedAccountService.getSharedAccountInfo(groupId, jwtPrincipal);
     }
 
     @PostMapping(value="/new", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -32,8 +34,8 @@ public class SharedAccountController {
         sharedAccountService.updateDepositCycle(groupId, dto);
     }
 
-
-
-
-
+    @PostMapping("/reset-cycle/{saPk}")
+    public void disableDepositCycle(@PathVariable long groupId, @PathVariable long saPk) {
+        sharedAccountService.disableDepositCycle(saPk);
+    }
 }

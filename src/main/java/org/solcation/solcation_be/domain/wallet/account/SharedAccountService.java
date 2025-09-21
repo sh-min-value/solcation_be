@@ -11,7 +11,7 @@ import org.solcation.solcation_be.entity.enums.ALARMCODE;
 import org.solcation.solcation_be.entity.enums.DEPOSITCYCLE;
 import org.solcation.solcation_be.entity.enums.DEPOSITDAY;
 import org.solcation.solcation_be.repository.*;
-import org.solcation.solcation_be.scheduler.dto.DepositAlarmDTO;
+import org.solcation.solcation_be.security.JwtPrincipal;
 import org.solcation.solcation_be.util.category.AlarmCategoryLookup;
 import org.solcation.solcation_be.util.s3.S3Utils;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,12 +19,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 @Slf4j
@@ -36,6 +34,8 @@ public class SharedAccountService {
     private final TermsCategoryRepository termsCategoryRepository;
     private final TermsAgreementRepository termsAgreementRepository;
     private final GroupMemberRepository groupMemberRepository;
+    private final UserRepository userRepository;
+    private final CardRepository cardRepository;
     private final NotificationService notificationService;
     private final AlarmCategoryLookup alarmCategoryLookup;
     private final S3Utils s3Utils;
@@ -45,11 +45,11 @@ public class SharedAccountService {
 
     private static final SecureRandom random = new SecureRandom();
 
-    public SharedAccountResDTO getSharedAccountInfo(Long groupId) {
-        SharedAccount res = sharedAccountRepository.findByGroup_GroupPk(groupId);
-        if (res == null) {
-            throw new CustomException(ErrorCode.NOT_FOUND_ACCOUNT);
-        }
+    @Transactional(readOnly = true)
+    public SharedAccountResDTO getSharedAccountInfo(Long groupId, JwtPrincipal jwtPrincipal) {
+        SharedAccount res = sharedAccountRepository.findByGroup_GroupPk(groupId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ACCOUNT));
+        Card card = cardRepository.findBySaPk_GroupAndGmPk_UserAndCancellationFalse(groupRepository.getReferenceById(groupId), userRepository.getReferenceById(jwtPrincipal.userPk())).orElse(null);
+
         SharedAccountResDTO dto = SharedAccountResDTO.builder()
                 .saPk(res.getSaPk())
                 .groupPk(groupId)
@@ -60,15 +60,17 @@ public class SharedAccountService {
                 .depositDay(res.getDepositDay() != null ? DEPOSITDAY.valueOf(res.getDepositDay().name()) : null)
                 .depositAmount(res.getDepositAmount())
                 .accountNum(res.getAccountNum())
-                .saPw(res.getSaPw())
+                .isOpened(card != null)
+                .sacPk(card != null ? card.getSacPk() : null)
                 .build();
         return dto;
     }
 
+
     @Transactional
     public void createSharedAccount(Long groupId, SharedAccountReqDTO dto) {
         var group = groupRepository.findByGroupPk(groupId);
-        if(sharedAccountRepository.findByGroup_GroupPk(groupId)!=null) throw new CustomException(ErrorCode.ACCOUNT_ALREADY_EXISTS);
+        if(sharedAccountRepository.existsSharedAccountByGroup_GroupPk(groupId)) throw new CustomException(ErrorCode.ACCOUNT_ALREADY_EXISTS);
 
         var signature = dto.getSignature();
         //확장자 확인(png, jpeg, jpg)
@@ -144,15 +146,10 @@ public class SharedAccountService {
 
     @Transactional
     public void updateDepositCycle(Long groupId, DepositCycleDTO dto) {
-        SharedAccount res = sharedAccountRepository.findByGroup_GroupPk(groupId);
-        if (res == null) throw new CustomException(ErrorCode.NOT_FOUND_ACCOUNT);
+        SharedAccount sa = sharedAccountRepository.findByGroup_GroupPk(groupId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ACCOUNT));
 
-        sharedAccountRepository.updateDepositCycle(dto.getSaPk(),
-                dto.getDepositAlarm(),
-                dto.getDepositCycle(),
-                dto.getDepositDate(),
-                dto.getDepositDay(),
-                dto.getDepositAmount());
+        sa.updateDepositCycle(dto);
+        sharedAccountRepository.save(sa);
     }
 
     //정기 입금일 비활성화

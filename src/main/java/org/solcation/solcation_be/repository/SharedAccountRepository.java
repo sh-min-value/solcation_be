@@ -1,5 +1,6 @@
 package org.solcation.solcation_be.repository;
 
+import org.solcation.solcation_be.domain.wallet.account.dto.SharedAccountResDTO;
 import org.solcation.solcation_be.entity.Group;
 import org.solcation.solcation_be.entity.SharedAccount;
 import org.solcation.solcation_be.entity.enums.DEPOSITCYCLE;
@@ -17,8 +18,11 @@ import java.util.Optional;
 public interface SharedAccountRepository extends JpaRepository<SharedAccount, Long> {
     //그룹의 계좌 정보 조회
     Optional<SharedAccount> findByGroup(@Param("group") Group group);
+    Optional<SharedAccount> findByGroup_GroupPk(@Param("groupPk") Long groupPk);
 
-    SharedAccount findByGroup_GroupPk(Long groupId);
+    //그룹에 계좌가 존재하는지
+    boolean existsSharedAccountByGroup_GroupPk(@Param("group") Long group);
+
     @Modifying
     @Transactional
     @Query("UPDATE SharedAccount sa " +

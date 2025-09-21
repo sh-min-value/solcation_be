@@ -55,6 +55,7 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
       g.groupImage,
       gc.gcCode,
       leader.userName,
+      leader.userPk,
       g.totalMembers,
       (select count(t2) from Travel t2 where t2.group = g and t2.tpState = :beforeState),
       (select count(t2) from Travel t2 where t2.group = g and t2.tpState = :finishState),
