@@ -55,4 +55,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
             WHERE u.tel = :tel
             """)
     Optional<UserDTO> findByTelWithGroupCheck(@Param("tel") String tel, @Param("groupPk") Long groupPk);
+
+    boolean existsUserByUserId(String userId);
 }

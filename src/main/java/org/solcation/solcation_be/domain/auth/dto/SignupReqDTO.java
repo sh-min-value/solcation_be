@@ -54,8 +54,7 @@ public class SignupReqDTO {
     private LocalDate dateOfBirth;
 
     @NotNull
-    @NotBlank(message = "성별 입력")
-    private String gender;
+    private GENDER gender;
 
     @Email(message = "이메일 형식 오류")
     @NotNull
@@ -74,7 +73,7 @@ public class SignupReqDTO {
                 .tel(dto.getTel())
                 .userName(dto.getUserName())
                 .dateOfBirth(dto.getDateOfBirth())
-                .gender(("m".equalsIgnoreCase(dto.getGender())) ? GENDER.M : GENDER.F)
+                .gender(dto.getGender())
                 .role(ROLE.USER)
                 .email(dto.getEmail())
                 .build();
