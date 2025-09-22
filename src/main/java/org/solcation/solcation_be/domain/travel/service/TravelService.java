@@ -152,4 +152,16 @@ public class TravelService {
                 .build();
     }
 
+    @Transactional
+    public void deleteTravel(Long travelId) {
+
+        Travel travel = travelRepository.findById(travelId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_TRAVEL));
+        if(travel.getTpState() != TRAVELSTATE.BEFORE) {
+            throw new CustomException(ErrorCode.TRAVEL_ALREADY_STARTED);
+        }
+
+        planDetailRepository.deleteAllByTravel_TpPk(travelId);
+        travelRepository.deleteTravelByTpPk(travelId);
+    }
+
 }
