@@ -18,22 +18,21 @@ import java.util.Optional;
 @Repository
 public interface PushNotificationRepository extends JpaRepository<PushNotification, Long>{
     // 메인페이지 알림 미리보기
-    @Query("""
-        select new org.solcation.solcation_be.domain.main.dto.NotificationPreviewDTO(
-          ac.acCode,
-          g.groupName,
-          gl.userName,
-          p.pnTitle
-        )
-        from PushNotification p
-        join p.acPk ac
-        join p.groupPk g
-        join g.groupLeader gl
-        where p.userPk.userPk = :userPk
-          and p.isAccepted = false
-        order by p.pnTime desc
-        """)
-    List<NotificationPreviewDTO> findPreviewByUser(@Param("userPk") Long userPk, Pageable pageable);
+    @Query(value = """
+    select ac.ac_code as acCode,
+           g.group_name as groupName,
+           gl.user_name as userName,
+           p.pn_title as pnTitle
+    from push_notification_tb p
+    join alarm_category_tb ac on p.ac_pk = ac.ac_pk
+    join group_tb g on p.group_pk = g.group_pk
+    join user_tb gl on g.group_leader = gl.user_pk
+    where p.user_pk = :userPk
+      and p.is_accepted = false
+    order by p.pn_time desc
+    limit :limit
+    """, nativeQuery = true)
+    List<NotificationPreviewDTO> findPreviewByUser(@Param("userPk") Long userPk, @Param("limit") int limit);
 
     @Query(value = """
     SELECT COUNT(*)
