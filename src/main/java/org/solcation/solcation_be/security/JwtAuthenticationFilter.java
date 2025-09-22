@@ -6,6 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,9 +16,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -33,29 +36,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 Claims claims = jwtTokenProvider.parseClaims(token);
                 if (!jwtTokenProvider.isExpired(token)) {
+                    Number userPkNum = claims.get("userPk", Number.class);
+                    Long userPk = userPkNum != null ? userPkNum.longValue() : null;
+
                     String userId = claims.getSubject();
+                    String userName = claims.get("userName", String.class);
+                    String email = claims.get("email", String.class);
+                    String tel = claims.get("tel", String.class);
 
                     @SuppressWarnings("unchecked")
-                    var roles = (Collection<String>) claims.getOrDefault("roles", java.util.List.of("ROLE_USER"));
-                    var authorities = roles.stream()
-                            .filter(Objects::nonNull)
-                            .map(SimpleGrantedAuthority::new)
-                            .collect(Collectors.toList());
+                    var raw = claims.get("roles", List.class);
+                    List<String> roles = (raw == null ? List.of("ROLE_USER") : (List<String>) raw.stream().map(String::valueOf).toList());
 
-                    JwtPrincipal principal = new JwtPrincipal(
-                            (Long) claims.get("userPk"),
-                            userId,
-                            (String) claims.get("userName"),
-                            (String) claims.get("email"),
-                            (String) claims.get("tel"),
-                            roles
-                    );
+                    var authorities = roles.stream().filter(Objects::nonNull).map(SimpleGrantedAuthority::new).toList();
+
+                    JwtPrincipal principal = new JwtPrincipal(userPk, userId, userName, email, tel, roles);
 
                     Authentication auth = new JwtUserAuthentication(principal, authorities);
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 }
-            } catch (Exception ignore) {
-
+            } catch (io.jsonwebtoken.ExpiredJwtException ex) {
+                log.info("JWT expired", ex);
+            } catch (Exception ex) {
+                 log.warn("JWT parsing/authentication failed: {}", ex.toString());
             }
         }
         filterChain.doFilter(request, response);
