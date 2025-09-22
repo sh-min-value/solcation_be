@@ -3,6 +3,8 @@ package org.solcation.solcation_be.domain.travel.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.redisson.api.RedissonClient;
+import org.redisson.client.codec.StringCodec;
 import org.solcation.solcation_be.common.CustomException;
 import org.solcation.solcation_be.common.ErrorCode;
 import org.solcation.solcation_be.domain.notification.NotificationService;
@@ -14,6 +16,7 @@ import org.solcation.solcation_be.entity.enums.ALARMCODE;
 import org.solcation.solcation_be.entity.enums.TRAVELSTATE;
 import org.solcation.solcation_be.repository.*;
 import org.solcation.solcation_be.util.category.AlarmCategoryLookup;
+import org.solcation.solcation_be.util.redis.RedisKeys;
 import org.solcation.solcation_be.util.s3.S3Utils;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -38,6 +41,8 @@ public class TravelService {
     private final NotificationService notificationService;
     private final AlarmCategoryLookup alarmCategoryLookup;
     private final S3Utils s3Utils;
+    private final RedissonClient redisson;
+    private final EditSessionService editSessionService;
 
     @Value("${cloud.s3.bucket.upload.profile.travel}")
     private String UPLOAD_PATH;
@@ -160,8 +165,30 @@ public class TravelService {
             throw new CustomException(ErrorCode.TRAVEL_ALREADY_STARTED);
         }
 
+        String imageKey = travel.getTpImage();
+        String backupKey = imageKey + ".backup";
+
+        s3Utils.copyObject(imageKey, UPLOAD_PATH, backupKey, UPLOAD_PATH);
+
         planDetailRepository.deleteAllByTravel_TpPk(travelId);
         travelRepository.deleteTravelByTpPk(travelId);
+        editSessionService.delete(travelId);
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCompletion(int status) {
+                if(status == TransactionSynchronization.STATUS_COMMITTED) {
+                    try {
+                        s3Utils.deleteObject(imageKey, UPLOAD_PATH);
+                        s3Utils.deleteObject(backupKey, UPLOAD_PATH);
+                    } catch (Exception e) {
+                        s3Utils.copyObject(backupKey, UPLOAD_PATH, imageKey, UPLOAD_PATH);
+                        log.error("S3 삭제 실패: {}. 수동 복구 필요", imageKey);
+
+                    }
+                }
+            }
+        });
     }
 
 }
