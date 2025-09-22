@@ -69,6 +69,7 @@ public class MainService {
                         .groupName(t.getGroup().getGroupName())
                         .groupPk(t.getGroup().getGroupPk())
                         .gcCode(t.getGroup().getGcPk().getGcCode())
+                        .travelPk(t.getTpPk())
                         .build())
                 .toList();
     }
