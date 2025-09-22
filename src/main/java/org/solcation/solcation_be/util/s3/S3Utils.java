@@ -86,18 +86,4 @@ public class S3Utils {
 
         return possibleExt.contains(extension);
     }
-
-    /* 삭제 실패 시 복구를 위한 임시 백업 */
-    public void copyObject(String sourceKey, String sourcePath, String targetKey, String targetPath) {
-        try {
-            s3Client.copyObject(builder -> builder
-                    .copySource(BUCKET_NAME + "/" + sourcePath + sourceKey)
-                    .bucket(BUCKET_NAME)
-                    .key(targetPath + targetKey)
-            );
-        } catch (AwsServiceException | SdkClientException e) {
-            log.error("S3 객체 복사 실패: {} -> {}", sourceKey, targetKey, e);
-        }
-    }
-
 }

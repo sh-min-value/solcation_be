@@ -166,9 +166,6 @@ public class TravelService {
         }
 
         String imageKey = travel.getTpImage();
-        String backupKey = imageKey + ".backup";
-
-        s3Utils.copyObject(imageKey, UPLOAD_PATH, backupKey, UPLOAD_PATH);
 
         planDetailRepository.deleteAllByTravel_TpPk(travelId);
         travelRepository.deleteTravelByTpPk(travelId);
@@ -178,13 +175,28 @@ public class TravelService {
             @Override
             public void afterCompletion(int status) {
                 if(status == TransactionSynchronization.STATUS_COMMITTED) {
-                    try {
-                        s3Utils.deleteObject(imageKey, UPLOAD_PATH);
-                        s3Utils.deleteObject(backupKey, UPLOAD_PATH);
-                    } catch (Exception e) {
-                        s3Utils.copyObject(backupKey, UPLOAD_PATH, imageKey, UPLOAD_PATH);
-                        log.error("S3 삭제 실패: {}. 수동 복구 필요", imageKey);
+                    int attempts = 0;
+                    boolean deleted = false;
 
+                    while(!deleted && attempts < 3) { // 최대 3회 재시도
+                        try {
+                            s3Utils.deleteObject(imageKey, UPLOAD_PATH);
+                            deleted = true;
+                        } catch(Exception e) {
+                            attempts++;
+                            log.warn("S3 삭제 실패, 재시도 {}/3: {}", attempts, e.getMessage());
+
+                            try {
+                                Thread.sleep(500);
+                            } catch (InterruptedException ex) {
+                                Thread.currentThread().interrupt();
+                                log.error("재시도 대기 중 인터럽트 발생", ex);
+                            }
+                        }
+                    }
+
+                    if(!deleted) {
+                        log.error("S3 삭제 실패: {}" , imageKey);
                     }
                 }
             }
