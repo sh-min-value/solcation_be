@@ -23,10 +23,10 @@ public interface PushNotificationRepository extends JpaRepository<PushNotificati
            g.group_name as groupName,
            gl.user_name as userName,
            p.pn_title as pnTitle
-    from push_notification p
-    join account ac on p.ac_pk = ac.ac_pk
-    join group_table g on p.group_pk = g.group_pk
-    join user gl on g.group_leader = gl.user_pk
+    from push_notification_tb p
+    join alarm_category_tb ac on p.ac_pk = ac.ac_pk
+    join group_tb g on p.group_pk = g.group_pk
+    join user_tb gl on g.group_leader = gl.user_pk
     where p.user_pk = :userPk
       and p.is_accepted = false
     order by p.pn_time desc
