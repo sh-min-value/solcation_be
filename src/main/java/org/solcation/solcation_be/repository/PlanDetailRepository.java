@@ -34,4 +34,5 @@ public interface PlanDetailRepository extends JpaRepository<PlanDetail, Long> {
 
     Optional<PlanDetail> findByCrdtId(String crdtId);
 
+    void deleteAllByTravel_TpPk(Long travelId);
 }
