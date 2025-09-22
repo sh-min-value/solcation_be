@@ -30,7 +30,7 @@ public class EditSessionService {
     private final SimpMessagingTemplate messaging;
 
     public JoinPayload join(long travelId, String userId, String sessionId) {
-        RSet<String> members = redisson.getSet(RedisKeys.members(travelId));
+        RSet<String> members = redisson.getSet(RedisKeys.members(travelId), StringCodec.INSTANCE);
         members.add(userId);
 
         Iterable<String> keys = redisson.getKeys().getKeysByPattern("plan:snapshot:" + travelId + ":*");
@@ -109,7 +109,8 @@ public class EditSessionService {
     }
 
     public void leave(long travelId, String userId) {
-        redisson.getSet(RedisKeys.members(travelId)).remove(userId);
+        log.info("@@@@Leaving travel {} for user {}", travelId, userId);
+        redisson.getSet(RedisKeys.members(travelId), StringCodec.INSTANCE).remove(userId);
         messaging.convertAndSend("/topic/travel/"+travelId, Map.of(
                 "type","presence-leave","userId",userId
         ));
