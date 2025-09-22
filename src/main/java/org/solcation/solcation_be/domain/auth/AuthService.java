@@ -72,4 +72,11 @@ public class AuthService {
                 .tel(user.getTel())
                 .build();
     }
+
+    /* 아이디 중복 체크 */
+    public boolean checkIdDup(String id) {
+        log.info("결과: " + !userRepository.existsUserByUserId(id));
+        return !userRepository.existsUserByUserId(id);
+        //가능: true | 불가능 false
+    }
 }

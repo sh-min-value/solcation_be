@@ -3,6 +3,7 @@ package org.solcation.solcation_be.domain.auth;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.solcation.solcation_be.domain.auth.dto.LoginReqDTO;
 import org.solcation.solcation_be.domain.auth.dto.LoginResDTO;
@@ -26,5 +27,11 @@ public class AuthController {
     @PostMapping("/sign-up")
     public void signup(@Valid @RequestBody SignupReqDTO reqDTO) {
         authService.signUp(reqDTO);
+    }
+
+    @Operation(summary = "아이디 중복체크")
+    @GetMapping("/check-dup")
+    public boolean checkDupId(@PathParam("userId") String userId) {
+        return authService.checkIdDup(userId);
     }
 }
