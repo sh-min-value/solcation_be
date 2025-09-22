@@ -14,6 +14,7 @@ import org.solcation.solcation_be.repository.GroupMemberRepository;
 import org.solcation.solcation_be.repository.PushNotificationRepository;
 import org.solcation.solcation_be.repository.TravelRepository;
 import org.solcation.solcation_be.repository.UserRepository;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -68,6 +69,7 @@ public class MainService {
                         .groupName(t.getGroup().getGroupName())
                         .groupPk(t.getGroup().getGroupPk())
                         .gcCode(t.getGroup().getGcPk().getGcCode())
+                        .travelPk(t.getTpPk())
                         .build())
                 .toList();
     }
@@ -88,14 +90,6 @@ public class MainService {
 
     // 메인 페이지 알림 렌더링
     public List<NotificationPreviewDTO> getNotificationPreview(Long userPk) {
-        var top2 = pushNotificationRepository.findTop2ByUserPk_UserPkAndIsAcceptedFalseOrderByPnTimeDesc(userPk);
-        return top2.stream()
-                .map(n -> NotificationPreviewDTO.builder()
-                        .acCode(n.getAcPk().getAcCode())
-                        .groupName(n.getGroupPk().getGroupName())
-                        .groupLeader(n.getGroupPk().getGroupLeader().getUserName())
-                        .pnTitle(n.getPnTitle())
-                        .build())
-                .toList();
+        return pushNotificationRepository.findPreviewByUser(userPk, 2);
     }
 }

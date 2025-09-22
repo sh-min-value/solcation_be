@@ -14,4 +14,5 @@ public class MonthlyPlanDTO {
     private String tpTitle;
     private String groupName;
     private Long groupPk;
+    private Long travelPk;
 }
