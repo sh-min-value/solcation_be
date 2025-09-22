@@ -26,14 +26,14 @@ public enum ErrorCode {
 
     // 404 Not Found
     NOT_FOUND_END_POINT(40400, HttpStatus.NOT_FOUND, "존재하지 않는 API입니다."), //DEFAULT
-    NOT_EXIST(40004, HttpStatus.NOT_FOUND, "존재하지 않습니다."),
-    NOT_FOUND_ACCOUNT(40001, HttpStatus.NOT_FOUND, "계좌가 존재하지 않습니다."),
-    NOT_FOUND_CARD(40002, HttpStatus.NOT_FOUND, "카드가 존재하지 않습니다."),
+    NOT_EXIST(40404, HttpStatus.NOT_FOUND, "존재하지 않습니다."),
+    NOT_FOUND_ACCOUNT(40401, HttpStatus.NOT_FOUND, "계좌가 존재하지 않습니다."),
+    NOT_FOUND_CARD(40402, HttpStatus.NOT_FOUND, "카드가 존재하지 않습니다."),
     NOT_FOUND_PLAN(40403, HttpStatus.NOT_FOUND, "여행 계획이 없습니다."),
     NOT_FOUND_CATEGORY(40404, HttpStatus.NOT_FOUND, "존재하지 않는 카테고리입니다"),
     NOT_FOUND_GROUP(40405, HttpStatus.NOT_FOUND, "존재하지 않는 세부 계획입니다"),
     NOT_FOUND_USER_BY_TEL(40406, HttpStatus.NOT_FOUND, "해당 전화번호로 등록된 회원이 없습니다."),
-
+    NOT_FOUND_TRAVEL(40407, HttpStatus.NOT_FOUND, "존재하지 않는 여행입니다."),
     // 405 Method Not Allowed
     METHOD_NOT_ALLOWED(40500, HttpStatus.METHOD_NOT_ALLOWED, "허용되지 않은 HTTP 메서드입니다."), //DEFAULT
 
@@ -46,6 +46,7 @@ public enum ErrorCode {
     ACCOUNT_ALREADY_EXISTS(40902, HttpStatus.CONFLICT, "계좌가 이미 존재합니다."),
     ALREADY_GROUP_MEMBER(40903, HttpStatus.CONFLICT, "이미 그룹에 속해 있는 회원입니다."),
     ALREADY_INVITED(40904, HttpStatus.CONFLICT, "이미 초대가 진행 중인 회원입니다."),
+    TRAVEL_ALREADY_STARTED(40905, HttpStatus.CONFLICT, "이미 시작되었거나 종료된 여행입니다."),
 
 
     // 410 Gone

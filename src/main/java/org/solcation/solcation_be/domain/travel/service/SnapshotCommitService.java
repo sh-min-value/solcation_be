@@ -112,7 +112,7 @@ public class SnapshotCommitService {
             }
         }
         if(days.isEmpty()) {
-            messaging.convertAndSend("/topic/travel/" + travelId, Map.of("type", "saved"));
+            messaging.convertAndSend("/topic/travel/" + travelId, Map.of("type", "saved",  "userId", clientId));
             return;
         }
         days.sort(Integer::compareTo);

@@ -29,4 +29,7 @@ public interface TravelRepository extends JpaRepository<Travel, Long> {
 
     //해당 그룹 여행인지 확인
     boolean existsByGroup_GroupPkAndTpPk(Long groupPk, Long tpPk);
+
+    //여행 삭제
+    void deleteTravelByTpPk(Long tpPk);
 }

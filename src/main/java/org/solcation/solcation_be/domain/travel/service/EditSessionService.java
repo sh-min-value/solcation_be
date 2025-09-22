@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
+import org.redisson.api.RKeys;
 import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.StringCodec;
@@ -30,7 +31,7 @@ public class EditSessionService {
     private final SimpMessagingTemplate messaging;
 
     public JoinPayload join(long travelId, String userId, String sessionId) {
-        RSet<String> members = redisson.getSet(RedisKeys.members(travelId));
+        RSet<String> members = redisson.getSet(RedisKeys.members(travelId), StringCodec.INSTANCE);
         members.add(userId);
 
         Iterable<String> keys = redisson.getKeys().getKeysByPattern("plan:snapshot:" + travelId + ":*");
@@ -109,11 +110,35 @@ public class EditSessionService {
     }
 
     public void leave(long travelId, String userId) {
-        redisson.getSet(RedisKeys.members(travelId)).remove(userId);
+        redisson.getSet(RedisKeys.members(travelId), StringCodec.INSTANCE).remove(userId);
         messaging.convertAndSend("/topic/travel/"+travelId, Map.of(
                 "type","presence-leave","userId",userId
         ));
     }
+
+    public void delete(Long travelId) {
+        RSet<String> members = redisson.getSet("plan:members:" + travelId, StringCodec.INSTANCE);
+        members.delete();
+
+        RKeys keys = redisson.getKeys();
+
+        // Snapshot 삭제
+        Iterable<String> snapshotKeys = keys.getKeysByPattern("plan:snapshot:" + travelId + ":*");
+        for (String key : snapshotKeys) {
+            redisson.getBucket(key, StringCodec.INSTANCE).delete();
+        }
+
+        // Stream 삭제
+        Iterable<String> streamKeys = keys.getKeysByPattern("plan:stream:" + travelId + ":*");
+        for (String key : streamKeys) {
+            redisson.getStream(key, StringCodec.INSTANCE).delete();
+        }
+
+        messaging.convertAndSend("/topic/travel/"+travelId, Map.of(
+                "type","deleted"
+        ));
+    }
+
 
     private <T> T readJson(String s, Class<T> c){ try { return s == null ? null : om.readValue(s,c);} catch(Exception e){ throw new RuntimeException(e);} }
     private String writeJson(Object o){ try { return om.writeValueAsString(o);} catch(Exception e){ throw new RuntimeException(e);} }
