@@ -90,6 +90,6 @@ public class MainService {
 
     // 메인 페이지 알림 렌더링
     public List<NotificationPreviewDTO> getNotificationPreview(Long userPk) {
-        return pushNotificationRepository.findPreviewByUser(userPk, PageRequest.of(0, 2));
+        return pushNotificationRepository.findPreviewByUser(userPk, 2);
     }
 }
