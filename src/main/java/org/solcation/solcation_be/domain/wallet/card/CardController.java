@@ -3,16 +3,14 @@ package org.solcation.solcation_be.domain.wallet.card;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.domain.wallet.card.dto.CardInfoDTO;
 import org.solcation.solcation_be.domain.wallet.card.dto.OpenCardReqDTO;
 import org.solcation.solcation_be.domain.wallet.card.dto.UserAddressDTO;
-import org.solcation.solcation_be.domain.wallet.card.dto.VerifyPwReq;
+import org.solcation.solcation_be.domain.wallet.card.dto.VerifyPwReqDTO;
 import org.solcation.solcation_be.security.JwtPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "카드 컨트롤러")
@@ -53,7 +51,7 @@ public class CardController {
     /* 카드 비밀번호 확인 */
     @Operation(summary = "카드 비밀번호 확인")
     @PostMapping("/{sacPk:\\d+}/verify")
-    public boolean verifyPw(@PathVariable("groupId") Long groupId, @PathVariable("sacPk") Long sacPk, @Valid @RequestBody(required = true) VerifyPwReq pw) {
-        return cardService.verifyPw(sacPk, pw.sacPw());
+    public boolean verifyPw(@PathVariable("groupId") Long groupId, @PathVariable("sacPk") Long sacPk, @Valid @RequestBody(required = true) VerifyPwReqDTO pw) {
+        return cardService.verifyPw(sacPk, pw.getSacPw());
     }
 }
