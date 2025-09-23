@@ -195,15 +195,11 @@ public class SharedAccountService {
     }
 
     @Transactional(readOnly = true)
-    public SharedAccountLoginResDTO loginSharedAccount(Long groupId, Long saPk, String saPw) {
+    public boolean loginSharedAccount(Long groupId, Long saPk, String saPw) {
         String storedPw = sharedAccountRepository
                 .findSaPwByGroupPkAndSaPk(groupId, saPk)
                 .orElse(null);
 
-        boolean success = storedPw != null && storedPw.equals(saPw);
-
-        return SharedAccountLoginResDTO.builder()
-                .success(success)
-                .build();
+        return storedPw != null && storedPw.equals(saPw);
     }
 }
