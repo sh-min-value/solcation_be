@@ -51,4 +51,8 @@ public class GroupInfoDTO {
     //대기 중인 초대
     @NotNull
     private Long pending;
+
+    //계좌 존재 여부
+    @NotNull
+    private boolean isCreated;
 }

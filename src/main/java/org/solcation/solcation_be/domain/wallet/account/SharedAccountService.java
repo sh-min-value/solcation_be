@@ -98,6 +98,7 @@ public class SharedAccountService {
         });
 
         group.updateSignatureUrl(filename);
+        group.updateIsCreated();
         groupRepository.save(group);
 
         SharedAccount account = SharedAccount.builder()
@@ -199,7 +200,6 @@ public class SharedAccountService {
         String storedPw = sharedAccountRepository
                 .findSaPwByGroupPkAndSaPk(groupId, saPk)
                 .orElse(null);
-
         return storedPw != null && storedPw.equals(saPw);
     }
 }

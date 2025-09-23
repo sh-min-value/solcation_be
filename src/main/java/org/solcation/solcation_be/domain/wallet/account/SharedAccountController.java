@@ -41,9 +41,8 @@ public class SharedAccountController {
 
     @Operation(summary = "모임통장 페이지 비밀번호 확인")
     @PostMapping("/{saPk}/sa-login")
-    public ResponseEntity<Boolean> loginSharedAccount(@PathVariable Long groupId, @PathVariable Long saPk, @RequestBody @Valid SharedAccountLoginReqDTO req) {
+    public boolean loginSharedAccount(@PathVariable Long groupId, @PathVariable Long saPk, @RequestBody @Valid SharedAccountLoginReqDTO req) {
 
-        boolean success = sharedAccountService.loginSharedAccount(groupId, saPk, req.getSaPw());
-        return ResponseEntity.ok(success);
+        return sharedAccountService.loginSharedAccount(groupId, saPk, req.getSaPw());
     }
 }
