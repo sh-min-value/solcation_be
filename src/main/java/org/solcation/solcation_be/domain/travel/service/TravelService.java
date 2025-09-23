@@ -3,6 +3,8 @@ package org.solcation.solcation_be.domain.travel.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.redisson.api.RedissonClient;
+import org.redisson.client.codec.StringCodec;
 import org.solcation.solcation_be.common.CustomException;
 import org.solcation.solcation_be.common.ErrorCode;
 import org.solcation.solcation_be.domain.notification.NotificationService;
@@ -14,6 +16,7 @@ import org.solcation.solcation_be.entity.enums.ALARMCODE;
 import org.solcation.solcation_be.entity.enums.TRAVELSTATE;
 import org.solcation.solcation_be.repository.*;
 import org.solcation.solcation_be.util.category.AlarmCategoryLookup;
+import org.solcation.solcation_be.util.redis.RedisKeys;
 import org.solcation.solcation_be.util.s3.S3Utils;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -38,6 +41,8 @@ public class TravelService {
     private final NotificationService notificationService;
     private final AlarmCategoryLookup alarmCategoryLookup;
     private final S3Utils s3Utils;
+    private final RedissonClient redisson;
+    private final EditSessionService editSessionService;
 
     @Value("${cloud.s3.bucket.upload.profile.travel}")
     private String UPLOAD_PATH;
@@ -150,6 +155,52 @@ public class TravelService {
                 .categoryName(t.getTravelCategory().getTpcName())
                 .participant(t.getParticipant())
                 .build();
+    }
+
+    @Transactional
+    public void deleteTravel(Long travelId) {
+
+        Travel travel = travelRepository.findById(travelId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_TRAVEL));
+        if(travel.getTpState() != TRAVELSTATE.BEFORE) {
+            throw new CustomException(ErrorCode.TRAVEL_ALREADY_STARTED);
+        }
+
+        String imageKey = travel.getTpImage();
+
+        planDetailRepository.deleteAllByTravel_TpPk(travelId);
+        travelRepository.deleteTravelByTpPk(travelId);
+        editSessionService.delete(travelId);
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCompletion(int status) {
+                if(status == TransactionSynchronization.STATUS_COMMITTED) {
+                    int attempts = 0;
+                    boolean deleted = false;
+
+                    while(!deleted && attempts < 3) { // 최대 3회 재시도
+                        try {
+                            s3Utils.deleteObject(imageKey, UPLOAD_PATH);
+                            deleted = true;
+                        } catch(Exception e) {
+                            attempts++;
+                            log.warn("S3 삭제 실패, 재시도 {}/3: {}", attempts, e.getMessage());
+
+                            try {
+                                Thread.sleep(500);
+                            } catch (InterruptedException ex) {
+                                Thread.currentThread().interrupt();
+                                log.error("재시도 대기 중 인터럽트 발생", ex);
+                            }
+                        }
+                    }
+
+                    if(!deleted) {
+                        log.error("S3 삭제 실패: {}" , imageKey);
+                    }
+                }
+            }
+        });
     }
 
 }

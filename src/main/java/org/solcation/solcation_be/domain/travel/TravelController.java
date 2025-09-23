@@ -57,4 +57,11 @@ public class TravelController {
     ) {
         return travelService.getTravelPlans(travelId);
     }
+
+    @Operation(summary = "여행 삭제")
+    @DeleteMapping("/{travelId}")
+    public void deleteTravel(@PathVariable Long groupId, @PathVariable Long travelId){
+        travelService.deleteTravel(travelId);
+        return;
+    }
 }
