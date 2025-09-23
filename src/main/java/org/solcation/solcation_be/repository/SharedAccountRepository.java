@@ -38,4 +38,12 @@ public interface SharedAccountRepository extends JpaRepository<SharedAccount, Lo
     Optional<SharedAccount> findBySaPk(Long saPk);
 
     Long group(Group group);
+
+    @Query("""
+        select sa.saPw 
+        from SharedAccount sa
+        where sa.group.groupPk = :groupPk
+          and sa.saPk = :saPk
+    """)
+    Optional<String> findSaPwByGroupPkAndSaPk(@Param("groupPk") Long groupPk, @Param("saPk") Long saPk);
 }

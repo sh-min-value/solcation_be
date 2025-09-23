@@ -193,4 +193,13 @@ public class SharedAccountService {
 
        return bankCode + branchCode + serialNumber;
     }
+
+    @Transactional(readOnly = true)
+    public boolean loginSharedAccount(Long groupId, Long saPk, String saPw) {
+        String storedPw = sharedAccountRepository
+                .findSaPwByGroupPkAndSaPk(groupId, saPk)
+                .orElse(null);
+
+        return storedPw != null && storedPw.equals(saPw);
+    }
 }
