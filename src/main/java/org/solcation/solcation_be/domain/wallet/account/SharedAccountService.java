@@ -199,7 +199,6 @@ public class SharedAccountService {
         String storedPw = sharedAccountRepository
                 .findSaPwByGroupPkAndSaPk(groupId, saPk)
                 .orElse(null);
-
         return storedPw != null && storedPw.equals(saPw);
     }
 }
