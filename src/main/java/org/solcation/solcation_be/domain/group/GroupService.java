@@ -126,7 +126,7 @@ public class GroupService {
         for (GroupMemberFlatDTO f : all) {
             GroupMemberDTO dto = new GroupMemberDTO(
                     f.getUserPk(), f.getUserId(), f.getTel(), f.getUserName(),
-                    f.getDateOfBirth(), f.getGender(), f.getEmail()
+                    f.getDateOfBirth(), f.getGender()
             );
 
             if(Boolean.TRUE.equals(f.getRole())) {
@@ -137,7 +137,7 @@ public class GroupService {
                 waiting.add(dto);
             }
         }
-
+        log.info("가공 완료");
         return GroupMembersDTO.builder()
                 .groupLeader(leader)
                 .members(members)

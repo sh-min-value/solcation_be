@@ -33,7 +33,4 @@ public class GroupMemberDTO {
 
     @NotNull
     private GENDER gender;
-
-    @NotNull
-    private String email;
 }

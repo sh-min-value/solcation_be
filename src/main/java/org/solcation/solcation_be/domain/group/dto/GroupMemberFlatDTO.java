@@ -35,9 +35,6 @@ public class GroupMemberFlatDTO {
     private GENDER gender;
 
     @NotNull
-    private String email;
-
-    @NotNull
     private Boolean isAccepted;
 
     @NotNull

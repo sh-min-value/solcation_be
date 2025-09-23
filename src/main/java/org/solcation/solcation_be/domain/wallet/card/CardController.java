@@ -8,9 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.domain.wallet.card.dto.CardInfoDTO;
 import org.solcation.solcation_be.domain.wallet.card.dto.OpenCardReqDTO;
 import org.solcation.solcation_be.domain.wallet.card.dto.UserAddressDTO;
+import org.solcation.solcation_be.domain.wallet.card.dto.VerifyPwReqDTO;
 import org.solcation.solcation_be.security.JwtPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "카드 컨트롤러")
@@ -46,5 +46,12 @@ public class CardController {
     @PostMapping("/{sacPk:\\d+}/cancel")
     public void cancelCard(@PathVariable("groupId") Long groupId, @PathVariable("sacPk") Long sacPk, @AuthenticationPrincipal JwtPrincipal principal) {
         cardService.cancelCard(groupId, principal, sacPk);
+    }
+
+    /* 카드 비밀번호 확인 */
+    @Operation(summary = "카드 비밀번호 확인")
+    @PostMapping("/{sacPk:\\d+}/verify")
+    public boolean verifyPw(@PathVariable("groupId") Long groupId, @PathVariable("sacPk") Long sacPk, @Valid @RequestBody(required = true) VerifyPwReqDTO pw) {
+        return cardService.verifyPw(sacPk, pw.getSacPw());
     }
 }

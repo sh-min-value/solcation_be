@@ -50,7 +50,6 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
         u.userName,
         u.dateOfBirth,
         u.gender,
-        u.email,
         g.isAccepted,
         g.role
     )
