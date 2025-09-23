@@ -128,6 +128,13 @@ public class CardService {
         cardRepository.save(card);
     }
 
+    /* 카드 비밀번호 확인 */
+    @Transactional(readOnly = true)
+    public boolean verifyPw(Long sacPk, String password) {
+        String dbPassword = cardRepository.getPwBySacPk(sacPk);
+        return password.equals(dbPassword);
+    }
+
     /** 카드 번호 생성(Luhn 알고리즘)
      * 1-4: 카드 브랜드(네트워크) 고유 번호
      * 5-6: 카드를 발급한 금융 기관 코드

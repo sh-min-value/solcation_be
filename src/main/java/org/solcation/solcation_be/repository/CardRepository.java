@@ -29,4 +29,11 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     //해당 그룹에서 해당 유저가 개설한 카드가 있는지 확인
     boolean existsBySacPkAndSaPk_Group_GroupPkAndGmPk_User_UserPkAndCancellationFalse(@Param("sacPk") Long sacPk, @Param("groupPk") Long groupPk, @Param("userPk") Long userPk);
 
+    //비밀번호 가져오기
+    @Query("""
+        select c.pw
+        from Card c
+        where c.sacPk = :sacPk
+    """)
+    String getPwBySacPk(@Param("sacPk") Long sacPk);
 }
