@@ -98,6 +98,7 @@ public class SharedAccountService {
         });
 
         group.updateSignatureUrl(filename);
+        group.updateIsCreated();
         groupRepository.save(group);
 
         SharedAccount account = SharedAccount.builder()

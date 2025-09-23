@@ -59,7 +59,8 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
       g.totalMembers,
       (select count(t2) from Travel t2 where t2.group = g and t2.tpState = :beforeState),
       (select count(t2) from Travel t2 where t2.group = g and t2.tpState = :finishState),
-      (select count(gm) from GroupMember gm where gm.group = g and gm.isAccepted is null)
+      (select count(gm) from GroupMember gm where gm.group = g and gm.isAccepted is null),
+      g.isCreated
     )
     FROM Group g
     JOIN g.gcPk gc

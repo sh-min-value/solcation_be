@@ -51,5 +51,10 @@ public class Group extends BaseEntity {
     public void updateSignatureUrl(String signatureUrl) {
         this.signatureUrl = signatureUrl;
     }
+
+    public void updateIsCreated() {
+        this.isCreated = true;
+    }
+
     public void updateTotalMember(Integer totalMembers) { this.totalMembers = totalMembers; }
 }
