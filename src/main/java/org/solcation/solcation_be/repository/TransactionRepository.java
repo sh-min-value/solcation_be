@@ -78,6 +78,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
              JOIN shared_account_transaction_tb t2
                ON t2.sa_pk = s2.sa_pk
              WHERE tr.tp_pk = :tpPk
+               AND tr2.tp_state = 2
                AND t2.transaction_type IN (:types)
                AND t2.sat_time >= CONVERT_TZ(CONCAT(tr2.tp_start,' 00:00:00'),'Asia/Seoul','UTC')
                AND t2.sat_time <  CONVERT_TZ(DATE_ADD(CONCAT(tr2.tp_end,' 00:00:00'), INTERVAL 1 DAY),'Asia/Seoul','UTC')
@@ -93,6 +94,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
                ON tr2.tp_location = tr.tp_location
               AND tr2.group_pk <> tr.group_pk
             WHERE tr.tp_pk = :tpPk
+              AND tr2.tp_state = 2
             """, nativeQuery = true)
     long sumOthersPersonDays(@Param("tpPk") Long tpPk);
 
@@ -185,14 +187,14 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
 
     // 그룹의 총 여행 일수 합계
     @Query("""
-    select coalesce(
-        sum( cast(function('datediff', tr.tpEnd, tr.tpStart) as long) + 1L ),
-        0L
-    )
-    from Travel tr
-    where tr.group.groupPk = :groupPk
-      and tr.tpState = org.solcation.solcation_be.entity.enums.TRAVELSTATE.FINISH
-    """)
+            select coalesce(
+                sum( cast(function('datediff', tr.tpEnd, tr.tpStart) as long) + 1L ),
+                0L
+            )
+            from Travel tr
+            where tr.group.groupPk = :groupPk
+              and tr.tpState = org.solcation.solcation_be.entity.enums.TRAVELSTATE.FINISH
+            """)
     long sumTripDaysByGroup(@Param("groupPk") Long groupPk);
 
     // 그룹의 여행 기간 동안 실제 지출 합계
