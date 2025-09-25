@@ -1,7 +1,7 @@
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
-RUN addgroup --system app && adduser --system --ingroup app app
+RUN addgroup -S app && adduser -S app -G app
 USER app
 COPY build/libs/*.jar app.jar
-EXPOSE 8080
+EXPOSE 8081
 ENTRYPOINT ["java","-XX:MaxRAMPercentage=75.0","-jar","/app/app.jar"]
