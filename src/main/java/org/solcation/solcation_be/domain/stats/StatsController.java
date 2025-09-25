@@ -11,7 +11,7 @@ import java.util.List;
 
 @Tag(name = "통계 컨트롤러")
 @RestController
-@RequestMapping("/groups/{groupId:\\d+}/stats")
+@RequestMapping("api/groups/{groupId:\\d+}/stats")
 @RequiredArgsConstructor
 public class StatsController {
 

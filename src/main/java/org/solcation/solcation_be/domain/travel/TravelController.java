@@ -18,7 +18,7 @@ import java.util.List;
 @Tag(name = "여행 계획 컨트롤러")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/group/{groupId:\\d+}/travel")
+@RequestMapping("api/group/{groupId:\\d+}/travel")
 public class TravelController {
 
     private final TravelService travelService;

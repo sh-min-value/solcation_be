@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/group/{groupId:\\d+}/account/card/")
+@RequestMapping("api/group/{groupId:\\d+}/account/card/")
 public class CardController {
     private final CardService cardService;
 
