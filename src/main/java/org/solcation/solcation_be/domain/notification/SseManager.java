@@ -32,7 +32,7 @@ public class SseManager {
 
         //15초 주기 하트비트
         ScheduledFuture<?> f = heartbeatPool.scheduleAtFixedRate(
-                () -> sendHeartBeat(userPk, emitter), 0, 15, TimeUnit.SECONDS
+                () -> sendHeartBeat(userPk, emitter), 1, 15, TimeUnit.SECONDS
         );
 
         heartbeatTasks.put(emitter, f);
@@ -70,7 +70,7 @@ public class SseManager {
 
             //sse연결을 에러와 함께 즉시 취소
             try {
-                emitter.completeWithError(e);
+//                emitter.completeWithError(e);
             } catch(Exception ignore) {}
         }
     }
@@ -102,11 +102,14 @@ public class SseManager {
     public void cleanUpEmitter(Long userPk, SseEmitter emitter) {
         //hearbeatTask에서 삭제
         var task = heartbeatTasks.remove(emitter);
+        if(task != null) {task.cancel(true);}
 
-        //task 중지
-        task.cancel(true);
+        var list = emitterList.get(userPk);
+        if (list != null) {
+            list.remove(emitter);
+            if (list.isEmpty()) emitterList.remove(userPk, list);
+        }
 
-        //emitterList에서 삭제
-        emitterList.getOrDefault(userPk, new CopyOnWriteArrayList<>()).remove(emitter);
+        try { emitter.complete(); } catch (Exception ignore) {}
     }
 }

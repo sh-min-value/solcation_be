@@ -2,6 +2,7 @@ package org.solcation.solcation_be.common;
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -16,7 +17,9 @@ import org.springframework.web.HttpMediaTypeException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.NoHandlerFoundException;
@@ -33,6 +36,17 @@ public class GlobalExceptionHandler {
     public ApiResponse<?> handleCustomException(CustomException e) {
         log.error("handleCustomException() in GlobalExceptionHandler throw CustomException: {}", e.getMessage());
         return ApiResponse.fail(e);
+    }
+
+
+    @ExceptionHandler({
+            ClientAbortException.class,
+            AsyncRequestNotUsableException.class,
+            java.io.EOFException.class
+    })
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void ignoreSseDisconnects() {
+        // 스트림 중단은 정상 동작으로 무시
     }
 
     //40001 유효성 검증 검증 예외
