@@ -77,6 +77,7 @@ public class StatsService {
         ZonedTimeRange range = ZonedTimeUtil.custom(travel.getTpStart(), travel.getTpEnd());
 
         return transactionRepository.categorySpent(
+                travel.getTpPk(),
                 range.start(),
                 range.end()
         );
@@ -113,6 +114,7 @@ public class StatsService {
 
         // 내 여행 카테고리 소비
         List<CategorySpentDTO> mine = transactionRepository.categorySpent(
+                travel.getTpPk(),
                 range.start(),
                 range.end()
         );
@@ -160,7 +162,7 @@ public class StatsService {
         ZonedTimeRange range = ZonedTimeUtil.custom(travel.getTpStart(), travel.getTpEnd());
 
         List<CategorySpentDTO> planned = transactionRepository.plannedCategorySpentOfTravel(travelId);
-        List<CategorySpentDTO> actual = transactionRepository.categorySpent(range.start(), range.end());
+        List<CategorySpentDTO> actual = transactionRepository.categorySpent(travel.getTpPk(), range.start(), range.end());
 
         Map<Long, CategorySpentDTO> plannedMap = planned.stream()
                 .collect(Collectors.toMap(CategorySpentDTO::getTcPk, x -> x));
