@@ -19,7 +19,7 @@ import java.util.List;
 
 @Tag(name = "메인 컨트롤러")
 @RestController
-@RequestMapping("/main")
+@RequestMapping("/api/main")
 @RequiredArgsConstructor
 public class MainController {
 

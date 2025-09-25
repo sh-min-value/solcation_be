@@ -15,6 +15,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -27,14 +29,24 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, PageAuth pageAuth) throws Exception {
         var pp = PathPatternRequestMatcher.withDefaults();
-        RequestMatcher groupMatcher = pp.matcher("/group/{groupId:\\d+}/**");
-        RequestMatcher TravelMatcher = pp.matcher("/group/{groupId:\\d+}/travel/{tpPk:\\d+}/**");
-        RequestMatcher TransactionMatcher = pp.matcher("/group/{groupId:\\d+}/account/transaction/{satPk:\\d+}/**");
-        RequestMatcher CardMatcher = pp.matcher("/group/{groupId:\\d+}/account/card/{sacPk:\\d+}/**");
+        RequestMatcher groupMatcher = pp.matcher("/api/group/{groupId:\\d+}/**");
+        RequestMatcher TravelMatcher = pp.matcher("/api/group/{groupId:\\d+}/travel/{tpPk:\\d+}/**");
+        RequestMatcher TransactionMatcher = pp.matcher("/api/group/{groupId:\\d+}/account/transaction/{satPk:\\d+}/**");
+        RequestMatcher CardMatcher = pp.matcher("/api/group/{groupId:\\d+}/account/card/{sacPk:\\d+}/**");
 
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> {})
+                .cors(cors -> {
+                    CorsConfiguration config = new CorsConfiguration();
+                    config.addAllowedOrigin("*");
+                    config.addAllowedMethod("*");
+                    config.addAllowedHeader("*");
+
+                    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                    source.registerCorsConfiguration("/**", config);
+
+                    cors.configurationSource(source);
+                })
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
@@ -43,8 +55,8 @@ public class SecurityConfig {
                         // Swagger & 헬스
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/actuator/health").permitAll()
                         // 인증 발급/회원가입/소셜 콜백 등 공개
-                        .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                         //여행 인증
                         .requestMatchers(TravelMatcher).access(new GroupAuthorizationManager(pageAuth))
                         //트랜잭션 인증

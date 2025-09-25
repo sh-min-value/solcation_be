@@ -3,7 +3,6 @@ package org.solcation.solcation_be.domain.auth;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.solcation.solcation_be.domain.auth.dto.LoginReqDTO;
 import org.solcation.solcation_be.domain.auth.dto.LoginResDTO;
@@ -13,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "인증/인가 컨트롤러")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("api/auth")
 public class AuthController {
     private final AuthService authService;
 
@@ -31,7 +30,7 @@ public class AuthController {
 
     @Operation(summary = "아이디 중복체크")
     @GetMapping("/check-dup")
-    public boolean checkDupId(@PathParam("userId") String userId) {
+    public boolean checkDupId(@RequestParam("userId") String userId) {
         return authService.checkIdDup(userId);
     }
 }

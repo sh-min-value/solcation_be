@@ -2,7 +2,6 @@ package org.solcation.solcation_be.domain.group;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.common.CustomException;
@@ -21,7 +20,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/group")
+@RequestMapping("api/group")
 public class GroupController {
     private final UserRepository userRepository;
     private final GroupService groupService;
@@ -53,13 +52,13 @@ public class GroupController {
 
     @Operation(summary = "그룹 메인 - 그룹 초대 전송")
     @PostMapping("/{groupId:\\d+}/invite")
-    public void inviteMembers(@PathVariable("groupId") Long groupId, @PathParam("tel") String tel) {
+    public void inviteMembers(@PathVariable("groupId") Long groupId, @RequestParam("tel") String tel) {
         groupService.inviteMembers(groupId, tel);
     }
 
     @Operation(summary = "초대자 정보 조회")
     @GetMapping("/{groupId:\\d+}/get-invitee")
-    public UserDTO getInvitee(@PathVariable("groupId") Long groupId, @PathParam("tel") String tel) {
+    public UserDTO getInvitee(@PathVariable("groupId") Long groupId, @RequestParam("tel") String tel) {
         return groupService.getInvitee(groupId, tel);
     }
 }

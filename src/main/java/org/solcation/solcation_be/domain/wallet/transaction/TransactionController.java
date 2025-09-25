@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
-import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solcation.solcation_be.domain.wallet.transaction.dto.*;
@@ -24,13 +23,13 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("group/{groupId:\\d+}/account/transaction")
+@RequestMapping("api/group/{groupId:\\d+}/account/transaction")
 public class TransactionController {
     private final TransactionService transactionService;
 
     @Operation(summary = "전체 거래 내역 렌더링(필터링 포함 - 거래 유형으로 필터링)")
     @GetMapping("/all")
-    public List<TransactionDTO> getTransactionsAll(@PathVariable("groupId") Long groupId, @AuthenticationPrincipal JwtPrincipal principal, @PathParam("tType") @Nullable TRANSACTIONTYPE tType) {
+    public List<TransactionDTO> getTransactionsAll(@PathVariable("groupId") Long groupId, @AuthenticationPrincipal JwtPrincipal principal, @RequestParam("tType") @Nullable TRANSACTIONTYPE tType) {
         return transactionService.getTransactionsAll(groupId, principal, tType);
     }
 
