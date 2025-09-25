@@ -57,6 +57,9 @@ public class SecurityConfig {
                         // 인증 발급/회원가입/소셜 콜백 등 공개
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
+                        // 알림 허용
+                        .requestMatchers("/api/notification/conn").permitAll()
+
                         //여행 인증
                         .requestMatchers(TravelMatcher).access(new GroupAuthorizationManager(pageAuth))
                         //트랜잭션 인증

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "모임통장 계좌 컨트롤러")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("api/group/{groupId:\\d+}/account")
+@RequestMapping("/api/group/{groupId:\\d+}/account")
 public class SharedAccountController {
     private final SharedAccountService sharedAccountService;
 

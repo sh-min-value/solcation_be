@@ -20,7 +20,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("api/group")
+@RequestMapping("/api/group")
 public class GroupController {
     private final UserRepository userRepository;
     private final GroupService groupService;
