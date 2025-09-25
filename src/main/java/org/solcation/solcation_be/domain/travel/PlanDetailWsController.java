@@ -24,7 +24,7 @@ public class PlanDetailWsController{
     private final SnapshotCommitService snapshotCommitService;
 
     // 여행 편집 입장
-    @MessageMapping("api/group/{groupId}/travel/{travelId}/edit/join")
+    @MessageMapping("/api/group/{groupId}/travel/{travelId}/edit/join")
     public JoinPayload join(@DestinationVariable long travelId,
                             @Payload Map<String, Object> payload,
                             SimpMessageHeaderAccessor header) {
@@ -34,7 +34,7 @@ public class PlanDetailWsController{
     }
 
     // 여행 편집 퇴장
-    @MessageMapping("api/group/{groupId}/travel/{travelId}/edit/leave")
+    @MessageMapping("/api/group/{groupId}/travel/{travelId}/edit/leave")
     public void leave(@DestinationVariable long travelId,
                       @Payload Map<String, Object> payload) {
         String userId = (String) payload.get("userId");
@@ -43,7 +43,7 @@ public class PlanDetailWsController{
     }
 
     // 여행 편집 저장
-    @MessageMapping("api/group/{groupId}/travel/{travelId}/edit/save")
+    @MessageMapping("/api/group/{groupId}/travel/{travelId}/edit/save")
     public void save(@DestinationVariable long travelId,
                      @Payload Map<String, Object> payload) {
         String clientId = (String) payload.get("clientId");
@@ -52,7 +52,7 @@ public class PlanDetailWsController{
         editSessionService.leave(travelId, clientId);
     }
 
-    @MessageMapping("api/group/{groupId}/travel/{travelId}/edit/op")
+    @MessageMapping("/api/group/{groupId}/travel/{travelId}/edit/op")
     public void onOp(@DestinationVariable long groupId,
                      @DestinationVariable long travelId,
                      @Payload Map<String, Object> body) {

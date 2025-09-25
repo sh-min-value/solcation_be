@@ -23,7 +23,7 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("api/group/{groupId:\\d+}/account/transaction")
+@RequestMapping("/api/group/{groupId:\\d+}/account/transaction")
 public class TransactionController {
     private final TransactionService transactionService;
 
