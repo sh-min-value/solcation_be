@@ -49,7 +49,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
                 tc.tcCode,
                 coalesce(sum(
                     case
-                        when t.satTime >= :start
+                        when tp.tpPk = :tpPk
+                             and t.satTime >= :start
                              and t.satTime < :endExclusive
                              and t.tcPk is not null
                              and (t.transactionType is null or t.transactionType <> org.solcation.solcation_be.entity.enums.TRANSACTIONTYPE.DEPOSIT)
@@ -60,10 +61,14 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
             )
             from TransactionCategory tc
             left join Transaction t on t.tcPk = tc
+            left join t.gmPk gm
+            left join gm.group g
+            left join g.travels tp
             group by tc.tcPk, tc.tcName, tc.tcCode
             order by tc.tcPk
             """)
-    List<CategorySpentDTO> categorySpent(@Param("start") Instant start,
+    List<CategorySpentDTO> categorySpent(@Param("tpPk") Long tpPk,
+                                         @Param("start") Instant start,
                                          @Param("endExclusive") Instant endExclusive);
 
     // 같은 여행지를 여행한 다른 그룹의 소비 총합
@@ -231,9 +236,11 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
                                 org.solcation.solcation_be.entity.enums.TRANSACTIONTYPE.WITHDRAW,
                                 org.solcation.solcation_be.entity.enums.TRANSACTIONTYPE.CARD
                            )
+                           and g.groupPk = :groupPk
                            and exists (
-                               select 1 from Travel tr
-                               where tr.group.groupPk = :groupPk
+                               select 1
+                               from Travel tr
+                               where tr.group = g
                                  and function('date', function('convert_tz', t.satTime, '+00:00', '+09:00'))
                                      between tr.tpStart and tr.tpEnd
                            )
@@ -243,6 +250,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
                    ), 0)
             from TransactionCategory tc
             left join Transaction t on t.tcPk = tc
+            left join t.gmPk gm
+            left join gm.group g
             group by tc.tcPk, tc.tcName, tc.tcCode
             order by tc.tcPk
             """)
