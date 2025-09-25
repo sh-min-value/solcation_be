@@ -32,9 +32,6 @@ public class NotificationController {
     @Operation(summary = "sse 연결", description = "emitter 생성")
     @GetMapping(value = "/conn", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter connectSse(@AuthenticationPrincipal JwtPrincipal jwtPrincipal) {
-        if (jwtPrincipal == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing or invalid token");
-        }
         return notificationService.connectSse(jwtPrincipal.userPk());
     }
 
