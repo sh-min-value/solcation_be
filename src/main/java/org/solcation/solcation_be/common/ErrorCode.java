@@ -47,7 +47,7 @@ public enum ErrorCode {
     ALREADY_GROUP_MEMBER(40903, HttpStatus.CONFLICT, "이미 그룹에 속해 있는 회원입니다."),
     ALREADY_INVITED(40904, HttpStatus.CONFLICT, "이미 초대가 진행 중인 회원입니다."),
     TRAVEL_ALREADY_STARTED(40905, HttpStatus.CONFLICT, "이미 시작되었거나 종료된 여행입니다."),
-
+    ALREADY_EXIST_USER(40906, HttpStatus.CONFLICT, "이미 존재하는 유저입니다."),
 
     // 410 Gone
     GONE(41000, HttpStatus.GONE, "만료되었습니다."),
