@@ -39,16 +39,6 @@ public class GlobalExceptionHandler {
     }
 
 
-    @ExceptionHandler({
-            ClientAbortException.class,
-            AsyncRequestNotUsableException.class,
-            java.io.EOFException.class
-    })
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void ignoreSseDisconnects() {
-        // 스트림 중단은 정상 동작으로 무시
-    }
-
     //40001 유효성 검증 검증 예외
     @ExceptionHandler({
             MethodArgumentNotValidException.class,
