@@ -31,6 +31,9 @@ public class AuthService {
     /* 회원가입 */
     @Transactional
     public void signUp(SignupReqDTO req) {
+        if(userRepository.existsBUserByTel(req.getTel())) {
+            throw new CustomException(ErrorCode.ALREADY_EXIST_USER);
+        }
         User user = SignupReqDTO.toEntity(req);
         user.setPwEncoding(passwordEncoder.encode(req.getUserPw()));
         userRepository.save(user);
