@@ -40,13 +40,13 @@ public class GroupInfoDTO {
     @NotNull
     private Integer totalMembers;
 
-    //완료된 여정
-    @NotNull
-    private Long finished;
-
     //예정된 여정
     @NotNull
     private Long scheduled;
+
+    //완료된 여정
+    @NotNull
+    private Long finished;
 
     //대기 중인 초대
     @NotNull
