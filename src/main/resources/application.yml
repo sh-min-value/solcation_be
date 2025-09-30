@@ -58,7 +58,7 @@ springdoc:
 cloud:
   s3:
     bucket:
-      name: solcation
+      name: solcationbucket
       upload:
         profile:
           group: images/group_profiles/
