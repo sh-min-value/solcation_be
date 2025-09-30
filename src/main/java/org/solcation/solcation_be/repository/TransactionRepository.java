@@ -57,7 +57,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
                         then t.satAmount
                         else 0
                     end
-                ), 0L)
+                ), 0L) as totalAmount
             )
             from TransactionCategory tc
             left join Transaction t on t.tcPk = tc
@@ -65,7 +65,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
             left join gm.group g
             left join g.travels tp
             group by tc.tcPk, tc.tcName, tc.tcCode
-            order by tc.tcPk
+            order by totalAmount desc
             """)
     List<CategorySpentDTO> categorySpent(@Param("tpPk") Long tpPk,
                                          @Param("start") Instant start,
