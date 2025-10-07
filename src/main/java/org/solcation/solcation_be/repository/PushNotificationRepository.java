@@ -21,8 +21,11 @@ public interface PushNotificationRepository extends JpaRepository<PushNotificati
     @Query(value = """
     select ac.ac_code as acCode,
            g.group_name as groupName,
+           g.group_pk as groupPk,
            gl.user_name as userName,
-           p.pn_title as pnTitle
+           p.pn_title as pnTitle,
+           ac.ac_dest as acDest,
+           p.pn_pk as pnPk
     from push_notification_tb p
     join alarm_category_tb ac on p.ac_pk = ac.ac_pk
     join group_tb g on p.group_pk = g.group_pk
