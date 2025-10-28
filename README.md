@@ -28,7 +28,7 @@
 ## 🚀 Getting Started
 
 ### Requirements
-- [List your project requirements here, e.g., Node.js version, JDK, database, etc.]
+- [JDK 17, Node.js 22, MariaDB, Redis]
 
 ### Backend
 ```bash
